@@ -1,0 +1,31 @@
+# V12 Engines demo app: 2 containers.
+#   api = Python (scoring + replay + genai)    web = nginx (dashboard + /api forwarding)
+# Start / rebuild after a git pull:   docker compose up -d --build
+# Stop and remove:                    docker compose down
+# Watch logs:                         docker compose logs -f
+
+services:
+  api:
+    build:
+      context: .                      # repo root, so the image can copy src/ and requirements.txt
+      dockerfile: deploy/api.Dockerfile
+    restart: unless-stopped           # comes back after a crash or VM reboot
+    environment:
+      MODEL_DIR: /models
+      DATA_DIR: /data
+      STATE_DIR: /state
+    volumes:
+      - /srv/v12e/models:/models:ro               # trained models from Jupyter, read-only
+      - /srv/v12e/data/test.csv:/data/test.csv:ro # ONLY test data on the demo side
+      - /srv/v12e/state:/state                    # writable: review log, etc.
+    # No "ports:" on purpose. Only web can reach the API, over the private Compose network.
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:8080:8080"         # reachable only from the VM itself -> use the SSH tunnel
