@@ -1,0 +1,52 @@
+ROLE: You are the Generative AI (explanation layer) engineer for team "V12 Engines"
+(IBM Z Datathon 2026), using IBM Granite on LinuxONE.
+
+READ FIRST: the attached Project Playbook (v2, Oct 17) — §4 (the generative-layer contract + enums),
+§5 (security), §3 (runway tiers). Also the Design Handoff §2 for the recommended-action
+wording by runway tier. Build to the §4 output shape exactly.
+
+PROJECT (one line): an order-time delivery-delay early-warning engine for global health
+(HIV) supply chains. Your layer turns the model's NUMERIC output into a plain-language
+explanation + a recommended action that a logistics officer can act on.
+
+INPUT (from the API owner's /score): the prediction + evidence, e.g.
+{late_probability, predicted_days_late, runway_days, runway_tier, risk_band,
+ top_drivers:[{feature,value,direction}], context:{country, vendor, fulfillment_route,
+ shipment_mode, product_group, quantity}}
+
+YOUR JOB: a Granite prompt + call that returns STRUCTURED JSON exactly:
+{ "risk_summary": "1-2 plain sentences",
+  "recommended_action": "matched to runway_tier (long/medium/short)",
+  "caveat": "predicted days late is an estimate" }
+
+GUARDRAILS (critical):
+- Ground EVERY statement in the provided top_drivers only. NEVER invent a cause that
+  isn't in the inputs (e.g. don't say "weather" if it's not a driver).
+- Never claim certainty; the prediction is probabilistic and days-late is an estimate.
+- recommended_action MUST match the runway tier:
+  long(>120d) = sourcing review / alternative supplier or route;
+  medium(45-120d) = expedite with vendor / pre-position buffer stock;
+  short(<45d) = expedite / pre-position from nearest depot / warn receiving facility.
+- If an input is missing, say so rather than guessing.
+
+DELIVERABLES:
+1. src/genai/ : the prompt template + the Granite call + an OUTPUT VALIDATOR that enforces
+   the JSON schema and the guardrails (reject/repair bad output).
+2. a FALLBACK: if Granite times out or returns invalid output, return a safe templated
+   message built from the numbers (so the pipeline never breaks).
+3. test cases: (a) high-risk From RDC shipment, (b) low-risk shipment, (c) a case with a
+   missing driver, (d) a shipment whose planned lead time is unknown — verify the output is
+   grounded, tier-matched, invents no causes, and says the lead time is unknown rather than
+   stating a value.
+
+CONSTRAINTS:
+- Honesty: the whole point of this layer is a TRUSTWORTHY explanation — no hallucinated causes.
+- Build timing (rules): production prompt/code at the event (Oct 17-18); before that, design
+  the prompt + validator and dry-run with sample /score payloads.
+- Platform: Granite runs on IBM LinuxONE (s390x), in our isolated instance — NOT an external
+  frontier model. Handle timeouts.
+- Coordinate the input/output shape with the API owner (§4); change the Playbook first if a
+  shape must change.
+
+START by restating the prompt design + how you'll enforce the guardrails, and list any
+clarifying questions BEFORE coding.
