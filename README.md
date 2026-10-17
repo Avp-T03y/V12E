@@ -1,41 +1,59 @@
-# V12 Engines — Delivery-Delay Early Warning for Global Health Supply Chains
+<div align="center">
+
+#  V12 Engines 🚀
+### Order-time delivery-delay early warning for global HIV supply chains
+
+![IBM LinuxONE](https://img.shields.io/badge/IBM-LinuxONE-054ADA)
+![Snap ML](https://img.shields.io/badge/Snap%20ML-boosted%20trees-blue)
+![IBM Granite](https://img.shields.io/badge/IBM-Granite-0f62fe)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688)
+![Event code](https://img.shields.io/badge/Event%20code-SSF2026-orange)
 
 **IBM Z Datathon 2026 · Event code: SSF2026**
 
+<!-- TODO: add a dashboard screenshot or short GIF of the Live view (from the final demo) -->
+<!-- <img src="docs/dashboard.png" width="800" alt="V12 Engines Live view"> -->
+
+</div>
+
+> [!IMPORTANT]
+> **This demo is a replay of 2006–2015 shipments, not a live 2026 feed.** Models train on earlier shipments and are evaluated on later ones; in deployment they would retrain on current data.
+
 > Ride apps predict arrival to the minute. Life-critical health deliveries still have no order-time prediction.
 
-V12 Engines is an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV rapid test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
+V12 Engines is an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
 
 ---
 
 ## The problem
 
-Late ARVs and test kits can mean interrupted HIV treatment. Logistics officers do sense delays through calls and emails with carriers and forwarders, but that signal is manual and inconsistent, and global logistics is disrupted by the unexpected (customs delays, cancelled flights, port congestion). Signals get missed or arrive too late. There is no consistent, order-time risk score.
+Late ARVs and test kits risk interrupted HIV treatment. Logistics officers do sense delays through calls and emails with carriers and forwarders, but that signal is manual and inconsistent, and global logistics is disrupted by the unexpected (customs delays, cancelled flights, port congestion). Signals get missed or arrive too late. There is no consistent, order-time risk score.
 
 ## What it does
 
 1. **Predicts** late probability (classifier) and days late (regressor) at order time.
-2. **Ranks** alerts by risk × quantity × product criticality, shorter runway first among ties. Only the top ~10% by risk is surfaced, to limit alert fatigue.
-3. **Explains** each alert with IBM Granite, grounded only in the model's top drivers (no invented causes).
-4. **Recommends** an action matched to the runway tier (long >120 d, medium 45–120 d, short <45 d).
-5. **Keeps a human in the loop**: Acknowledge / Take action / Dismiss, with a reviewed-by log as an audit trail.
-
-## Data
-
-- **Source:** USAID/PEPFAR SCMS shipment data, 10,324 shipments, 2006–2015, 43 countries. HIV treatment drugs (ARVs) and test kits (not vaccines). Mix: ARV 8,550 · HRDT 1,728 · small malaria set 46.
-- **Label:** late = delivered date > scheduled date. Overall late rate **11.5%** (no-skill baseline 0.115).
-- **Key finding:** delays concentrate by fulfillment route: Direct Drop 5.3% vs From RDC 17.2%; From RDC accounts for 78% of all late shipments.
-- **Split (time-based, no shuffling):** train ≤ 2013 (7,779 rows, 830 late) / test 2014–2015 (2,545 rows, 356 late).
-- Features are leakage-safe: `prior_late_rate_*` uses only shipments delivered before each row's cutoff (365-day window, smoothed with M = 20).
-- **Data source link:** _TODO: add SCMS dataset URL_
+2. **Tracks runway:** how many days remain until the promised delivery, grouped into long (>120 d), medium (45–120 d), and short (<45 d) tiers.
+3. **Ranks** alerts by risk × quantity × product criticality, shorter runway first among ties. Only the top ~10% by risk is surfaced, to limit alert fatigue.
+4. **Explains** each alert with IBM Granite, grounded only in the model's top drivers. Output is checked by a validator, and a templated fallback built from the numbers is used if Granite times out or returns invalid output.
+5. **Recommends** an action matched to the runway tier.
+6. **Keeps a human in the loop:** Acknowledge / Take action / Dismiss, with a "Reviewed by [officer] · time" log that serves as the audit trail.
 
 ## Architecture
 
-```
-SCMS data -> features -> 2 Snap ML models -> scoring API -> Granite explanation -> dashboard
+```mermaid
+flowchart LR
+  D[("USAID/PEPFAR<br/>2006-2015 shipments")] --> F["Feature pipeline<br/>build_features"]
+  F --> T["Training<br/>Snap ML classifier + regressor"]
+  subgraph POD["IBM LinuxONE (s390x) - Docker containers (v12e)"]
+    R["Replay<br/>historical shipments"] --> A["Scoring API<br/>FastAPI"]
+    A <--> G["IBM Granite<br/>grounded explanation"]
+    A --> W["Dashboard<br/>nginx + Chart.js"]
+  end
+  T -- "model artifacts" --> A
+  W --> O["Logistics officer<br/>Acknowledge / Take action / Dismiss"]
 ```
 
-![Architecture](docs/architecture.png)
+<!-- TODO: replace or supplement with Daniel's final one-page flowchart: docs/architecture.png -->
 
 | Component | Folder | Role |
 |---|---|---|
@@ -46,13 +64,22 @@ SCMS data -> features -> 2 Snap ML models -> scoring API -> Granite explanation 
 | Explanation layer | `src/genai/` | IBM Granite (structured JSON), output validator, templated fallback |
 | Dashboard | `src/web/` | HTML + Chart.js: Live, Model, Platform views, served by nginx |
 
-All services run in one Podman pod (`v12e`) on a single LinuxONE VM. nginx forwards `/api/*` to the scoring API (one address, no CORS).
+All services run as Docker containers (`scoring-api`, `genai`, `replay`, `web`) on a single LinuxONE VM. nginx forwards `/api/*` to the scoring API (one address, no CORS).
 
 ## Dashboard views
 
-- **Live:** replayed shipments scored as they "arrive", alert cards with probability, days late, runway badge, drivers, explanation, action, and human-in-the-loop buttons.
-- **Model:** one time-split scorecard (PR curve, confusion matrix, feature importance, baseline comparison) plus Correct / Type I / Type II error breakdown.
-- **Platform:** environment evidence (`lscpu`, `podman ps`, machine type, NNPA). Items not yet verified are marked "To confirm".
+- **Live:** replayed shipments scored as they "arrive"; alert cards show probability, days late, runway badge (redder as runway shrinks), top drivers, explanation, recommended action, and the human-in-the-loop buttons.
+- **Model:** one time-split scorecard (PR curve, confusion matrix, feature importance, baseline comparison) plus the Correct / Type I / Type II error breakdown.
+- **Platform:** environment evidence (`lscpu`, `docker ps`, machine type, NNPA). Items not yet verified are marked "To confirm".
+
+## Data
+
+- **Source:** USAID/PEPFAR SCMS shipment data: 10,324 shipments, 2006–2015, 43 countries. HIV treatment drugs (ARVs) and test kits, not vaccines. Mix: ARV 8,550 · HRDT 1,728 · small malaria set 46.
+- **Label:** late = delivered date > scheduled date. Overall late rate **11.5%** (no-skill baseline 0.115).
+- **Key finding:** delays concentrate by fulfillment route: Direct Drop 5.3% vs From RDC 17.2%; From RDC accounts for 78% of all late shipments.
+- **Split (chronological, no shuffling):** train ≤ 2013 (7,779 rows, 830 late) / test 2014–2015 (2,545 rows, 356 late).
+- **Leakage-safe features:** `prior_late_rate_*` uses only shipments delivered before each row's cutoff (365-day window, smoothed with M = 20).
+- **Data source link:** _TODO: add SCMS dataset URL_
 
 ## Results
 
@@ -73,17 +100,22 @@ Days-late regressor MAE: _TBD_ days (an estimate, not a guarantee).
 |---|---|---|
 | _TBD %_ | _TBD %_ | _TBD %_ |
 
+Full details: [`docs/model_card.md`](docs/model_card.md).
+
 ## How to run
 
-> _Pending: confirm exact commands with the Platform and API owners; see their runbooks in `docs/`._
+> _Pending: confirm exact commands with Ethan (Platform) and Adi (Pipeline); see their runbooks in `docs/`._
+
+<details>
+<summary>Deploy on LinuxONE (click to expand)</summary>
 
 ```bash
 # 1. On the LinuxONE VM (event code SSF2026, "-datathon" image, "AI Lab" flavor)
 git clone <repo-url> && cd <repo>
 
-# 2. Build and start the Podman pod "v12e" (scoring-api, genai, replay, web)
-#    TODO: replace with the real pod start script path
-./deploy/start_pod.sh
+# 2. Build and start the Docker containers (scoring-api, genai, replay, web)
+#    TODO: replace with the real start command (e.g. a compose file or script path)
+./deploy/start.sh
 
 # 3. From your laptop, open an SSH tunnel to the dashboard
 ssh -L 8080:localhost:8080 <user>@<server-ip>
@@ -93,6 +125,8 @@ ssh -L 8080:localhost:8080 <user>@<server-ip>
 
 Data, models, and state live under `/srv/v12e/{data,models,state}`; models are mounted read-only into containers.
 
+</details>
+
 ## Security (IBM Z)
 
 We use the platform's security rather than building our own. Status reflects what we actually enabled:
@@ -100,7 +134,7 @@ We use the platform's security rather than building our own. Status reflects wha
 | Item | Status |
 |---|---|
 | TLS on the scoring API | _Verified / To confirm_ |
-| Isolated container (Podman) | _Verified / To confirm_ |
+| Isolated container (Docker) | _Verified / To confirm_ |
 | IBM Z pervasive encryption | _To confirm_ |
 | Quantum-safe cryptography | Not demonstrated (roadmap) |
 
@@ -108,7 +142,7 @@ Data is de-identified, shipment-level only (no patient data). The human-in-the-l
 
 ## Honest limits
 
-- **This demo is a replay of 2006–2015 shipments, not a live 2026 feed.** The model trains on earlier shipments and is evaluated on later ones; in deployment it would retrain on current data.
+- **Replay, not live:** the demo replays 2006–2015 shipments; it is not a live 2026 feed.
 - The late rate is **non-stationary** (it swings by year), which is why retraining on recent data matters.
 - Predicted days late is an **estimate**, not a guarantee. Predictions are probabilistic.
 - The dataset has no dispatch date, in-transit location, or temperature, so we do not model transit time or cold chain.
@@ -118,7 +152,16 @@ Data is de-identified, shipment-level only (no patient data). The human-in-the-l
 
 ## Tech stack
 
-IBM LinuxONE (s390x, no GPU) · Snap ML · scikit-learn (baseline) · IBM Granite · FastAPI · Podman · nginx · HTML + Chart.js
+IBM LinuxONE (s390x, no GPU) · Snap ML · scikit-learn (baseline) · IBM Granite · FastAPI · Docker · nginx · HTML + Chart.js
+
+## Documentation
+
+| Doc | Path |
+|---|---|
+| Model / decision card | [`docs/model_card.md`](docs/model_card.md) |
+| Platform evidence | `docs/evidence/` |
+| Deployment runbook | _TODO: add path_ |
+| Demo video script | _TODO: add path_ |
 
 ## Open-source and data links
 
@@ -128,18 +171,15 @@ IBM LinuxONE (s390x, no GPU) · Snap ML · scikit-learn (baseline) · IBM Granit
 - FastAPI: _TODO_
 - Chart.js: _TODO_
 
-## Model / decision card
-
-See [`docs/model_card.md`](docs/model_card.md): model version, what it predicts, how it was evaluated, and its limits.
-
 ## Team
 
 **V12 Engines** · IBM Z Datathon 2026 · Event code **SSF2026**
+
 | Member | Role |
 |---|---|
-| Ethan Ong | Platform: demo VM, Podman pod, SSH tunnel, platform evidence |
-| Jihye Noh | Data & preprocessing: data audit, labels, features, time-based split, baselines |
-| Vishnu Jegan Babu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
-| Aditya Venkata Pavuluri | Pipeline: scoring API, score log, replay, generative layer |
-| Indra Erdenebat | Research & docs: source research, README, data and model cards, decision log, video script |
-| Jongmin (Daniel) Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+| Ethan | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
+| Jihye | Data & preprocessing: data audit, labels, features, time-based split, baselines |
+| Vishnu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
+| Adi | Pipeline: scoring API, score log, replay, generative layer |
+| Indra | Research & docs: source research, README, data and model cards, decision log, video script |
+| Daniel | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
