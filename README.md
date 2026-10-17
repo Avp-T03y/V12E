@@ -177,9 +177,9 @@ IBM LinuxONE (s390x, no GPU) · Snap ML · scikit-learn (baseline) · IBM Granit
 
 | Member | Role |
 |---|---|
-| Ethan | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
-| Jihye | Data & preprocessing: data audit, labels, features, time-based split, baselines |
-| Vishnu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
-| Adi | Pipeline: scoring API, score log, replay, generative layer |
-| Indra | Research & docs: source research, README, data and model cards, decision log, video script |
-| Daniel | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+| Ethan Ong | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
+| Jihye Noh | Data & preprocessing: data audit, labels, features, time-based split, baselines |
+| Vishnu Jegan Babu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
+| Aditya Venkata Pavuluri | Pipeline: scoring API, score log, replay, generative layer |
+| Indra Erdenebat | Research & docs: source research, README, data and model cards, decision log, video script |
+| Jongmin (Daniel) Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
