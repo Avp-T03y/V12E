@@ -1,0 +1,18 @@
+{
+  "fulfillment_route": 0.09749618342222482,
+  "vendor": 0.03812861400735322,
+  "prior_late_rate_vendor": 0.029755886617819784,
+  "country": 0.024938489987159817,
+  "planned_lead_time_days": 0.023553084267245738,
+  "quantity": 0.013920307469219984,
+  "shipment_mode": 0.0104652538361515,
+  "prior_late_rate_fulfillment_route": 0.008778664325518614,
+  "product_group": 0.0072238893706520705,
+  "prior_late_rate_country": 0.005928542727051544,
+  "prior_known_vendor": 0.0008479041957854206,
+  "prior_known_country": 0.00022541463250338455,
+  "managed_by": 0.0,
+  "decision_date_known": 0.0,
+  "prior_known_fulfillment_route": 0.0,
+  "manufacturing_site": -0.003456175433351971
+}
