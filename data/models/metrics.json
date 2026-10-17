@@ -1,0 +1,18 @@
+{
+  "late_rate": 0.1399,
+  "no_skill": 0.115,
+  "pr_auc": 0.3435,
+  "recall_at_threshold": 0.2809,
+  "confusion": {
+    "tp": 100,
+    "fp": 165,
+    "fn": 256,
+    "tn": 2024
+  },
+  "error_breakdown": {
+    "correct": 0.8346,
+    "type1": 0.0648,
+    "type2": 0.1006
+  },
+  "split": "train<=2013 / test 2014-2015"
+}

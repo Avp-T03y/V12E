@@ -1,0 +1,37 @@
+{
+  "model_version": "v12e-20261017-snapml-8c040306",
+  "backend": "snapml",
+  "features": [
+    "country",
+    "vendor",
+    "fulfillment_route",
+    "shipment_mode",
+    "product_group",
+    "managed_by",
+    "manufacturing_site",
+    "quantity",
+    "planned_lead_time_days",
+    "decision_date_known",
+    "prior_late_rate_country",
+    "prior_late_rate_vendor",
+    "prior_late_rate_fulfillment_route",
+    "prior_known_country",
+    "prior_known_vendor",
+    "prior_known_fulfillment_route"
+  ],
+  "cat_features": [
+    "country",
+    "vendor",
+    "fulfillment_route",
+    "shipment_mode",
+    "product_group",
+    "managed_by",
+    "manufacturing_site"
+  ],
+  "missing_fill": -1.0,
+  "operating_threshold": 0.6810544760543603,
+  "threshold_rule": "recall>=0.7 on 2013 validation slice",
+  "trained_at": "2026-10-17T18:49:48.872174+00:00",
+  "train_rows": 7779,
+  "note": "predicted days late is an estimate, not a guarantee"
+}
