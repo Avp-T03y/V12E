@@ -7,4 +7,4 @@ V12 Engines is an **order-time delivery-delay early-warning engine** for global 
 The models are trained on **10,324 USAID/PEPFAR shipments from 2006–2015**: trained on shipments through 2013 and evaluated on held-out 2014–2015 shipments.
 
 > [!IMPORTANT]
-> The demo is a **replay of historical data, not a live 2026 feed**. In deployment, the models retrain on current data. Predicted days late is an **estimate**, and a **human always decides**.
+> This demo is a **replay of historical data, not a live 2026 feed**. In deployment, the models retrain on current data. Predicted days late is an **estimate**, and a **human always decides**.
