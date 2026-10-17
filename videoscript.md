@@ -22,11 +22,11 @@ V12 Engines is an order-time delivery-delay early-warning engine for global HIV 
 
 | Time | Beat | On screen | Speaker |
 |---|---|---|---|
-| 0:00–1:00 | Opening: hook, stakes, honest problem, data | Split screen (ride-app countdown vs shipment map captioned "Replay of 2006–2015 data"), officer with phone/email, route chart | TBD |
-| 1:00–1:40 | Solution | Architecture flowchart, then one alert card (probability, runway badge, drivers, explanation, action) | TBD |
+| 0:00–1:00 | Opening: hook, stakes, honest problem, data | Split screen (ride-app countdown vs shipment map captioned "Replay of 2006–2015 data"), officer with phone/email, route chart | Vishnu |
+| 1:00–1:40 | Solution | Architecture flowchart, then one alert card (probability, runway badge, drivers, explanation, action) | Vishnu |
 | 1:40–2:10 | Why IBM Z + live demo | Running replay, HITL buttons, Platform view with real evidence | Platform and dashboard owners |
-| 2:10–2:35 | Results | Model view: PR curve, confusion matrix, Error breakdown | TBD |
-| 2:35–3:00 | Why us + close | Three differentiators on screen, title card with SSF2026 | TBD |
+| 2:10–2:35 | Results | Model view: PR curve, confusion matrix, Error breakdown | Vishnu |
+| 2:35–3:00 | Why us + close | Three differentiators on screen, title card with SSF2026 | Vishnu |
 
 Show a visible time check at 1:00 and 2:00. Record a backup clip of the working demo.
 
@@ -38,15 +38,15 @@ Show a visible time check at 1:00 and 2:00. Record a backup clip of the working 
 
 > A ride app can tell you your car arrives in four minutes. But for life-critical health deliveries, there is still no prediction at the moment an order is placed.
 >
-> The stakes are treatment continuity: when HIV medicines and test kits arrive late, patients risk interrupted treatment, and interruption is linked to worse outcomes, including a higher risk of death. Our aim is to give officers earlier warning so they can act.
+> The stakes are treatment continuity: when HIV medicines and test kits arrive late, patients risk interrupted treatment, and interruption is linked to worse outcomes, including a higher risk of death. Our aim is to give officers earlier warning so they can act accordingly.
 >
 > Logistics officers do sense delays through calls and emails with carriers and forwarders. But that signal is manual and inconsistent, and global logistics is hit by the unexpected: customs holds, cancelled flights, port congestion. Warnings get missed or come too late.
 >
-> That is where we come in. We are V12 Engines. We use 10,324 real USAID and PEPFAR shipments from 2006 to 2015. About 11.5 percent arrived late, and the delays are not random: shipments routed From RDC make up 78 percent of all late deliveries.
+> That is where we come in. We are V12 Engines. We used 10,324 real USAID and PEPFAR shipments from 2006 to 2015. About 11.5 percent arrived late, and the delays are not random: shipments routed From RDC make up 78 percent of all late deliveries.
 
 ### 2. SOLUTION (1:00–1:40)
 
-> The moment an order is placed, two Snap ML models score it: one predicts the probability of being late, the other estimates how many days late. IBM Granite explains why, using only the model's top drivers, and recommends an action matched to the runway: how many days remain until the promised delivery. The dashboard ranks alerts by risk, and a logistics officer makes the final call.
+> So here is the solution. The moment an order is placed, two Snap ML models score it: one predicts the probability of being late, the other estimates how many days late. IBM Granite explains why, using only the model's top drivers, and recommends an action matched to the runway: how many days remain until the promised delivery. The dashboard ranks alerts by risk, and a logistics officer makes the final call.
 
 ### 3. WHY IBM Z + LIVE DEMO (1:40–2:10)
 
@@ -64,9 +64,24 @@ Show a visible time check at 1:00 and 2:00. Record a backup clip of the working 
 
 ---
 
-## D. "Why us": competitor framing (sourced)
+## D. "Why us":How V12 Engines Compares to Market Alternatives competitor framing (sourced)
 
-Rules: describe what each alternative says it does, cite the source, compare on facts, and make no claim about what a product "can't" do. Vendor statements are the vendors' own claims.
+1. Manual Tracking (Calls & Emails with Carriers / Forwarders)
+What it does: Relies on human knowledge, phone calls, and email follow-ups with carriers to sense delays.
+Limitations: Manual, inconsistent, and warnings arrive too late when unexpected disruptions hit (e.g., customs holds, port congestion, or cancelled flights).
+>V12 Engines Advantage: Automatically scores 100% of shipments the exact moment an order is placed, eliminating manual guesswork and catching risks upfront.
+
+2. In-Transit Tracking Platforms (project44 & FourKites)
+What they do: Provide real-time visibility and predictive ETAs using active, in-transit signals—such as GPS tracking, IoT sensors, carrier telematics, and AIS ocean positioning.
+Limitations: They predict during transit. Once a shipment is already en route, the window of time to reroute or prevent an inventory stockout is significantly reduced.
+>V12 Engines Advantage:Predicts at order time using only order-time attributes—before the cargo ever moves.   Gives health supply chain teams maximum "runway" (lead time) to take preventative action.
+Note: V12 Engines does not claim to replace or beat their in-transit ETA accuracy; rather, it complements them by addressing the crucial order-placement moment.
+
+3. Enterprise Planning Suites (SAP Integrated Business Planning / SAP IBP)
+What they do: Broad, macro-level supply chain management covering Sales & Operations Planning (S&OP), demand sensing, inventory optimization, and general network visibility.
+Limitations: Designed for high-level enterprise planning rather than delivering immediate, shipment-level delay predictions.
+
+>V12 Engines Advantage: A narrow, hyper-focused risk-alert engine tailored specifically for critical health supply chains, providing immediate actionable explanations powered by IBM Granite. 
 
 | Alternative | What it does (per its own materials) | How we differ (safe wording) | Source |
 |---|---|---|---|
