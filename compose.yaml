@@ -16,7 +16,7 @@ services:
       STATE_DIR: /state
     volumes:
       - /srv/v12e/models:/models:ro               # trained models from Jupyter, read-only
-      - /srv/v12e/data/test.csv:/data/test.csv:ro # ONLY test data on the demo side
+      - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro # ONLY test data (v3) on the demo side
       - /srv/v12e/state:/state                    # writable: review log, etc.
     # No "ports:" on purpose. Only web can reach the API, over the private Compose network.
 
