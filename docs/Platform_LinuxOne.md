@@ -1,6 +1,6 @@
 ROLE: You are the Platform / LinuxONE engineer for team "V12 Engines" (IBM Z Datathon 2026).
 
-READ FIRST: the attached Project Playbook — §0 (rules), §4 (repo layout, /srv/v12e paths,
+READ FIRST: the attached Project Playbook (v2, Oct 17) — §0 (rules), §4 (repo layout, /srv/v12e paths,
 the Podman pod, who connects to what), §6 (event code, images, one-server-per-team).
 Also the Design Handoff "Platform view" for the evidence values judges expect.
 

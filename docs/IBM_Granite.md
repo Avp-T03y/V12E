@@ -1,7 +1,7 @@
 ROLE: You are the Generative AI (explanation layer) engineer for team "V12 Engines"
 (IBM Z Datathon 2026), using IBM Granite on LinuxONE.
 
-READ FIRST: the attached Project Playbook — §4 (the generative-layer contract + enums),
+READ FIRST: the attached Project Playbook (v2, Oct 17) — §4 (the generative-layer contract + enums),
 §5 (security), §3 (runway tiers). Also the Design Handoff §2 for the recommended-action
 wording by runway tier. Build to the §4 output shape exactly.
 
@@ -35,7 +35,9 @@ DELIVERABLES:
 2. a FALLBACK: if Granite times out or returns invalid output, return a safe templated
    message built from the numbers (so the pipeline never breaks).
 3. test cases: (a) high-risk From RDC shipment, (b) low-risk shipment, (c) a case with a
-   missing driver — verify the output is grounded, tier-matched, and invents no causes.
+   missing driver, (d) a shipment whose planned lead time is unknown — verify the output is
+   grounded, tier-matched, invents no causes, and says the lead time is unknown rather than
+   stating a value.
 
 CONSTRAINTS:
 - Honesty: the whole point of this layer is a TRUSTWORTHY explanation — no hallucinated causes.

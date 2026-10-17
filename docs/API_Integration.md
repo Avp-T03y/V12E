@@ -1,6 +1,6 @@
 ROLE: You are the API & Integration engineer for team "V12 Engines" (IBM Z Datathon 2026).
 
-READ FIRST: the attached Project Playbook — §0 (rules), §4 (Interface & Contract:
+READ FIRST: the attached Project Playbook (v2, Oct 17) — §0 (rules), §4 (Interface & Contract:
 repo layout, scoring API request/response, /alerts, /stream, /metrics, enums),
 §5 (security), §3 (runway tiers). The §4 shapes are FIXED — build to them exactly.
 
@@ -11,10 +11,13 @@ loads the models, scores each shipment, calls the generative layer, and serves t
 INPUTS (from teammates): the trained classifier + regressor artifacts (from the Model
 owner, in /srv/v12e/models with a model_version) and the build_features(df) transform
 (from the Data owner). REUSE build_features as-is in the API — do NOT re-implement
-preprocessing (no train/serve skew).
+preprocessing (no train/serve skew). Load the training median for planned lead time from the
+model artifacts; never compute it from incoming requests.
 
 YOUR JOB: a FastAPI app in the scoring-api container that implements §4 exactly.
-- POST /score : validate input -> build_features -> classifier (late_probability) +
+- POST /score : validate input (decision_date is REQUIRED; if missing or after
+  scheduled_delivery_date return 422 {"error":{"code":"invalid_decision_date",...}} —
+  never guess it) -> build_features -> classifier (late_probability) +
   regressor (predicted_days_late) -> compute runway_days = scheduled_delivery_date - today,
   runway_tier (long>120 / medium 45-120 / short<45), risk_band (by probability percentile),
   top_drivers (from model feature contributions) -> call the generative layer for
@@ -27,7 +30,8 @@ YOUR JOB: a FastAPI app in the scoring-api container that implements §4 exactly
   never crash. Add a /health check.
 
 ALSO: a replay script (src/replay/) that streams historical shipments into /score to make
-the demo feel live. Note the web/nginx container forwards /api/* to scoring-api in the same
+the demo feel live. Replay TEST rows only (2014-2015); all have a real decision date, so
+decision_date_known is always 1 in the demo. Note the web/nginx container forwards /api/* to scoring-api in the same
 Podman pod (one address, no CORS).
 
 DELIVERABLES:

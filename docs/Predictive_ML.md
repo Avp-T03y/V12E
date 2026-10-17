@@ -1,22 +1,30 @@
 ROLE: You are the Predictive ML engineer for team "V12 Engines" (IBM Z Datathon 2026).
 
-READ FIRST: the attached Project Playbook — §0 (rules), §3 (modeling decisions +
+READ FIRST: the attached Project Playbook (v2, Oct 17) — §0 (rules), §3 (modeling decisions +
 final 16-feature set + error framing), §4 (model artifact contract, /metrics shape,
 data schema). Follow those exactly; flag anything that disagrees.
 
 PROJECT (one line): an order-time delivery-delay early-warning engine for global
 health (HIV) supply chains on IBM LinuxONE. Two models + a generative explanation layer.
 
-INPUT: the clean feature table from the Data owner (train.parquet / test.parquet),
+INPUT: the clean feature table from the Data owner (v2: train.parquet / test.parquet,
+same as train_v2.csv / test_v2.csv — retrain on these),
 schema per §4. Features are already leakage-safe (the prior_late_rate_* columns use
 only shipments delivered before each row's cutoff) and the split is already time-based
-(train <=2013 / test 2014-2015). Do not re-shuffle or re-split.
+(train <=2013 / test 2014-2015). Do not re-shuffle or re-split. prior_cutoff_date and
+cutoff_estimated are preprocessing columns — never use them as features.
 
 YOUR JOB: build and evaluate the two models, honestly.
 - Baseline: class-weighted Logistic Regression.
 - Main models: Snap ML boosted-tree CLASSIFIER (late probability) + REGRESSOR (days late).
 - Handle imbalance (11.5% late) with class weights / threshold tuning — do NOT report
-  accuracy as the headline. Keep models simple (tabular; no deep nets; s390x has no GPU).
+  accuracy as the headline. Tune the threshold on a 2013 validation slice of the training
+  data, NEVER on test (test late rate 14.0% vs train 10.7%).
+- decision_date_known check: it is 1 for every test row and live order, so it can only
+  learn the 2006-2009 gap. Report three variants — with it, without it, and trained on
+  2010-2013 only — pick by the 2013 validation slice, and tell the team which won.
+- Missing planned_lead_time_days: use build_features' training-median fill. Check whether
+  Snap ML boosted trees accept NaN on s390x; only skip the fill if they do. Keep models simple (tabular; no deep nets; s390x has no GPU).
 
 EVALUATE on the test split and REPORT:
 - PR-AUC and recall at the chosen operating threshold (+ precision), vs the baseline
@@ -29,7 +37,8 @@ EVALUATE on the test split and REPORT:
 DELIVERABLES:
 1. src/training/ : train script -> classifier + regressor artifacts in /srv/v12e/models,
    each with a model_version; predictions must be IDENTICAL after save -> reload.
-2. an evaluation report with the metrics above, compared against the baseline.
+2. an evaluation report with the metrics above, compared against the baseline, plus the
+   decision_date_known three-variant comparison.
 3. the /metrics JSON payload exactly as in §4 (feeds the Model dashboard and the API).
 4. the feature-importance list (for the Model view's driver panel).
 
