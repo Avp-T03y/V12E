@@ -1,7 +1,0 @@
-# Python 3.9-3.12 (snapml publishes wheels for these only)
-numpy>=1.23
-pandas>=1.5
-scikit-learn>=1.2
-# Snap ML: wheels for Linux x86_64 / s390x (IBM Z, LinuxONE) / ppc64le and Intel macOS.
-# Optional locally; the model falls back to scikit-learn when it is not installed.
-snapml>=1.17; platform_machine == "s390x" or platform_machine == "x86_64" or platform_machine == "ppc64le"
