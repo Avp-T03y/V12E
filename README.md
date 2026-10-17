@@ -1,6 +1,6 @@
 <div align="center">
 
-#  V12 Engines 🚀
+# 🚀 V12 Engines
 ### Order-time delivery-delay early warning for global HIV supply chains
 
 ![IBM LinuxONE](https://img.shields.io/badge/IBM-LinuxONE-054ADA)
@@ -21,7 +21,7 @@
 
 > Ride apps predict arrival to the minute. Life-critical health deliveries still have no order-time prediction.
 
-V12 Engines created an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
+V12 Engines is an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
 
 ---
 
@@ -29,7 +29,7 @@ V12 Engines created an **order-time delivery-delay early-warning engine** for gl
 
 Late ARVs and test kits risk interrupted HIV treatment. Logistics officers do sense delays through calls and emails with carriers and forwarders, but that signal is manual and inconsistent, and global logistics is disrupted by the unexpected (customs delays, cancelled flights, port congestion). Signals get missed or arrive too late. There is no consistent, order-time risk score.
 
-## What our system does
+## What it does
 
 1. **Predicts** late probability (classifier) and days late (regressor) at order time.
 2. **Tracks runway:** how many days remain until the promised delivery, grouped into long (>120 d), medium (45–120 d), and short (<45 d) tiers.
@@ -75,7 +75,7 @@ All services run as Docker containers (`scoring-api`, `genai`, `replay`, `web`) 
 ## Data
 
 - **Source:** USAID/PEPFAR SCMS shipment data: 10,324 shipments, 2006–2015, 43 countries. HIV treatment drugs (ARVs) and test kits, not vaccines. Mix: ARV 8,550 · HRDT 1,728 · small malaria set 46.
-- **Label:** late = delivered date > scheduled date. Overall late rate **11.5%** (no-skill baseline 0.115).
+- **Label:** late = delivered date > scheduled date. Overall late rate **11.5%** (train 10.7%, test 14.0%).
 - **Key finding:** delays concentrate by fulfillment route: Direct Drop 5.3% vs From RDC 17.2%; From RDC accounts for 78% of all late shipments.
 - **Split (chronological, no shuffling):** train ≤ 2013 (7,779 rows, 830 late) / test 2014–2015 (2,545 rows, 356 late).
 - **Leakage-safe features:** `prior_late_rate_*` uses only shipments delivered before each row's cutoff (365-day window, smoothed with M = 20).
@@ -85,20 +85,24 @@ All services run as Docker containers (`scoring-api`, `genai`, `replay`, `web`) 
 
 > Numbers below come directly from the model's `/metrics` output on the 2014–2015 test split. **Fill in only after the final training run; do not estimate.**
 
-| Metric | Baseline (class-weighted LR) | Snap ML classifier |
-|---|---|---|
-| PR-AUC (no-skill = 0.115) | _TBD_ | _TBD_ |
-| Recall at operating threshold | _TBD_ | _TBD_ |
-| Precision at operating threshold | _TBD_ | _TBD_ |
-| Recall in top 10% by predicted risk | _TBD_ | _TBD_ |
+| Metric (test 2014–2015) | No skill | Baseline: class-weighted LR | Baseline: route lookup | Snap ML classifier |
+|---|---|---|---|---|
+| PR-AUC | 0.140 (= test late rate) | 0.163 | 0.297 | _TBD_ |
+| Recall at operating threshold | n/a | 0.118 | 0.711 | _TBD_ |
+| Precision at operating threshold | n/a | 0.113 | 0.299 | _TBD_ |
+| Share of shipments flagged | n/a | 14.7% | 33.2% | _TBD_ |
+| Recall in top 10% by predicted risk | 0.100 | 0.020 | 0.229 | _TBD_ |
 
+Baseline figures are from `baseline_report.json` (run Oct 17). The route-lookup baseline scores each shipment by its fulfillment route's prior late rate. Its high recall comes from flagging a third of all shipments, so compare models at the same flagged share (top 10%) rather than at their own thresholds.
 Days-late regressor MAE: _TBD_ days (an estimate, not a guarantee).
 
 **Error framing:** we minimize errors rather than maximize accuracy. Type II (predicted on time, actually late) is the costliest, because it is a missed warning, so we favor recall. Type I (false alarm) drives alert fatigue.
 
-| Correct | Type I (false alarm) | Type II (missed late) |
-|---|---|---|
-| _TBD %_ | _TBD %_ | _TBD %_ |
+| Model | Correct | Type I (false alarm) | Type II (missed late) |
+|---|---|---|---|
+| Baseline: class-weighted LR | 74.7% | 13.0% | 12.3% |
+| Baseline: route lookup | 72.7% | 23.3% | 4.1% |
+| Snap ML classifier | _TBD %_ | _TBD %_ | _TBD %_ |
 
 Full details: [`docs/model_card.md`](docs/model_card.md).
 
@@ -177,9 +181,19 @@ IBM LinuxONE (s390x, no GPU) · Snap ML · scikit-learn (baseline) · IBM Granit
 
 | Member | Role |
 |---|---|
+| Ethan | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
+| Jihye | Data & preprocessing: data audit, labels, features, time-based split, baselines |
+| Vishnu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
+| Adi | Pipeline: scoring API, score log, replay, generative layer |
+| Indra | Research & docs: source research, README, data and model cards, decision log, video script |
+| Daniel | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+
+| Member | Role |
+|---|---|
 | Ethan Ong | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
 | Jihye Noh | Data & preprocessing: data audit, labels, features, time-based split, baselines |
 | Vishnu Jegan Babu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
 | Aditya Venkata Pavuluri | Pipeline: scoring API, score log, replay, generative layer |
 | Indra Erdenebat | Research & docs: source research, README, data and model cards, decision log, video script |
 | Jongmin (Daniel) Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+🚀
