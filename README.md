@@ -21,7 +21,7 @@
 
 > Ride apps predict arrival to the minute. Life-critical health deliveries still have no order-time prediction.
 
-V12 Engines is an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
+V12 Engines created an **order-time delivery-delay early-warning engine** for global HIV supply chains (antiretroviral medicines and HIV test kits), running on **IBM LinuxONE (s390x)**. When a shipment is ordered, it predicts the **probability it will be late** and **how many days late**, explains the alert in plain language, and recommends an action. **A logistics officer makes the final call.**
 
 ---
 
@@ -29,7 +29,7 @@ V12 Engines is an **order-time delivery-delay early-warning engine** for global 
 
 Late ARVs and test kits risk interrupted HIV treatment. Logistics officers do sense delays through calls and emails with carriers and forwarders, but that signal is manual and inconsistent, and global logistics is disrupted by the unexpected (customs delays, cancelled flights, port congestion). Signals get missed or arrive too late. There is no consistent, order-time risk score.
 
-## What it does
+## What our system does
 
 1. **Predicts** late probability (classifier) and days late (regressor) at order time.
 2. **Tracks runway:** how many days remain until the promised delivery, grouped into long (>120 d), medium (45–120 d), and short (<45 d) tiers.
