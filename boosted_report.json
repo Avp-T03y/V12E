@@ -1,0 +1,644 @@
+{
+  "backend": "sklearn",
+  "features": [
+    "quantity",
+    "planned_lead_time_days",
+    "lead_time_missing",
+    "prior_excess_country",
+    "prior_excess_vendor",
+    "prior_excess_fulfillment_route",
+    "prior_known_country",
+    "prior_known_vendor",
+    "prior_known_fulfillment_route"
+  ],
+  "training_era": "2010-2013",
+  "validation": {
+    "scheme": "rolling origin",
+    "years": [
+      2011,
+      2012,
+      2013
+    ],
+    "candidates": {
+      "logistic_relative_priors_only (benchmark)": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3052,
+            "lift": 1.3,
+            "recall_top10": 0.0672,
+            "precision_top10": 0.1584,
+            "recall_monthly10": 0.1345,
+            "precision_monthly10": 0.2963
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1033,
+            "lift": 1.3,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.1089,
+            "precision_monthly10": 0.084
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2296,
+            "lift": 1.28,
+            "recall_top10": 0.1184,
+            "precision_top10": 0.2126,
+            "recall_monthly10": 0.1272,
+            "precision_monthly10": 0.2214
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2127,
+          "mean_lift": 1.2933,
+          "mean_recall_top10": 0.1015,
+          "mean_recall_monthly10": 0.1235,
+          "mean_precision_monthly10": 0.2006,
+          "min_recall_monthly10": 0.1089
+        }
+      },
+      "trees r=100 lr=0.03 d=2": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3599,
+            "lift": 1.53,
+            "recall_top10": 0.145,
+            "precision_top10": 0.3416,
+            "recall_monthly10": 0.1232,
+            "precision_monthly10": 0.2716
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.0928,
+            "lift": 1.17,
+            "recall_top10": 0.0926,
+            "precision_top10": 0.0737,
+            "recall_monthly10": 0.1488,
+            "precision_monthly10": 0.1147
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2332,
+            "lift": 1.3,
+            "recall_top10": 0.1271,
+            "precision_top10": 0.2282,
+            "recall_monthly10": 0.13,
+            "precision_monthly10": 0.2262
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2286,
+          "mean_lift": 1.3333,
+          "mean_recall_top10": 0.1216,
+          "mean_recall_monthly10": 0.134,
+          "mean_precision_monthly10": 0.2042,
+          "min_recall_monthly10": 0.1232
+        }
+      },
+      "trees r=100 lr=0.03 d=3": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3371,
+            "lift": 1.43,
+            "recall_top10": 0.1303,
+            "precision_top10": 0.3069,
+            "recall_monthly10": 0.1052,
+            "precision_monthly10": 0.2319
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1075,
+            "lift": 1.36,
+            "recall_top10": 0.1248,
+            "precision_top10": 0.0992,
+            "recall_monthly10": 0.1733,
+            "precision_monthly10": 0.1336
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2557,
+            "lift": 1.43,
+            "recall_top10": 0.1632,
+            "precision_top10": 0.2929,
+            "recall_monthly10": 0.1915,
+            "precision_monthly10": 0.3333
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2334,
+          "mean_lift": 1.4067,
+          "mean_recall_top10": 0.1394,
+          "mean_recall_monthly10": 0.1567,
+          "mean_precision_monthly10": 0.2329,
+          "min_recall_monthly10": 0.1052
+        }
+      },
+      "trees r=100 lr=0.03 d=4": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3652,
+            "lift": 1.55,
+            "recall_top10": 0.1645,
+            "precision_top10": 0.3876,
+            "recall_monthly10": 0.158,
+            "precision_monthly10": 0.3483
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1074,
+            "lift": 1.35,
+            "recall_top10": 0.1287,
+            "precision_top10": 0.1024,
+            "recall_monthly10": 0.137,
+            "precision_monthly10": 0.1056
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2325,
+            "lift": 1.3,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1582,
+            "precision_monthly10": 0.2753
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.235,
+          "mean_lift": 1.4,
+          "mean_recall_top10": 0.1431,
+          "mean_recall_monthly10": 0.1511,
+          "mean_precision_monthly10": 0.2431,
+          "min_recall_monthly10": 0.137
+        }
+      },
+      "trees r=100 lr=0.1 d=2": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3414,
+            "lift": 1.45,
+            "recall_top10": 0.1176,
+            "precision_top10": 0.2772,
+            "recall_monthly10": 0.1104,
+            "precision_monthly10": 0.2433
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1022,
+            "lift": 1.29,
+            "recall_top10": 0.1089,
+            "precision_top10": 0.0866,
+            "recall_monthly10": 0.1658,
+            "precision_monthly10": 0.1279
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2345,
+            "lift": 1.31,
+            "recall_top10": 0.107,
+            "precision_top10": 0.1921,
+            "recall_monthly10": 0.1271,
+            "precision_monthly10": 0.2212
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.226,
+          "mean_lift": 1.35,
+          "mean_recall_top10": 0.1112,
+          "mean_recall_monthly10": 0.1344,
+          "mean_precision_monthly10": 0.1975,
+          "min_recall_monthly10": 0.1104
+        }
+      },
+      "trees r=100 lr=0.1 d=3": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3411,
+            "lift": 1.45,
+            "recall_top10": 0.1254,
+            "precision_top10": 0.2954,
+            "recall_monthly10": 0.1218,
+            "precision_monthly10": 0.2685
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1105,
+            "lift": 1.39,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1584,
+            "precision_monthly10": 0.1221
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2364,
+            "lift": 1.32,
+            "recall_top10": 0.107,
+            "precision_top10": 0.1921,
+            "recall_monthly10": 0.1513,
+            "precision_monthly10": 0.2634
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2293,
+          "mean_lift": 1.3867,
+          "mean_recall_top10": 0.127,
+          "mean_recall_monthly10": 0.1438,
+          "mean_precision_monthly10": 0.218,
+          "min_recall_monthly10": 0.1218
+        }
+      },
+      "trees r=100 lr=0.1 d=4": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.358,
+            "lift": 1.52,
+            "recall_top10": 0.1471,
+            "precision_top10": 0.3465,
+            "recall_monthly10": 0.166,
+            "precision_monthly10": 0.3657
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1055,
+            "lift": 1.33,
+            "recall_top10": 0.1386,
+            "precision_top10": 0.1102,
+            "recall_monthly10": 0.1089,
+            "precision_monthly10": 0.084
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2493,
+            "lift": 1.39,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1667,
+            "precision_monthly10": 0.2901
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2376,
+          "mean_lift": 1.4133,
+          "mean_recall_top10": 0.1406,
+          "mean_recall_monthly10": 0.1472,
+          "mean_precision_monthly10": 0.2466,
+          "min_recall_monthly10": 0.1089
+        }
+      },
+      "trees r=300 lr=0.03 d=2": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3388,
+            "lift": 1.44,
+            "recall_top10": 0.1176,
+            "precision_top10": 0.2772,
+            "recall_monthly10": 0.1137,
+            "precision_monthly10": 0.2505
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1045,
+            "lift": 1.32,
+            "recall_top10": 0.0891,
+            "precision_top10": 0.0709,
+            "recall_monthly10": 0.1584,
+            "precision_monthly10": 0.1221
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2323,
+            "lift": 1.3,
+            "recall_top10": 0.1038,
+            "precision_top10": 0.1864,
+            "recall_monthly10": 0.1301,
+            "precision_monthly10": 0.2265
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2252,
+          "mean_lift": 1.3533,
+          "mean_recall_top10": 0.1035,
+          "mean_recall_monthly10": 0.1341,
+          "mean_precision_monthly10": 0.1997,
+          "min_recall_monthly10": 0.1137
+        }
+      },
+      "trees r=300 lr=0.03 d=3": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3493,
+            "lift": 1.48,
+            "recall_top10": 0.1429,
+            "precision_top10": 0.3366,
+            "recall_monthly10": 0.1303,
+            "precision_monthly10": 0.287
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.106,
+            "lift": 1.34,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.1733,
+            "precision_monthly10": 0.1336
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2392,
+            "lift": 1.33,
+            "recall_top10": 0.1404,
+            "precision_top10": 0.252,
+            "recall_monthly10": 0.1654,
+            "precision_monthly10": 0.2879
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2315,
+          "mean_lift": 1.3833,
+          "mean_recall_top10": 0.134,
+          "mean_recall_monthly10": 0.1563,
+          "mean_precision_monthly10": 0.2362,
+          "min_recall_monthly10": 0.1303
+        }
+      },
+      "trees r=300 lr=0.03 d=4": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3529,
+            "lift": 1.5,
+            "recall_top10": 0.1415,
+            "precision_top10": 0.3333,
+            "recall_monthly10": 0.1555,
+            "precision_monthly10": 0.3426
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1082,
+            "lift": 1.36,
+            "recall_top10": 0.1584,
+            "precision_top10": 0.126,
+            "recall_monthly10": 0.1188,
+            "precision_monthly10": 0.0916
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2443,
+            "lift": 1.36,
+            "recall_top10": 0.1404,
+            "precision_top10": 0.252,
+            "recall_monthly10": 0.1736,
+            "precision_monthly10": 0.3021
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2351,
+          "mean_lift": 1.4067,
+          "mean_recall_top10": 0.1468,
+          "mean_recall_monthly10": 0.1493,
+          "mean_precision_monthly10": 0.2454,
+          "min_recall_monthly10": 0.1188
+        }
+      },
+      "trees r=300 lr=0.1 d=2": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3492,
+            "lift": 1.48,
+            "recall_top10": 0.1366,
+            "precision_top10": 0.3218,
+            "recall_monthly10": 0.1218,
+            "precision_monthly10": 0.2685
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1079,
+            "lift": 1.36,
+            "recall_top10": 0.1584,
+            "precision_top10": 0.126,
+            "recall_monthly10": 0.1782,
+            "precision_monthly10": 0.1374
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2477,
+            "lift": 1.38,
+            "recall_top10": 0.1404,
+            "precision_top10": 0.252,
+            "recall_monthly10": 0.1605,
+            "precision_monthly10": 0.2794
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2349,
+          "mean_lift": 1.4067,
+          "mean_recall_top10": 0.1451,
+          "mean_recall_monthly10": 0.1535,
+          "mean_precision_monthly10": 0.2284,
+          "min_recall_monthly10": 0.1218
+        }
+      },
+      "trees r=300 lr=0.1 d=3": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3433,
+            "lift": 1.46,
+            "recall_top10": 0.1303,
+            "precision_top10": 0.3069,
+            "recall_monthly10": 0.1415,
+            "precision_monthly10": 0.3117
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1202,
+            "lift": 1.52,
+            "recall_top10": 0.1881,
+            "precision_top10": 0.1496,
+            "recall_monthly10": 0.1628,
+            "precision_monthly10": 0.1255
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2439,
+            "lift": 1.36,
+            "recall_top10": 0.1316,
+            "precision_top10": 0.2362,
+            "recall_monthly10": 0.1316,
+            "precision_monthly10": 0.229
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2358,
+          "mean_lift": 1.4467,
+          "mean_recall_top10": 0.15,
+          "mean_recall_monthly10": 0.1453,
+          "mean_precision_monthly10": 0.2221,
+          "min_recall_monthly10": 0.1316
+        }
+      },
+      "trees r=300 lr=0.1 d=4": {
+        "per_fold": {
+          "2011": {
+            "late_rate": 0.2354,
+            "pr_auc": 0.3457,
+            "lift": 1.47,
+            "recall_top10": 0.1324,
+            "precision_top10": 0.3119,
+            "recall_monthly10": 0.1492,
+            "precision_monthly10": 0.3287
+          },
+          "2012": {
+            "late_rate": 0.0793,
+            "pr_auc": 0.1102,
+            "lift": 1.39,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1518,
+            "precision_monthly10": 0.117
+          },
+          "2013": {
+            "late_rate": 0.1792,
+            "pr_auc": 0.2473,
+            "lift": 1.38,
+            "recall_top10": 0.1447,
+            "precision_top10": 0.2598,
+            "recall_monthly10": 0.1272,
+            "precision_monthly10": 0.2214
+          }
+        },
+        "summary": {
+          "mean_pr_auc": 0.2344,
+          "mean_lift": 1.4133,
+          "mean_recall_top10": 0.1419,
+          "mean_recall_monthly10": 0.1427,
+          "mean_precision_monthly10": 0.2224,
+          "min_recall_monthly10": 0.1272
+        }
+      }
+    },
+    "chosen": "trees r=100 lr=0.03 d=3",
+    "chosen_params": {
+      "n_rounds": 100,
+      "learning_rate": 0.03,
+      "max_depth": 3
+    },
+    "beats_logistic_benchmark": true
+  },
+  "test": {
+    "boosted": {
+      "late_rate": 0.1399,
+      "pr_auc": 0.3534,
+      "lift": 2.53,
+      "recall_top10": 0.2781,
+      "precision_top10": 0.3898,
+      "recall_monthly10": 0.2638,
+      "precision_monthly10": 0.3626
+    },
+    "logistic_relative_priors_only": {
+      "late_rate": 0.1399,
+      "pr_auc": 0.2582,
+      "lift": 1.85,
+      "recall_top10": 0.1854,
+      "precision_top10": 0.2598,
+      "recall_monthly10": 0.2163,
+      "precision_monthly10": 0.2973
+    },
+    "route_excess_lookup": {
+      "late_rate": 0.1399,
+      "pr_auc": 0.2915,
+      "lift": 2.08,
+      "recall_top10": 0.1943,
+      "precision_top10": 0.2723,
+      "recall_monthly10": 0.2616,
+      "precision_monthly10": 0.3595
+    },
+    "no_skill": {
+      "late_rate": 0.1399,
+      "pr_auc": 0.1399,
+      "lift": 1.0,
+      "recall_top10": 0.0998,
+      "precision_top10": 0.1399,
+      "recall_monthly10": 0.1047,
+      "precision_monthly10": 0.1439
+    }
+  },
+  "alert_rule": "top 10% of each order month",
+  "permutation_importance_last_fold": {
+    "prior_excess_vendor": {
+      "pr_auc_drop": 0.0306,
+      "recall_monthly10_drop": 0.0685
+    },
+    "prior_excess_country": {
+      "pr_auc_drop": 0.0244,
+      "recall_monthly10_drop": 0.026
+    },
+    "planned_lead_time_days": {
+      "pr_auc_drop": 0.0228,
+      "recall_monthly10_drop": 0.0412
+    },
+    "quantity": {
+      "pr_auc_drop": 0.0106,
+      "recall_monthly10_drop": 0.0312
+    },
+    "prior_excess_fulfillment_route": {
+      "pr_auc_drop": 0.0084,
+      "recall_monthly10_drop": 0.0403
+    },
+    "prior_known_vendor": {
+      "pr_auc_drop": 0.0013,
+      "recall_monthly10_drop": -0.0008
+    },
+    "prior_known_country": {
+      "pr_auc_drop": 0.0004,
+      "recall_monthly10_drop": 0.0004
+    },
+    "lead_time_missing": {
+      "pr_auc_drop": 0.0,
+      "recall_monthly10_drop": 0.0
+    },
+    "prior_known_fulfillment_route": {
+      "pr_auc_drop": 0.0,
+      "recall_monthly10_drop": 0.0
+    }
+  },
+  "days_late": {
+    "folds": {
+      "2011": {
+        "mae_boosted": 18.21,
+        "mae_global_median": 19.21
+      },
+      "2012": {
+        "mae_boosted": 7.98,
+        "mae_global_median": 8.11
+      },
+      "2013": {
+        "mae_boosted": 27.13,
+        "mae_global_median": 25.98
+      }
+    },
+    "test": {
+      "n_late": 356,
+      "mae_boosted": 12.78,
+      "mae_global_median": 11.74
+    },
+    "params": {
+      "n_rounds": 100,
+      "learning_rate": 0.03,
+      "max_depth": 3
+    }
+  },
+  "model_file": "model.pkl",
+  "runtime_seconds": 38.3
+}

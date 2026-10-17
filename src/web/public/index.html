@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- PLACEHOLDER: the dashboard owner replaces this folder's contents. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>V12 Engines platform check</title></head>
+<body style="font-family: sans-serif; padding: 24px">
+  <h1>V12 Engines platform check</h1>
+  <p>This page is served by nginx. The box below is fetched from the API through <code>/api/health</code>.</p>
+  <pre id="out">loading...</pre>
+  <script>
+    fetch('/api/health')
+      .then(r => r.json())
+      .then(j => { document.getElementById('out').textContent = JSON.stringify(j, null, 2); })
+      .catch(e => { document.getElementById('out').textContent = 'API not reachable: ' + e; });
+  </script>
+</body>
+</html>
