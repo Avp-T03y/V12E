@@ -1,0 +1,9 @@
+# Extra Python packages for the api container, on top of IBM's s390x image.
+# Versions verified installing on the LinuxONE VM (s390x), Oct 17, 2026.
+fastapi==0.143.3
+uvicorn==0.54.0
+snapml==1.17.2
+
+# Already in the base image -- do NOT add them here (no s390x wheels on PyPI; pinning a
+# different version would make pip try to download one and the build would fail):
+#   pandas 3.0.6, scikit-learn 1.9.0, xgboost 3.4.1, numpy 2.0.2, scipy 1.13.1, llama_cpp_python
