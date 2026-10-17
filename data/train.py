@@ -27,7 +27,8 @@ from datetime import datetime, timezone
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
+from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, mean_absolute_error
@@ -64,7 +65,7 @@ def load(path_base):
     elif os.path.exists(path_base + ".csv"):
         df = pd.read_csv(path_base + ".csv", keep_default_na=False, na_values=[""],
                          parse_dates=["decision_date", "scheduled_delivery_date"])
-    else:
+    else: 
         sys.exit(f"Missing {path_base}.parquet / .csv")
     return df.reset_index(drop=True)
 
@@ -138,10 +139,48 @@ def fit_classifier(backend, X, y):
     return m
 
 
-def fit_regressor(backend, X, y):
-    m = new_regressor(backend)
-    m.fit(X.values, np.asarray(y, dtype=np.float32))
+REG_CANDIDATES = ["median", "trees_raw", "trees_log"]
+
+
+def fit_regressor(backend, X, y, kind="trees_log"):
+    """Days-late regressor, trained on LATE rows only -> 'if late, about how many days'.
+    kind: median (constant baseline) | trees_raw | trees_log (trees on log1p(days)).
+    Every option is a standard picklable estimator whose .predict() returns days."""
+    y = np.asarray(y, dtype=np.float32)
+    if kind == "median":
+        m = DummyRegressor(strategy="median")
+    elif kind == "trees_raw":
+        m = new_regressor(backend)
+    elif kind == "trees_log":
+        m = TransformedTargetRegressor(regressor=new_regressor(backend),
+                                       func=np.log1p, inverse_func=np.expm1, check_inverse=False)
+    else:
+        raise ValueError(kind)
+    m.fit(X.values, y)
     return m
+
+
+def choose_regressor(backend, train, val_years):
+    """Rolling validation inside train: fit on years < vy, score MAE on late rows of vy.
+    Returns (best_kind, {kind: mean_mae}). Candidates that error out are skipped."""
+    yr = train["scheduled_delivery_date"].dt.year
+    scores = {k: [] for k in REG_CANDIDATES}
+    for vy in val_years:
+        fit_df = train[(yr < vy) & (train[TARGET_REG] > 0)]
+        val_df = train[(yr == vy) & (train[TARGET_REG] > 0)]
+        enc = make_encoder(); Xf = encode(enc, fit_df, fit=True); Xv = encode(enc, val_df)
+        for k in REG_CANDIDATES:
+            if scores[k] is None:
+                continue
+            try:
+                m = fit_regressor(backend, Xf, fit_df[TARGET_REG], k)
+                scores[k].append(mean_absolute_error(val_df[TARGET_REG], predict_days(m, Xv)))
+            except Exception as e:                                       # pragma: no cover
+                print(f"[regressor] candidate {k} failed ({e}); skipped")
+                scores[k] = None
+    mean = {k: float(np.mean(v)) for k, v in scores.items() if v}
+    best = min(mean, key=mean.get)
+    return best, mean
 
 
 def predict_proba(model, X):
@@ -239,6 +278,8 @@ def main():
     ap.add_argument("--recall-target", type=float, default=0.70,
                     help="recall the operating threshold must reach on the 2013 validation slice")
     ap.add_argument("--val-year", type=int, default=2013)
+    ap.add_argument("--reg-val-years", type=int, nargs="+", default=[2012, 2013],
+                    help="rolling validation years for choosing the days-late regressor")
     args = ap.parse_args()
     os.makedirs(args.model_dir, exist_ok=True)
 
@@ -268,7 +309,12 @@ def main():
     # ---- 2. refit on ALL train, evaluate ONCE on test ---------------------------------------
     enc = make_encoder(); Xtr = encode(enc, train, fit=True); Xte = encode(enc, test)
     clf = fit_classifier(backend, Xtr, train[TARGET_CLS])
-    reg = fit_regressor(backend, Xtr, train[TARGET_REG])
+
+    reg_kind, reg_val = choose_regressor(backend, train, args.reg_val_years)
+    print(f"[regressor] rolling validation MAE on late rows {args.reg_val_years}: "
+          + ", ".join(f"{k}={v:.2f}" for k, v in reg_val.items()) + f" -> chosen: {reg_kind}")
+    late_tr = train[TARGET_REG] > 0
+    reg = fit_regressor(backend, Xtr[late_tr.values], train.loc[late_tr, TARGET_REG], reg_kind)
     base = make_baseline().fit(baseline_frame(train), train[TARGET_CLS])
 
     p_clf = predict_proba(clf, Xte)
@@ -280,20 +326,26 @@ def main():
     d_pred = predict_days(reg, Xte)
     d_true = test[TARGET_REG].values
     late = d_true > 0
-    reg_res = dict(mae_all=float(mean_absolute_error(d_true, d_pred)),
-                   mae_late_only=float(mean_absolute_error(d_true[late], d_pred[late])),
-                   mae_zero_baseline_all=float(mean_absolute_error(d_true, np.zeros_like(d_true))),
-                   mae_median_late_baseline=float(mean_absolute_error(
-                       d_true, np.full_like(d_true, int(np.median(train.loc[train[TARGET_REG] > 0, TARGET_REG]))))),
-                   mean_pred_days_on_late_rows=float(d_pred[late].mean()),
-                   mean_true_days_on_late_rows=float(d_true[late].mean()))
+    tr_late = train[late_tr]
+    global_med = float(np.median(tr_late[TARGET_REG]))
+    route_med = tr_late.groupby("fulfillment_route")[TARGET_REG].median()
+    route_pred = test["fulfillment_route"].map(route_med).fillna(global_med).values
+    reg_res = dict(
+        chosen=reg_kind, n_late_test=int(late.sum()), target="days late, conditional on the shipment being late",
+        rolling_val_mae_late_rows=reg_val,
+        mae_late_only=float(mean_absolute_error(d_true[late], d_pred[late])),
+        baseline_global_median_mae=float(mean_absolute_error(d_true[late], np.full(late.sum(), global_med))),
+        baseline_route_median_mae=float(mean_absolute_error(d_true[late], route_pred[late])),
+        mean_pred_days_on_late_rows=float(d_pred[late].mean()),
+        mean_true_days_on_late_rows=float(d_true[late].mean()),
+        median_true_days_on_late_rows=float(np.median(d_true[late])))
 
     importance = permutation_importance(lambda X: predict_proba(clf, X), Xte, yte)
 
     # ---- 3. save + reload identity check ----------------------------------------------------
     stamp = hashlib.sha1(pd.util.hash_pandas_object(train[FEATURES + [TARGET_CLS]], index=False)
                          .values.tobytes()).hexdigest()[:8]
-    model_version = f"v12e-{datetime.now(timezone.utc):%Y%m%d}-{backend}-{stamp}"
+    model_version = f"v12e-{datetime.now(timezone.utc):%Y%m%d-%H%M}-{backend}-{stamp}"
 
     paths = {k: os.path.join(args.model_dir, v) for k, v in
              dict(clf="classifier.pkl", reg="regressor.pkl", enc="encoder.joblib",
@@ -311,6 +363,8 @@ def main():
                 cat_features=CAT_FEATURES, missing_fill=MISSING_FILL,
                 operating_threshold=thr, threshold_rule=f"recall>={args.recall_target} on {args.val_year} validation slice",
                 trained_at=datetime.now(timezone.utc).isoformat(), train_rows=len(train),
+                regressor=reg_kind,
+                regressor_meaning="if the shipment is late, about how many days (trained on late rows only)",
                 note="predicted days late is an estimate, not a guarantee")
     json.dump(meta, open(paths["meta"], "w"), indent=2)
 
@@ -352,9 +406,12 @@ def write_markdown(path, r, recall_target):
         "| Model | PR-AUC | Recall | Precision | Recall top 10% | Correct | Type I (false alarm) | Type II (missed late) |",
         "|---|---|---|---|---|---|---|---|", rows("Logistic baseline", b), rows("Boosted trees", c), "",
         f"Confusion (boosted trees): {c['confusion']}", "",
-        "## Days-late regressor",
-        f"- MAE all rows: **{g['mae_all']:.2f} d** (predict-0 baseline {g['mae_zero_baseline_all']:.2f} d)",
-        f"- MAE on truly late rows: **{g['mae_late_only']:.2f} d** (predict-median-late baseline {g['mae_median_late_baseline']:.2f} d)",
+        "## Days-late regressor (if late, about how many days)",
+        f"- Chosen by rolling validation on late rows of 2012-2013 (not test): **{g['chosen']}** "
+        f"(validation MAE: " + ", ".join(f"{k} {v:.2f} d" for k, v in g['rolling_val_mae_late_rows'].items()) + ")",
+        f"- Test MAE on the {g['n_late_test']} late shipments: **{g['mae_late_only']:.2f} d** "
+        f"| global-median baseline {g['baseline_global_median_mae']:.2f} d "
+        f"| route-median baseline {g['baseline_route_median_mae']:.2f} d",
         "- Predicted days late is an estimate, not a guarantee.", "",
         "## Feature importance (PR-AUC drop when shuffled, test set)"]
     lines += [f"- {k}: {v:.4f}" for k, v in r["feature_importance_pr_auc_drop"].items()]

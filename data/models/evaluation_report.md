@@ -1,4 +1,4 @@
-# V12 Engines - model evaluation (v12e-20261017-snapml-8c040306)
+# V12 Engines - model evaluation (v12e-20261017-2008-snapml-8c040306)
 
 Backend: **snapml**. Test split: 2014-2015, late rate **14.0%** (no-skill PR-AUC = test late rate; project baseline 0.115).
 Operating threshold chosen on a 2013 validation slice inside train (recall >= 0.7); the test set was scored once.
@@ -10,9 +10,9 @@ Operating threshold chosen on a 2013 validation slice inside train (recall >= 0.
 
 Confusion (boosted trees): {'tp': 100, 'fp': 165, 'fn': 256, 'tn': 2024}
 
-## Days-late regressor
-- MAE all rows: **4.95 d** (predict-0 baseline 2.52 d)
-- MAE on truly late rows: **15.67 d** (predict-median-late baseline 11.96 d)
+## Days-late regressor (if late, about how many days)
+- Chosen by rolling validation on late rows of 2012-2013 (not test): **median** (validation MAE: median 16.82 d, trees_raw 26.93 d, trees_log 19.17 d)
+- Test MAE on the 356 late shipments: **11.71 d** | global-median baseline 11.71 d | route-median baseline 12.24 d
 - Predicted days late is an estimate, not a guarantee.
 
 ## Feature importance (PR-AUC drop when shuffled, test set)
