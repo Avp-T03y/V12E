@@ -38,19 +38,19 @@ We use template explanations grounded in the model’s drivers, with IBM Granite
 "Finally, looking under the hood at our Platform tab, everything runs natively on IBM LinuxONE using s390x architecture and Docker Compose containers. We feature tunnel-only SSH encryption, active scoring logs, and template-based explanations designed for transparent, secure healthcare logistics." 
 
 
-Slide 5: 04. Technical Architecture
+>Slide 5: 04. Technical Architecture
 (On-Screen: End-to-End System Pipeline on IBM LinuxONE)
 
 
 "Our technical pipeline operates in four stages: First, our data integration pipeline processes 10,324 USAID SCMS shipment rows and computes 365-day rolling prior late rates. Second, a native s390x Snap ML boosted-tree classifier ranks order delay risk. Third, structured template explanations are generated from feature drivers, with IBM Granite tested for future deployment. And fourth, our FastAPI scoring service streams real-time replay events to the Nginx web frontend via Docker Compose across three containers for interactive officer review." 
 
-Slide 6: 05. Stakeholder Value
+>Slide 6: 05. Stakeholder Value
 (On-Screen: Target Audience & Ecosystem Impact)
 
 
 "This architecture is designed to deliver massive value across the ecosystem. Logistics officers get early risk alerts and recommended actions before dispatch. USAID and PEPFAR health programs can maintain HIV treatment continuity and avoid clinic stockouts. Clinics can reduce emergency stock rationing, helping patients gain uninterrupted access to life-critical antiretroviral therapies and diagnostic test kits. Meanwhile, enterprise tech teams get a demonstration of secure, scalable AI inference directly on core enterprise infrastructure, while global donors benefit from transparent officer review logs." 
 
-Slide 7: 06. Operational Impact
+>Slide 7: 06. Operational Impact
 (On-Screen: Expected Outcomes & Model Metrics)
 
 
@@ -58,7 +58,7 @@ Slide 7: 06. Operational Impact
 
 This platform is designed to help prevent supply gaps across 43 countries, could reduce emergency air charter costs by identifying risks at order placement, enables buffer stock pre-positioning, and ensures transparent supply chain governance with logged human decisions." 
 
-Slide 8: 07. Key Takeaways
+>Slide 8: 07. Key Takeaways
 (On-Screen: Learnings During the Datathon)
 
 
