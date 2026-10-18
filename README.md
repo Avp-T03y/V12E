@@ -1,6 +1,7 @@
 <div align="center">
+<img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/9b4b39e6-bebe-4550-ae97-3d9a41dd900c" />
 
-# 🏎️ V12 Engines
+# V12 Engines
 ### Order-time delivery-delay early warning for global HIV supply chains
 
 ![IBM LinuxONE](https://img.shields.io/badge/IBM-LinuxONE%20s390x-054ADA)
