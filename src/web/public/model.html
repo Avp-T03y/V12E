@@ -24,9 +24,16 @@
     <h1>Model results on the held-out test set</h1>
     <span class="small muted" id="subtitle">loading /api/metrics…</span>
   </div>
-  <p class="caption">Evaluated once on later shipments the model never saw (trained on orders due 2010–2013, tested on orders due 2014–2015
-    from historical USAID data); not a live 2026 feed. Alerts are the top 10% of orders placed in the previous 30 days.</p>
+  <p class="caption">Historical USAID data split by promised delivery date: trained on orders due 2010–2013, tested once on
+    orders due 2014–2015; not a live 2026 feed. Alerts are the top 10% of orders placed in the previous 30 days.</p>
   <p class="banner" id="banner" hidden></p>
+
+  <div class="head" id="scope-row" hidden>
+    <span class="seg-btns" role="group" aria-label="Which test orders">
+      <button data-scope="clean" aria-pressed="true">Placed after the training data</button><button data-scope="all" aria-pressed="false">All orders due 2014–2015</button>
+    </span>
+    <span class="small muted" id="scope-note" style="flex:1 1 420px"></span>
+  </div>
 
   <section class="row" aria-label="Headline metrics" id="kpis"></section>
 
@@ -71,7 +78,7 @@
 
   <div class="row">
     <section class="card" style="flex:1.4 1 520px" aria-label="Baselines">
-      <div class="head"><h2>Final model against simpler approaches</h2><span class="small muted">Test orders due 2014–2015</span></div>
+      <div class="head"><h2>Final model against simpler approaches</h2><span class="small muted" id="bl-sub"></span></div>
       <div style="overflow-x:auto"><table id="baselines"></table></div>
     </section>
     <section class="card" style="flex:1 1 340px" aria-label="How the model was chosen">
@@ -101,38 +108,71 @@
   }
   if (!m) return;
 
-  const T = m.test, B = T.boosted, live = m.live_alert_rule_test || {};
-  const late = B.late, n = B.n;
+  const T = m.test, B = T.boosted, C = m.test_clean;
+  const dl = m.days_late || {}, dp = dl.production || {};
   document.getElementById('subtitle').textContent =
     `${m.backend === 'snapml' ? 'Snap ML' : m.backend} boosted trees · model ${m.model_version} · ${mRes.live ? 'live /api/metrics' : 'sample data'}`;
 
-  // ---- KPIs (live rule = what the demo runs)
-  const ltp = live.confusion ? live.confusion.tp : Math.round(live.recall * late);
-  const lflag = live.confusion ? live.confusion.tp + live.confusion.fp : Math.round(live.flagged_share * n);
-  const dl = m.days_late || {}, dp = dl.production || {};
-  document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="label">Late shipments caught</div><div class="value">${pct(live.recall)}</div>
-      <div class="sub">${int(ltp)} of ${int(late)} late shipments, flagging ${pct(live.flagged_share)} of orders</div></div>
-    <div class="kpi"><div class="label">Alerts that were late</div><div class="value">${pct(live.precision)}</div>
-      <div class="sub">${int(ltp)} of ${int(lflag)} alerts · ${pct(B.late_rate)} of all orders were late</div></div>
-    <div class="kpi"><div class="label">PR-AUC</div><div class="value">${num(B.pr_auc)}</div>
-      <div class="sub">${num(B.lift, 1)}× the no-skill ${num(T.baselines.no_skill.pr_auc)} · logistic ${num(T.baselines.logistic_benchmark.pr_auc)}</div></div>
-    <div class="kpi"><div class="label">Typical delay, if late</div><div class="value">${num(dp.median, 0)} days</div>
-      <div class="sub">middle half ${num(dp.q25, 0)}–${num(dp.q75, 0)} days · historical estimate</div></div>`;
+  // Two views of the same test: the clean one (headline) and every order due 2014-2015.
+  function scopeData(sc) {
+    if (sc === 'clean' && C) {
+      return { key: 'clean', n: C.n, late: C.late, boosted: C.boosted, live: C.live, month: C.month_end,
+        baselines: C.baselines, liveBaselines: C.live_baselines || {}, pr: C.pr_curve,
+        label: `orders due 2014–2015 placed after ${C.cutoff_last_training_outcome}` };
+    }
+    // all orders: under all_orders in new metrics.json (headline keys are post-cutoff); top level in older files
+    const A = m.all_orders || { test: T, live_alert_rule_test: m.live_alert_rule_test, pr_curve: m.pr_curve };
+    const AT = A.test;
+    return { key: 'all', n: AT.boosted.n, late: AT.boosted.late, boosted: AT.boosted, live: A.live_alert_rule_test || {},
+      month: { confusion: AT.confusion, error_breakdown: AT.error_breakdown }, baselines: AT.baselines,
+      liveBaselines: {}, pr: A.pr_curve, label: 'all orders due 2014–2015' };
+  }
+  let scope = C ? 'clean' : 'all', rule = 'live';
 
-  // ---- PR curve
-  (function () {
+  if (C) {
+    document.getElementById('scope-row').hidden = false;
+    document.getElementById('scope-note').textContent =
+      `The split is by promised delivery date, so ${int(C.excluded.n)} of ${int(C.n + C.excluded.n)} test orders were placed before ` +
+      `${C.cutoff_last_training_outcome}, the last outcome the model was trained on. “Placed after the training data” keeps only ` +
+      `orders the model could have been trained before, as in real use.`;
+    document.querySelectorAll('[data-scope]').forEach((b) => b.addEventListener('click', () => {
+      scope = b.dataset.scope;
+      document.querySelectorAll('[data-scope]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+      renderScope();
+    }));
+  } else {
+    const b = document.getElementById('banner');
+    if (b.hidden) { b.hidden = false; b.textContent = 'This metrics.json has no clean-test block: re-run v12e_model.py evaluate to add the orders-placed-after-training view.'; }
+  }
+
+  function renderKpis(S) {
+    const live = S.live, BB = S.boosted;
+    const ltp = live.confusion ? live.confusion.tp : Math.round(live.recall * S.late);
+    const lflag = live.confusion ? live.confusion.tp + live.confusion.fp : Math.round(live.flagged_share * S.n);
+    const lg = S.baselines.logistic_benchmark;
+    document.getElementById('kpis').innerHTML = `
+      <div class="kpi"><div class="label">Late shipments caught</div><div class="value">${pct(live.recall)}</div>
+        <div class="sub">${int(ltp)} of ${int(S.late)} late shipments, flagging ${pct(live.flagged_share)} of orders</div></div>
+      <div class="kpi"><div class="label">Alerts that were late</div><div class="value">${pct(live.precision)}</div>
+        <div class="sub">${int(ltp)} of ${int(lflag)} alerts · ${pct(BB.late_rate)} of these orders were late</div></div>
+      <div class="kpi"><div class="label">PR-AUC</div><div class="value">${num(BB.pr_auc)}</div>
+        <div class="sub">${num(BB.lift, 1)}× the no-skill ${num(S.baselines.no_skill.pr_auc)}${lg ? ` · logistic ${num(lg.pr_auc)}` : ''}</div></div>
+      <div class="kpi"><div class="label">Typical delay, if late</div><div class="value">${num(dp.median, 0)} days</div>
+        <div class="sub">middle half ${num(dp.q25, 0)}–${num(dp.q75, 0)} days · historical estimate</div></div>`;
+  }
+
+  function renderPR(S) {
     const W = 560, H = 360, x0 = 56, x1 = 536, y0 = 308, y1 = 20;
     const px = (r) => x0 + (x1 - x0) * r, py = (p) => y0 - (y0 - y1) * p;
-    const pts = (m.pr_curve || []).slice().sort((a, b) => a.recall - b.recall)
+    const pts = (S.pr || []).slice().sort((a, b) => a.recall - b.recall)
       .map((p) => `${px(p.recall).toFixed(1)},${py(p.precision).toFixed(1)}`).join(' ');
-    const base = B.late_rate;
-    const op = { r: live.recall, p: live.precision };
+    const base = S.boosted.late_rate;
+    const op = { r: S.live.recall, p: S.live.precision };
     const grid = [0.25, 0.5, 0.75, 1].map((v) => `<line x1="${x0}" y1="${py(v)}" x2="${x1}" y2="${py(v)}" stroke="#EDEFF4"/>`).join('');
     const yl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="48" y="${py(v) + 4}" font-size="12" fill="#525A6E" text-anchor="end">${v.toFixed(2)}</text>`).join('');
     const xl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="${px(v)}" y="328" font-size="12" fill="#525A6E" text-anchor="middle">${v.toFixed(2)}</text>`).join('');
     document.getElementById('pr').innerHTML = `
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Precision against recall on test orders due 2014-2015; PR-AUC ${num(B.pr_auc)} against a no-skill rate of ${num(base)}"
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Precision against recall for ${esc(S.label)}; PR-AUC ${num(S.boosted.pr_auc)} against a no-skill rate of ${num(base)}"
         style="width:100%;height:auto;font-family:'IBM Plex Sans',system-ui,sans-serif">
         ${grid}<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#8D95A8"/>
         <line x1="${x0}" y1="${py(base)}" x2="${x1}" y2="${py(base)}" stroke="#8D95A8" stroke-dasharray="2 4"/>
@@ -144,29 +184,29 @@
         <text x="${(x0 + x1) / 2}" y="352" font-size="12" fill="#525A6E" text-anchor="middle">Recall (share of late shipments caught)</text>
         <text x="${x0}" y="12" font-size="12" fill="#525A6E">Precision (share of alerts that were late)</text>
       </svg>`;
-    document.getElementById('pr-sub').textContent = `Test orders due 2014–2015 · late rate ${pct(base)}`;
+    document.getElementById('pr-sub').textContent = `${S.key === 'clean' ? 'Placed after the training data' : 'All orders due 2014–2015'} · late rate ${pct(base)}`;
     document.getElementById('pr-note').textContent =
       `Live alert rule: recall ${num(op.r)}, precision ${num(op.p)}. The curve shows every other alert budget the same model could run at.`;
-  })();
+  }
 
   // ---- confusion matrix + error breakdown (live by default, month-end on toggle)
-  function renderCM(rule) {
-    const c = rule === 'live' ? live.confusion : T.confusion;
-    const e = rule === 'live' ? live.error_breakdown : T.error_breakdown;
+  function renderCM(S) {
+    const src = rule === 'live' ? S.live : S.month;
+    const c = src && src.confusion, e = src && src.error_breakdown, n = S.n;
     if (!c) {
       document.getElementById('cm').innerHTML = '<div class="empty" style="grid-column:span 2">Live confusion matrix not in this metrics.json: re-run <code>v12e_model.py evaluate</code>.</div>';
       return;
     }
-    document.getElementById('cm-sub').textContent = rule === 'live'
-      ? `Live 30-day rule (what the demo runs) · ${int(n)} test shipments`
-      : `Top 10% of each order month (needs the whole month; best case) · ${int(n)} test shipments`;
+    document.getElementById('cm-sub').textContent = (rule === 'live'
+      ? 'Live 30-day rule (what the demo runs)' : 'Top 10% of each order month (needs the whole month; best case)') +
+      ` · ${int(n)} ${S.key === 'clean' ? 'orders placed after the training data' : 'orders due 2014–2015'}`;
     document.getElementById('cm').innerHTML = `
       <div style="background:#DCE7FF"><span class="small" style="color:#0A3BA8">Late, flagged</span><span class="v">${int(c.tp)}</span><span class="small">caught in time to act</span></div>
       <div style="background:#FBE3D0"><span class="small" style="color:#7A2E00">Late, missed</span><span class="v">${int(c.fn)}</span><span class="small">no warning given</span></div>
       <div style="background:#FBE3D0"><span class="small" style="color:#7A2E00">On time, flagged</span><span class="v">${int(c.fp)}</span><span class="small">false alarms</span></div>
       <div style="background:#EDEFF4"><span class="small muted">On time, not flagged</span><span class="v">${int(c.tn)}</span><span class="small muted">correctly left alone</span></div>`;
     const okN = c.tp + c.tn;
-    document.getElementById('eb-sub').textContent = rule === 'live' ? 'share of the test set · live rule' : 'share of the test set · month-end best case';
+    document.getElementById('eb-sub').textContent = `share of ${S.key === 'clean' ? 'orders placed after the training data' : 'all orders due 2014–2015'} · ${rule === 'live' ? 'live rule' : 'month-end best case'}`;
     document.getElementById('eb-bar').innerHTML =
       `<span style="flex:${okN} 1 0;background:#8D95A8"></span><span style="flex:${c.fp} 1 0;background:#E08A4A"></span><span style="flex:${c.fn} 1 0;background:#B8470A"></span>`;
     const line = (color, title, sub, share, count) => `<div class="legend-row" style="padding:6px 0">
@@ -174,15 +214,44 @@
       <span>${title}<span class="small muted" style="display:block">${sub}</span></span></span>
       <span class="num" style="text-align:right"><b>${pct(share)}</b><span class="small muted" style="display:block">${int(count)} of ${int(n)}</span></span></div>`;
     document.getElementById('eb').innerHTML =
-      line('#8D95A8', 'Correct', 'on time and not flagged, or late and flagged', e.correct, okN) +
+      line('#8D95A8', `Correct <span class="small muted">(flag nothing: ${pct((c.tn + c.fp) / n)})</span>`, 'on time and not flagged, or late and flagged', e.correct, okN) +
       line('#E08A4A', 'Type I · false alarm', 'flagged but arrived on time (alert fatigue)', e.type1_false_alarm, c.fp) +
-      line('#B8470A', 'Type II · missed late', 'not flagged but arrived late (no warning)', e.type2_missed_late, c.fn);
+      line('#B8470A', 'Type II · missed late', 'not flagged but arrived late (no warning)', e.type2_missed_late, c.fn) +
+      `<p class="small muted" style="margin:6px 0 0">Flagging nothing would be ${pct((c.tn + c.fp) / n)} correct, because most orders arrive on time.
+        Accuracy is not the goal here; catching late shipments is (see the curve and the matrix).</p>`;
   }
   document.querySelectorAll('[data-rule]').forEach((b) => b.addEventListener('click', () => {
+    rule = b.dataset.rule;
     document.querySelectorAll('[data-rule]').forEach((x) => x.setAttribute('aria-pressed', x === b));
-    renderCM(b.dataset.rule);
+    renderCM(scopeData(scope));
   }));
-  renderCM('live');
+
+  // ---- baselines (same orders as the selected scope)
+  function renderBaselines(S) {
+    const bl = S.baselines, lb = S.liveBaselines, hasLive = Object.keys(lb).length > 0;
+    const rows = [['Boosted trees (final)', S.boosted, S.live, true], ['Logistic regression', bl.logistic_benchmark, lb.logistic_benchmark],
+                  ['Route late-rate lookup', bl.route_excess_lookup, lb.route_excess_lookup],
+                  ['Vendor late-rate lookup', bl.vendor_excess_lookup, lb.vendor_excess_lookup],
+                  ['No skill (random)', bl.no_skill, null]].filter((r) => r[1]);
+    document.getElementById('bl-sub').textContent = S.key === 'clean' ? 'orders placed after the training data' : 'all orders due 2014–2015';
+    document.getElementById('baselines').innerHTML = `
+      <thead><tr><th>Approach</th>${hasLive ? '<th class="r">Live: flagged</th><th class="r">Live: caught</th><th class="r">Live: alerts late</th>' : ''}
+        <th class="r">Month-end caught</th><th class="r">PR-AUC</th><th class="r">Lift</th></tr></thead>
+      <tbody>${rows.map(([name, r, lv, bold]) => `<tr${bold ? ' style="font-weight:600"' : ''}><td>${esc(name)}</td>
+        ${hasLive ? (lv ? `<td class="r num">${pct(lv.flagged_share)}</td><td class="r num">${pct(lv.recall)}</td><td class="r num">${pct(lv.precision)}</td>`
+                         : '<td class="r muted">–</td><td class="r muted">–</td><td class="r muted">–</td>') : ''}
+        <td class="r num">${pct(r.recall_monthly10)}</td><td class="r num">${num(r.pr_auc)}</td><td class="r num">${num(r.lift, 2)}×</td></tr>`).join('')}</tbody>`;
+    document.getElementById('bl-note').innerHTML = (hasLive
+      ? 'Live: each approach ranked with the same rolling 30-day rule the demo uses. Lookups give many orders the same score, so the rule flags more of them. '
+      : '') + 'Month-end caught: top 10% of each order month, the same budget for every approach. Averaged across order months; the confusion matrix pools all months, so its percentages differ slightly.';
+  }
+  document.getElementById('baselines').insertAdjacentHTML('afterend', '<p class="small muted" style="margin:8px 0 0" id="bl-note"></p>');
+
+  function renderScope() {
+    const S = scopeData(scope);
+    renderKpis(S); renderPR(S); renderCM(S); renderBaselines(S);
+  }
+  renderScope();
 
   // ---- feature importance
   const fi = (m.feature_importance || []).slice().sort((a, b) => b.recall_monthly10_drop - a.recall_monthly10_drop);
@@ -198,24 +267,12 @@
   document.getElementById('delay').innerHTML = `
     <p style="margin:0">A late shipment is typically <b>${num(dp.median, 0)} days</b> late; half fall between
       <b>${num(dp.q25, 0)} and ${num(dp.q75, 0)} days</b>.</p>
-    <p class="small muted" style="margin:0">Shown as a historical range, not a per-order prediction: no model beat the median.
-      On the test set, the median estimate is off by ${num(dl.test_mae_of_that_median, 1)} days on average.</p>`;
-
-  // ---- baselines
-  const rows = [['Boosted trees (final)', B, true], ['Logistic regression', T.baselines.logistic_benchmark],
-                ['Route late-rate lookup', T.baselines.route_excess_lookup], ['No skill (random)', T.baselines.no_skill]];
-  document.getElementById('baselines').innerHTML = `
-    <thead><tr><th>Approach</th><th class="r">Caught</th><th class="r">Alerts late</th><th class="r">PR-AUC</th><th class="r">Lift</th></tr></thead>
-    <tbody>${rows.map(([name, r, bold]) => `<tr${bold ? ' style="font-weight:600"' : ''}><td>${esc(name)}</td>
-      <td class="r num">${pct(r.recall_monthly10)}</td><td class="r num">${pct(r.precision_monthly10)}</td>
-      <td class="r num">${num(r.pr_auc)}</td><td class="r num">${num(r.lift, 2)}×</td></tr>`).join('')}</tbody>`;
-  document.getElementById('baselines').insertAdjacentHTML('afterend',
-    '<p class="small muted" style="margin:8px 0 0">Caught / alerts late: top 10% of each order month, the same budget for every approach. Averaged across order months; the confusion matrix pools all months, so its percentages differ slightly.</p>');
+    <p class="small muted" style="margin:0">Shown as a historical range, not a per-order prediction.</p>`;
 
   // ---- validation
   const v = m.validation || {};
   document.getElementById('validation').innerHTML = `
-    <p style="margin:0 0 8px">Chosen on three validation years (2011, 2012, 2013), each trained only on earlier years, before the test set was scored:
+    <p style="margin:0 0 8px">Chosen on three validation years (orders due 2011, 2012, 2013), each trained only on orders due earlier, before the test set was scored:
       <b>${esc(v.chosen || '')}</b>.</p>
     <p class="muted" style="margin:0 0 8px">Rule fixed in advance: ${esc(v.selection_rule || '')}.</p>
     <table><thead><tr><th>Candidate</th><th class="r">Mean caught</th><th class="r">Worst year</th></tr></thead><tbody>
@@ -224,6 +281,7 @@
       ${v.benchmark ? `<tr><td>Logistic benchmark</td><td class="r num">${pct(v.benchmark.mean_recall_monthly10)}</td><td class="r num">${pct(v.benchmark.min_recall_monthly10)}</td></tr>` : ''}
     </tbody></table>`;
 
+  const live = m.live_alert_rule_test || {};
   document.getElementById('caveats').innerHTML = (m.caveats || []).map((c) => `<li>${esc(c)}</li>`).join('') +
     (live.used_reference_fallback ? `<li>${int(live.used_reference_fallback)} test orders arrived when fewer than 30 orders had been placed in the previous 30 days; they were ranked against a fixed reference distribution instead.</li>` : '');
 })();

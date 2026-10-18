@@ -765,7 +765,8 @@ def cmd_evaluate(args):
         "excluded": {"n": int(excl.sum()), "late": int(yv[excl].sum()),
                      "late_rate": round(float(yv[excl].mean()), 4) if excl.any() else None},
         "boosted": metrics(yc, sc, mc),
-        "live": {"rule": live["rule"], **rule_summary(live_flag[clean], yc)},
+        "live": {"rule": live["rule"], **rule_summary(live_flag[clean], yc),
+                 "used_reference_fallback": int(sum(r[3] == "reference" for r, c in zip(ranked, clean) if c))},
         "month_end": rule_summary(month_flag, yc),
         "baselines": {
             "logistic_benchmark": metrics(yc, logit_score[clean], mc),
@@ -794,28 +795,51 @@ def cmd_evaluate(args):
     fn, tn = int(((f == 0) & (y == 1)).sum()), int(((f == 0) & (y == 0)).sum())
     n = len(alerts)
     test_m = report["test_2014_2015"]
+    all_orders_test = {
+        "boosted": test_m["boosted (chosen)"],
+        "baselines": {"logistic_benchmark": test_m["logistic benchmark"],
+                      "route_excess_lookup": test_m["route_excess_lookup"],
+                      "no_skill": test_m["no_skill"]},
+        "confusion_rule": "month-end top 10% of each order month (best case; needs the whole month)",
+        "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
+        "error_breakdown": {"correct": round((tp + tn) / n, 4), "type1_false_alarm": round(fp / n, 4),
+                            "type2_missed_late": round(fn / n, 4)},
+        "flagged_share": round(f.mean(), 4),
+    }
+    ME = test_clean["month_end"]
+    headline_test = {
+        "n": test_clean["n"], "late": test_clean["late"], "late_rate": test_clean["late_rate"],
+        "boosted": test_clean["boosted"],
+        "baselines": test_clean["baselines"],
+        "confusion_rule": "month-end top 10% of each order month (best case; needs the whole month)",
+        "confusion": ME["confusion"], "error_breakdown": ME["error_breakdown"], "flagged_share": ME["flagged_share"],
+    }
+    cohort = f"orders placed after {cutoff.date()}"
     metrics_payload = {
         "model_version": art.get("model_version"),
+        # every headline key below (live_alert_rule_test, test, pr_curve) covers this cohort only
+        "cohort": cohort,
+        "cohort_rule": f"order (decision) date > {cutoff.date()}, the last outcome in the training data; "
+                       f"the demo replay uses the same rule: --start {test_clean['first_order_date']}",
+        "cohort_first_order_date": test_clean["first_order_date"],
+        "n_orders": test_clean["n"],
         "backend": art["backend"],
         "split": "by promised (scheduled) delivery date: train = orders due 2010-2013 (selection on rolling "
                  "folds due 2011/2012/2013), test = orders due 2014-2015, scored once. Headline: test_clean, "
                  "the test orders placed after the last training outcome",
         "alert_rule": "live: top 10% of orders placed in the previous 30 days; "
                       "month-end top 10% shown as the best case",
-        "test_clean": test_clean,
-        "live_alert_rule_test": live,
-        "test": {
-            "boosted": test_m["boosted (chosen)"],
-            "baselines": {"logistic_benchmark": test_m["logistic benchmark"],
-                          "route_excess_lookup": test_m["route_excess_lookup"],
-                          "no_skill": test_m["no_skill"]},
-            "confusion_rule": "month-end top 10% of each order month (best case; needs the whole month)",
-            "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
-            "error_breakdown": {"correct": round((tp + tn) / n, 4), "type1_false_alarm": round(fp / n, 4),
-                                "type2_missed_late": round(fn / n, 4)},
-            "flagged_share": round(f.mean(), 4),
+        "live_alert_rule_test": test_clean["live"],
+        "test": headline_test,
+        "pr_curve": test_clean["pr_curve"],
+        # the same figures on every order due 2014-2015, kept for comparison; never the headline
+        "all_orders": {
+            "cohort": "all orders due 2014-2015", "n_orders": int(len(test)),
+            "live_alert_rule_test": live,
+            "test": all_orders_test,
+            "pr_curve": pr_curve(alerts.label_late.values, alerts.risk_score.values),
         },
-        "pr_curve": pr_curve(alerts.label_late.values, alerts.risk_score.values),
+        "test_clean": test_clean,       # cohort details: cutoff, excluded orders, live-rule baselines
         "feature_importance": [{"feature": k, **v} for k, v in report["importance_last_fold"].items()],
         "validation": {"chosen": report["validation"]["chosen"],
                        "selection_rule": report["selection_rule"],
@@ -838,9 +862,18 @@ def cmd_evaluate(args):
             "Test years were also viewed during the baseline study; treat test numbers as indicative.",
         ],
     }
+    # self-check: every headline confusion matrix covers exactly the cohort
+    for name, c in (("live", metrics_payload["live_alert_rule_test"]["confusion"]),
+                    ("month-end", metrics_payload["test"]["confusion"])):
+        assert sum(c.values()) == test_clean["n"], (name, c, test_clean["n"])
     (mdir / "metrics.json").write_text(json.dumps(metrics_payload, indent=2, default=str))
-    e = metrics_payload["test"]["error_breakdown"]
-    print(f"error breakdown (test, month-end best case): correct {e['correct']:.1%} · "
+    hl = metrics_payload["live_alert_rule_test"]
+    c = hl["confusion"]
+    print(f"HEADLINE ({cohort}, {test_clean['n']} orders): live rule caught {c['tp']} of {c['tp'] + c['fn']} late "
+          f"({hl['recall']:.1%}) · {c['tp']} of {c['tp'] + c['fp']} alerts late ({hl['precision']:.1%}) · "
+          f"confusion tp {c['tp']} fp {c['fp']} fn {c['fn']} tn {c['tn']} = {sum(c.values())}")
+    e = all_orders_test["error_breakdown"]
+    print(f"all orders (comparison only, under all_orders): month-end correct {e['correct']:.1%} · "
           f"Type I {e['type1_false_alarm']:.1%} · Type II {e['type2_missed_late']:.1%}")
     print(f"written: {mdir / 'metrics.json'}")
     if not reload_ok:
