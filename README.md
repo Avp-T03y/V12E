@@ -1,5 +1,4 @@
 <div align="center">
-<img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/9b4b39e6-bebe-4550-ae97-3d9a41dd900c" />
 
 # V12 Engines
 ### Order-time delivery-delay early warning for global HIV supply chains
@@ -199,3 +198,5 @@ IBM LinuxONE (s390x, no GPU) · Snap ML 1.17.2 · scikit-learn (baselines) · Fa
 | Aditya Pavuluri | Pipeline: scoring API, score log, replay, generative layer |
 | Indra Erdenebat | Research & docs: source research, README, data and model cards, decision log, video script |
 | Jongmin (Daniel) Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+
+<img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/9b4b39e6-bebe-4550-ae97-3d9a41dd900c" />
