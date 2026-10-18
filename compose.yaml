@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: deploy/api.Dockerfile
+    image: v12e-api
     restart: unless-stopped
     environment:
       MODEL_DIR: /models
@@ -15,6 +16,24 @@ services:
       - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro
       - /srv/v12e/data/SCMS_Delivery_History_Dataset_20150929.csv:/data/SCMS_Delivery_History_Dataset_20150929.csv:ro
       - /srv/v12e/state:/state
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  replay:
+    image: v12e-api
+    pull_policy: never
+    command: ["python", "src/replay/replay.py", "--input", "/data/test_v3.csv", "--api", "http://api:8000", "--interval", "3"]
+    volumes:
+      - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: "no"
+
   web:
     build:
       context: .
