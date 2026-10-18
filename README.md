@@ -85,7 +85,7 @@ flowchart LR
 - **Split (by promised delivery date):** model trained on orders due **2010–2013**; tested on orders due **2014–2015** (2,545 orders, 356 late).
 - **Training era 2010+:** orders due 2006–2009 had a 0–4% late rate and mostly missing decision dates, so they are not used for training.
 - **Leakage-safe features:** past-performance priors use only shipments delivered before each order's cutoff.
-- **Data source link:** _TODO: add SCMS dataset URL_
+- **Data source link:** USAID PEPFAR SCMS "Supply Chain Shipment Pricing Data", via [Kaggle](https://www.kaggle.com/datasets/apoorvwatsky/supply-chain-shipment-pricing-data) (file `SCMS_Delivery_History_Dataset_20150929.csv`).
 
 ## Results
 
