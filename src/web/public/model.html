@@ -108,7 +108,9 @@
   if (!m) return;
 
   const T = m.test, B = T.boosted, C = m.test_clean;
-  const dl = m.days_late || {}, dp = dl.production || {};
+  // the demo model's range (orders due 2010-2013), the same one the Live view shows; older files: production
+  const dl = m.days_late || {}, dp = dl.demo_model || dl.production || {};
+  const dpFrom = dl.demo_model ? 'late orders due 2010–2013' : 'late orders due 2010–2015';
   document.getElementById('subtitle').textContent =
     `${m.backend === 'snapml' ? 'Snap ML' : m.backend} boosted trees · model ${m.model_version} · ${mRes.live ? 'live /api/metrics' : 'sample data'}`;
 
@@ -157,7 +159,7 @@
       <div class="kpi"><div class="label">PR-AUC</div><div class="value">${num(BB.pr_auc)}</div>
         <div class="sub">${num(BB.lift, 1)}× the no-skill ${num(S.baselines.no_skill.pr_auc)}${lg ? ` · logistic ${num(lg.pr_auc)}` : ''}</div></div>
       <div class="kpi"><div class="label">Typical delay, if late</div><div class="value">${num(dp.median, 0)} days</div>
-        <div class="sub">middle half ${num(dp.q25, 0)}–${num(dp.q75, 0)} days · historical estimate</div></div>`;
+        <div class="sub">middle half ${num(dp.q25, 0)}–${num(dp.q75, 0)} days · historical, ${dpFrom}</div></div>`;
   }
 
   function renderPR(S) {
@@ -266,7 +268,8 @@
   document.getElementById('delay').innerHTML = `
     <p style="margin:0">A late shipment is typically <b>${num(dp.median, 0)} days</b> late; half fall between
       <b>${num(dp.q25, 0)} and ${num(dp.q75, 0)} days</b>.</p>
-    <p class="small muted" style="margin:0">Shown as a historical range, not a per-order prediction.</p>`;
+    <p class="small muted" style="margin:0">Historical range over ${dpFrom}, the data the demo model learned from; the Live view
+      shows the same figure. It is not a per-order prediction.</p>`;
 
   // ---- validation
   const v = m.validation || {};
