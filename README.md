@@ -159,21 +159,6 @@ ssh -L <local-port>:localhost:<web-port> <user>@<server-ip>   # TODO: ports
 
 IBM LinuxONE (s390x, no GPU) · Snap ML 1.17.2 · scikit-learn (baselines) · FastAPI · Docker Compose · nginx · HTML + Chart.js · IBM Granite (tested, off in the demo)
 
-## Documentation
-
-| Doc | Path |
-|---|---|
-| Model / decision card | [`docs/model_card.md`](docs/model_card.md) |
-| Platform evidence | `docs/evidence/` |
-| Deployment runbook | _TODO: add path_ |
-| Demo video script | _TODO: add path_ |
-
-## Open-source and data links
-
-- SCMS / PEPFAR dataset: _TODO_
-- Snap ML: _TODO_
-- IBM Granite: _TODO_
-- FastAPI: _TODO_
 
 ## Team
 
