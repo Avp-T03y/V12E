@@ -1,0 +1,41 @@
+{
+    "status": "ok",
+    "model_version": "dev-eval",
+    "role": "evaluation (trained 2010-2013; replay 2014-2015)",
+    "backend": "snapml",
+    "trained_on": "2010-2013",
+    "open_alerts": 261,
+    "history_deliveries": 10324,
+    "alert_rule": "top 10% of the previous 30 days",
+    "machine": "s390x",
+    "python": "3.12.15",
+    "model_file": "v12e_eval_model.pkl",
+    "granite": "disabled",
+    "scored_since_start": 976,
+    "uptime_s": 2064,
+    "latency": {
+        "model_ms": {
+            "n": 976,
+            "median_ms": 106.91,
+            "p95_ms": 114.01,
+            "max_ms": 144.6
+        },
+        "granite_ms": null,
+        "score_total_ms": {
+            "n": 976,
+            "median_ms": 106.98,
+            "p95_ms": 114.04,
+            "max_ms": 144.6
+        }
+    },
+    "machine_type": "9175",
+    "nnpa": true,
+    "cpus": 3,
+    "cpu_limit": null,
+    "mem_total_gb": 7.8,
+    "mem_limit_gb": null,
+    "disk_total_gb": 49.1,
+    "snapml_version": "1.17.2",
+    "tree_format": null,
+    "nnpa_used_by_model": false
+}

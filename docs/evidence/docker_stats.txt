@@ -1,0 +1,5 @@
+CONTAINER ID   NAME            CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+7bb1c8c00c47   v12e-web-1      0.00%     4.246MiB / 7.821GiB   0.05%     5.66MB / 5.82MB   0B / 8.19kB       4
+99b8c8fb93be   v12e-api-1      12.57%    146.1MiB / 7.821GiB   1.82%     1.61MB / 6.97MB   0B / 33.2MB       6
+13283975f566   v12e-replay-1   0.00%     59.23MiB / 7.821GiB   0.74%     2.44MB / 1.3MB    0B / 12.1MB       2
+13e3e436a089   notebook        0.00%     126.2MiB / 7.821GiB   1.58%     0B / 0B           73.1MB / 82.8MB   6

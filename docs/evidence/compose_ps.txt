@@ -1,0 +1,4 @@
+NAME            IMAGE                                                                     COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+v12e-api-1      v12e-api                                                                  "/usr/bin/tini -g --…"   api       34 minutes ago   Up 34 minutes (healthy)   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+v12e-replay-1   sha256:a2e27f39c103503763cc6be7a5d197331c4c76e480fe1c99aeb6be6e7bde36be   "/usr/bin/tini -g --…"   replay    45 minutes ago   Up 45 minutes             3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+v12e-web-1      v12e-web                                                                  "/docker-entrypoint.…"   web       34 minutes ago   Up 34 minutes             80/tcp, 127.0.0.1:8080->8080/tcp
