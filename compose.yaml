@@ -26,7 +26,7 @@ services:
   replay:
     image: v12e-api
     pull_policy: never
-    command: ["python", "src/replay/replay.py", "--input", "/data/test_v3.csv", "--api", "http://api:8000", "--interval", "3"]
+        command: ["python", "src/replay/replay.py", "--input", "/data/test_v3.csv", "--api", "http://api:8000", "--interval", "2", "--start", "2014-02-26"]
     volumes:
       - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro
     depends_on:
