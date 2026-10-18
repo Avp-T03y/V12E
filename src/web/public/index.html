@@ -50,6 +50,7 @@
   .runway-box { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 6px; }
   .runway-box.short { background: #FCE4E4; color: #A2191F; } .runway-box.medium { background: var(--warn-bg); color: var(--warn-ink); }
   .runway-box.long { background: var(--accent-bg); color: var(--accent-ink); }
+  .runway-box.unknown, .rw.unknown { background: var(--line2); color: var(--muted2); }
   h3 { margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
   .drv { display: flex; flex-direction: column; gap: 4px; }
   .drv .dtop { display: flex; gap: 8px; justify-content: space-between; font-size: 14px; }
@@ -80,7 +81,7 @@
     <span class="small muted" id="clock">Replay clock: waiting for the first order…</span>
   </div>
 
-  <p class="caption">Replay of historical orders due 2014–2015, placed from 26 Feb 2014 onward, sent one at a time through the live scoring API as if placed today; not a live 2026 feed.
+  <p class="caption">Replay of historical orders due 2014–2015, placed from 26 Feb 2014 onward, sent one at a time through the live scoring API as if placed today; not a live 2026 feed. The replay starts after the last outcome the model was trained on.
     Each order is ranked against the orders placed in the previous 30 days: the top 10% are <b>high</b>, the next 15% <b>elevated</b>.</p>
   <p class="banner" id="banner" hidden></p>
 
@@ -162,7 +163,8 @@
   const pctl = (o) => `P${num(o.risk_percentile, 0)}`;
   const barColor = (b) => (b === 'high' ? '#B8470A' : b === 'elevated' ? '#E08A4A' : '#0F62FE');
   const isOpen = (a) => !a.status || a.status === 'open';
-  function runwayText(d) { return d < 0 ? `${-d} days overdue` : d === 0 ? 'today' : `${d} days`; }
+  function runwayText(d) { return d == null ? 'n/a' : d < 0 ? `${-d} days overdue` : d === 0 ? 'today' : `${d} days`; }
+  const rwKey = (a) => (a.runway_days == null ? 1e6 : a.runway_days);   // unknown runway sorts last
   function showBanner(text, bad) { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner' + (bad ? ' bad' : ''); b.textContent = text; }
 
   function visibleAlerts() {
@@ -172,7 +174,7 @@
       : (a) => a.risk_score;
     return [...alerts.values()]
       .filter((a) => (view === 'history' || sessionIds.has(a.order_id)) && (showReviewed || isOpen(a)))
-      .sort((a, b) => key(b) - key(a) || a.runway_days - b.runway_days);
+      .sort((a, b) => key(b) - key(a) || rwKey(a) - rwKey(b));
   }
 
   // ---- renderers
@@ -203,7 +205,7 @@
           <span class="ellipsis">${esc(c.shipment_mode || '–')}</span>
           <span class="riskbar"><span class="track"><span class="fill" style="width:${num(a.risk_percentile, 0)}%;background:${barColor(a.risk_band)}"></span></span>
             <span style="width:40px;text-align:right;font-weight:600" class="num">${pctl(a)}</span></span>
-          <span class="rw ${esc(a.runway_tier)}">${runwayText(a.runway_days)}</span></button>`;
+          <span class="rw ${esc(a.runway_tier)}"${a.runway_days == null ? ' title="Promised date equals the order date in the source data"' : ''}>${runwayText(a.runway_days)}</span></button>`;
       }).join('');
     }
     if (!selected && list.length) { selected = list[0].order_id; renderDetail(); el.querySelector('.arow').setAttribute('aria-pressed', 'true'); }
@@ -232,8 +234,10 @@
           <span class="tiny muted">usually ${num(d.q25, 0)}–${num(d.q75, 0)} · historical, not a prediction</span></div>
       </div>
       <div class="runway-box ${esc(a.runway_tier)}">
-        <span style="font-size:15px;font-weight:600">${a.runway_days >= 0 ? `Promised in ${a.runway_days} days` : `${-a.runway_days} days overdue`}</span>
-        <span class="small">Order date ${esc(a.decision_date || '?')} · Promised ${esc(a.scheduled_delivery_date || '?')} · ${esc(a.runway_tier)} runway</span>
+        <span style="font-size:15px;font-weight:600">${a.runway_days == null ? 'Runway not available (source data)'
+          : a.runway_days >= 0 ? `Promised in ${a.runway_days} days` : `${-a.runway_days} days overdue`}</span>
+        <span class="small">Order date ${esc(a.decision_date || '?')} · Promised ${esc(a.scheduled_delivery_date || '?')} · ${a.runway_days == null
+          ? 'the promised date equals the order date in the source data' : esc(a.runway_tier) + ' runway'}</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <h3>Top drivers</h3>

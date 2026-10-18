@@ -248,7 +248,10 @@ async def score(order: Order):
         raise HTTPException(422, ("invalid_decision_date",
                                   "decision_date is required and must not be after scheduled_delivery_date"))
     today = pd.Timestamp(order.as_of) if order.as_of else pd.Timestamp(date.today())
-    runway = int((sched - today).days)
+    # In the source data some orders (all Direct Drop) have the promised date equal to the order date,
+    # so a runway is meaningless for them: report it as unavailable rather than 0 days.
+    runway_known = decided.normalize() != sched.normalize()
+    runway = int((sched - today).days) if runway_known else None
 
     df = pd.DataFrame([order.model_dump(exclude={"explain", "as_of"})])
     lane_cols = [c for c in vm.RELATIVE + vm.PRIOR_FLAGS]
@@ -266,7 +269,7 @@ async def score(order: Order):
     STATE["policy"].add(order.order_id, decided, s)
     drivers = vm.explain(art, df)[0]
     d = art["days_late_if_late"]
-    tier = tier_for(runway) if runway >= 0 else "short"
+    tier = "unknown" if runway is None else tier_for(runway) if runway >= 0 else "short"
     result = {
         "order_id": order.order_id, "model_version": art.get("model_version"),
         "risk_score": round(s, 4), "risk_band": band, "risk_percentile": pct,
@@ -275,6 +278,7 @@ async def score(order: Order):
                      for c in ["planned_lead_time_days"] + vm.RELATIVE + vm.PRIOR_FLAGS},
         "features_source": features_source,
         "runway_days": runway, "runway_tier": tier,
+        "runway_note": None if runway_known else "not available: promised date equals the order date in the source data",
         "typical_days_late_if_late": d,
         "top_drivers": drivers,
         "context": {k: getattr(order, k) for k in ("country", "vendor", "fulfillment_route", "shipment_mode",
@@ -323,7 +327,7 @@ def record_delivery(d: Delivery):
 @app.get("/alerts")
 def alerts(limit: int = 50, band: Optional[str] = None):
     rows = [a for a in STATE["alerts"].values() if band is None or a["risk_band"] == band]
-    rows.sort(key=lambda a: (-a["risk_score"], a["runway_days"]))
+    rows.sort(key=lambda a: (-a["risk_score"], a["runway_days"] if a["runway_days"] is not None else 10 ** 6))
     return {"count": len(rows), "alerts": rows[:limit]}
 
 

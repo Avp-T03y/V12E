@@ -29,6 +29,7 @@ ACTIONS = {
     "long": "Review sourcing: consider an alternative supplier or route.",
     "medium": "Expedite with the vendor or pre-position buffer stock.",
     "short": "Expedite now: pre-position from the nearest depot and warn the receiving facility.",
+    "unknown": "Confirm the promised delivery date with the vendor; the recorded date equals the order date.",
 }
 CAVEAT = ("Risk is a ranking against recent orders, not a guarantee; the delay range is a "
           "historical estimate.")
@@ -58,7 +59,9 @@ def user_prompt(p):
     drivers = p.get("drivers") or ["no individual driver stood out for this order"]
     return (f"RISK: {p['risk_band']} (score {p['risk_score']:.2f}, above {p.get('risk_percentile', 0):.0f}% "
             f"of recent orders)\n"
-            f"RUNWAY: {p['runway_days']} days until the scheduled delivery ({p['runway_tier']})\n"
+            + (f"RUNWAY: {p['runway_days']} days until the scheduled delivery ({p['runway_tier']})\n"
+               if p.get("runway_days") is not None else
+               "RUNWAY: not available (the promised date equals the order date in the source data)\n") +
             f"ACTION: {ACTIONS[p['runway_tier']]}\n"
             f"TYPICAL DELAY IF LATE: {d['median']:.0f} days (usually {d['q25']:.0f}-{d['q75']:.0f})\n"
             "DRIVERS:\n- " + "\n- ".join(drivers) + "\n"
@@ -97,7 +100,8 @@ def validate(out, p):
             raise ValueError("did not say the lead time is unknown")
     action = out["recommended_action"].lower()
     keys = {"long": ["sourcing", "supplier", "route"], "medium": ["expedite", "buffer", "pre-position"],
-            "short": ["expedite", "depot", "warn", "pre-position"]}[p["runway_tier"]]
+            "short": ["expedite", "depot", "warn", "pre-position"],
+            "unknown": ["confirm", "date"]}[p["runway_tier"]]
     if not any(k in action for k in keys):
         raise ValueError("action does not match the runway tier")
     if len(out["risk_summary"]) > 400:
