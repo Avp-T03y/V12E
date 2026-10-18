@@ -1,124 +1,33 @@
-### **Slide 1: Title Slide**
-
-*(On-Screen: IBM Z Datathon 2026 / V12 Engines Team)*
-
-> "Welcome to V12 Engines. Today, we’re excited to walk you through how we’re transforming global health supply chains with an early-warning delivery engine built right on IBM LinuxONE."
-> 
-> 
-
----
-
-### **Slide 2: 01. The Challenge**
-
-*(On-Screen: Problem Statement & Operational Context)*
-
-> "Think about how easy it is to track a rideshare app down to the exact minute. Yet for life-saving healthcare deliveries, logistics teams have had zero visibility the moment an order is placed.
-> 
-> 
-> The reality is heartbreaking: when vital HIV medicines and diagnostic kits arrive late, patients face dangerous treatment gaps. Right now, officers rely on stressful, manual phone calls and reactive tracking, meaning port congestion and customs delays are found out far too late. With 11.5 percent of global health shipments arriving late—and RDC fulfillment routes spiking to 17.2 percent—our goal is to turn a 128-day median lead time into actual, proactive runway before a crisis hits."
-> 
-> 
-
----
-
-### **Slide 3: 02. Competitive Landscape**
-
-*(On-Screen: How order-time scoring differs from tracking and planning tools)*
-
-> "Now, you might wonder how we compare to existing tools. Platforms like project44 and FourKites do an amazing job tracking shipments *in transit* using GPS and IoT sensors, while tools like SAP IBP focus on high-level enterprise planning.
-> 
-> 
-> But we solve a different moment: V12 Engines predicts risk the *exact second an order is placed*, using only order attributes. That gives logistics officers the maximum possible runway to step in and act."
-> 
-> 
-
----
-
-### **Slide 4: 03. Integrated Solution**
-
-*(On-Screen: Order-Time Delay Warning Engine)*
-
-> "To pull this off, our solution uses a Snap ML boosted-tree classifier running directly on IBM LinuxONE compute to rank each order's delay risk against historical ranges.
-> 
-> 
-> We’ve built-in template explanations driven by model features, tested IBM Granite for the next evolution, and secured everything with SSH-encrypted tunnels and audit logging. An intuitive dashboard brings it all together, ranking alerts so officers can take immediate action."
-> 
-> 
-
----
-
-### **Slide 5: 04. Technical Architecture**
-
-*(On-Screen: End-to-End System Pipeline on IBM LinuxONE)*
-
-> "Under the hood, our pipeline processes over 10,000 USAID SCMS shipment rows, computing rolling prior late rates. A native s390x Snap ML classifier scores risk, while FastAPI and Docker Compose power our real-time streaming replay feed for the web frontend."
-> 
-> 
-
----
-
-### **Video Walkthrough**
-
-*(On-Screen: Dashboard, Model, and Platform Demo)*
-
-### **Video Walkthrough**
-
-*(On-Screen: Dashboard, Model, and Platform Demo)*
-
-> Here, we are looking at our live dashboard interface, replaying historical orders through our scoring API. Each incoming order is evaluated at order time, displaying real-time metrics like units at risk, median scoring latency of under 107 milliseconds, and open risk alerts." 
-
- [On Screen: Clicking through 'Model' tab and looking at PR-AUC & confusion matrix]
-
-"Switching to our model tab, we evaluate performance strictly on future held-out test data. Using our Snap ML boosted-tree classifier, we achieve a strong PR-AUC compared to the no-skill baseline, optimizing for high recall to ensure we catch critical delays before they impact patients." 
-
- [On Screen: Clicking through 'Platform' tab showing IBM LinuxONE containers]
-
-"Finally, looking under the hood at our Platform tab, everything runs natively on IBM LinuxONE using s390x architecture and Docker Compose containers. We feature tunnel-only SSH encryption, active scoring logs, and template-based explanations designed for transparent, secure healthcare logistics.
-
----
-
-### **Slide 7: 05. Stakeholder Value**
-
-*(On-Screen: Target Audience & Ecosystem Impact)*
-
-> "This isn't just tech for tech's sake—it creates real impact. Logistics officers get early warnings, USAID and PEPFAR programs can protect HIV treatment continuity across 43 countries, and clinics can stop emergency rationing. Best of all, it proves that secure, powerful AI belongs right on core enterprise infrastructure."
-> 
-> 
-
----
-
-### **Slide 8: 06. Operational Impact**
-
-*(On-Screen: Expected Outcomes & Model Metrics)*
-
-> "When tested on post-cutoff data with a 9.5 percent late rate, our model successfully catches 37.8 percent of late shipments at our threshold. It’s designed to help prevent supply gaps, cut costly emergency air charters by catching risks early, and bring total transparency to supply chain governance."
-> 
-> 
-
----
-
-### **Slide 9: 07. Key Takeaways**
-
-*(On-Screen: Learnings During the Datathon)*
-
-> "Building this during the datathon was an incredible journey—from deploying Snap ML and testing Granite on LinuxONE without dedicated GPUs, to mastering leakage-safe temporal features under tight timelines.
-> 
-> 
-> To close: V12 Engines—knowing before it’s late, every shipment, the moment it’s ordered."
-> 
->
-
-### **Video Walkthrough**
-
-*(On-Screen: Dashboard, Model, and Platform Demo)*
-
-> Here, we are looking at our live dashboard interface, replaying historical orders through our scoring API. Each incoming order is evaluated at order time, displaying real-time metrics like units at risk, median scoring latency of under 107 milliseconds, and open risk alerts." 
-
- [On Screen: Clicking through 'Model' tab and looking at PR-AUC & confusion matrix]
-
-"Switching to our model tab, we evaluate performance strictly on future held-out test data. Using our Snap ML boosted-tree classifier, we achieve a strong PR-AUC compared to the no-skill baseline, optimizing for high recall to ensure we catch critical delays before they impact patients." 
-
- [On Screen: Clicking through 'Platform' tab showing IBM LinuxONE containers]
-
-"Finally, looking under the hood at our Platform tab, everything runs natively on IBM LinuxONE using s390x architecture and Docker Compose containers. We feature tunnel-only SSH encryption, active scoring logs, and template-based explanations designed for transparent, secure healthcare logistics.
-
+Slide 1: Title Slide
+(On-Screen: IBM Z Datathon 2026 / V12 Engines Team)
+"Welcome to V12 Engines. We built an order-time delivery-delay early-warning engine for global health supply chains, running on IBM LinuxONE."
+Slide 2: 01. The Challenge
+(On-Screen: Problem Statement & Operational Context)
+"A rideshare app can tell you when your driver will arrive, almost to the minute. Health supply chains rarely get that warning when an order is placed. In 10,324 USAID and PEPFAR shipments, 11.5 percent arrived late, and 17.2 percent of From RDC orders. For HIV medicines and test kits, that can interrupt treatment. Yet the median planned lead time is 128 days. Warn at order time, and that becomes runway to act."
+Slide 3: 02. Competitive Landscape
+(On-Screen: How order-time scoring differs from tracking and planning tools)
+"Tools like project44 and FourKites predict arrival while a shipment is in transit. SAP IBP covers broad planning. We focus on an earlier moment: the order itself, using only what is known when it is placed."
+Slide 4: 03. Integrated Solution
+(On-Screen: Order-Time Delay Warning Engine)
+"A Snap ML boosted-tree model ranks each order against the previous 30 days: the top 10 percent are high risk, the next 15 percent elevated. Each alert explains its top drivers and suggests an action matched to the runway. IBM Granite is installed and tested, but off in the demo for speed. It all runs in containers behind an SSH tunnel, and a human always decides."
+Slide 5: 04. Technical Architecture
+(On-Screen: End-to-End System Pipeline on IBM LinuxONE)
+"Features use only deliveries completed before each order: how late its vendor, country and route have been over the past year. FastAPI scores each order and streams it to the dashboard."
+Slide 6: Video Walkthrough
+(On-Screen: Live tab)
+"Here is our live dashboard, replaying 2014 to 2015 orders through the scoring API as if placed today, with units at risk, open alerts, and a median scoring latency of about 107 milliseconds."
+[On Screen: Model tab, PR-AUC and confusion matrix]
+"On the Model tab, we evaluate on held-out test data. PR-AUC is well above the no-skill baseline, and the confusion matrix shows what we catch and miss within a fixed alert budget."
+[On Screen: Platform tab, IBM LinuxONE containers]
+"The Platform tab shows it all running natively on IBM LinuxONE, s390x, in Docker Compose containers, with measured latency and template explanations."
+Slide 7: 05. Stakeholder Value
+(On-Screen: Target Audience & Ecosystem Impact)
+"Officers get a short, ranked list of risky orders. Programs like USAID and PEPFAR can act before delays cause stockouts, and every review is logged."
+Slide 8: 06. Operational Impact
+(On-Screen: Expected Outcomes & Model Metrics)
+"On orders placed after the training data, the model catches 37.8 percent of late shipments while flagging 12.3 percent of orders, and its alerts are late three times as often as average. That is comparable to the best simple rule, and real-world impact is still to be measured."
+Slide 9: 07. Key Takeaways
+(On-Screen: Learnings During the Datathon)
+"We learned to run Snap ML and Granite on s390x without a GPU, and to use only what is known at order time. Finding 811 test orders that overlapped training, we re-evaluated on clean data. V12 Engines: knowing before it's late, every shipment, the moment it's ordered."
+ 
+ 
