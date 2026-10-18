@@ -17,6 +17,7 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 
 # Then copy the code (changes often, so it comes after the slow step).
 COPY src/ ./src/
+COPY v12e_model.py ./
 
 EXPOSE 8000
 # Replaces the image's default command (which starts Jupyter) with our API server.

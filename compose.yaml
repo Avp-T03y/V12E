@@ -1,31 +1,25 @@
-# V12 Engines demo app: 2 containers.
-#   api = Python (scoring + replay + genai)    web = nginx (dashboard + /api forwarding)
-# Start / rebuild after a git pull:   docker compose up -d --build
-# Stop and remove:                    docker compose down
-# Watch logs:                         docker compose logs -f
-
 services:
   api:
     build:
-      context: .                      # repo root, so the image can copy src/ and requirements.txt
+      context: .
       dockerfile: deploy/api.Dockerfile
-    restart: unless-stopped           # comes back after a crash or VM reboot
+    restart: unless-stopped
     environment:
       MODEL_DIR: /models
       DATA_DIR: /data
       STATE_DIR: /state
+      HISTORY_CSV: /data/SCMS_Delivery_History_Dataset_20150929.csv
+      USE_GRANITE: "0"
     volumes:
-      - /srv/v12e/models:/models:ro               # trained models from Jupyter, read-only
-      - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro # ONLY test data (v3) on the demo side
-      - /srv/v12e/state:/state                    # writable: review log, etc.
-    # No "ports:" on purpose. Only web can reach the API, over the private Compose network.
-
+      - /srv/v12e/models:/models:ro
+      - /srv/v12e/data/test_v3.csv:/data/test_v3.csv:ro
+      - /srv/v12e/data/SCMS_Delivery_History_Dataset_20150929.csv:/data/SCMS_Delivery_History_Dataset_20150929.csv:ro
+      - /srv/v12e/state:/state
   web:
     build:
       context: .
       dockerfile: deploy/web.Dockerfile
     restart: unless-stopped
-    depends_on:
-      - api
+    depends_on: [api]
     ports:
-      - "127.0.0.1:8080:8080"         # reachable only from the VM itself -> use the SSH tunnel
+      - "127.0.0.1:8080:8080"
