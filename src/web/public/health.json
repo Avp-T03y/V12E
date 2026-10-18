@@ -1,0 +1,6 @@
+{"status": "sample", "model_version": "sample", "role": "sample data (API not reachable)", "backend": "sample",
+ "trained_on": "2010-2013", "open_alerts": 3, "history_deliveries": 0, "alert_rule": "top 10% of the previous 30 days",
+ "machine": null, "granite": "unknown (sample)", "scored_since_start": 0, "uptime_s": null,
+ "latency": {"model_ms": null, "granite_ms": null, "score_total_ms": null},
+ "machine_type": null, "nnpa": null, "cpus": null, "cpu_limit": null, "mem_total_gb": null, "mem_limit_gb": null,
+ "disk_total_gb": null, "snapml_version": null, "tree_format": null, "nnpa_used_by_model": false}

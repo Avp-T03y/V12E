@@ -1,0 +1,79 @@
+{
+  "model_version": "v12e-20261017-2215-snapml-92c49f21",
+  "backend": "snapml",
+  "test_late_rate": 0.13988212180746562,
+  "classifier": {
+    "pr_auc": 0.3215844613834712,
+    "threshold": 0.5978435638568358,
+    "recall": 0.41853932584269665,
+    "precision": 0.32603938730853393,
+    "confusion": {
+      "tp": 149,
+      "fp": 308,
+      "fn": 207,
+      "tn": 1881
+    },
+    "error_breakdown": {
+      "correct": 0.7976424361493124,
+      "type1": 0.12102161100196464,
+      "type2": 0.08133595284872298
+    },
+    "recall_top10pct": 0.2443820224719101,
+    "precision_top10pct": 0.3411764705882353,
+    "flagged_share": 0.17956777996070727
+  },
+  "baseline_logreg": {
+    "pr_auc": 0.20012721433690156,
+    "threshold": 0.5739886155030722,
+    "recall": 0.5112359550561798,
+    "precision": 0.22007255139056833,
+    "confusion": {
+      "tp": 182,
+      "fp": 645,
+      "fn": 174,
+      "tn": 1544
+    },
+    "error_breakdown": {
+      "correct": 0.6781925343811395,
+      "type1": 0.25343811394891946,
+      "type2": 0.06836935166994106
+    },
+    "recall_top10pct": 0.05898876404494382,
+    "precision_top10pct": 0.08235294117647059,
+    "flagged_share": 0.324950884086444
+  },
+  "regressor": {
+    "chosen": "median",
+    "n_late_test": 356,
+    "target": "days late, conditional on the shipment being late",
+    "rolling_val_mae_late_rows": {
+      "median": 16.82071825603613,
+      "trees_raw": 27.501889004689943,
+      "trees_log": 17.986451276706617
+    },
+    "mae_late_only": 11.707865168539326,
+    "baseline_global_median_mae": 11.707865168539326,
+    "baseline_route_median_mae": 12.241573033707866,
+    "mean_pred_days_on_late_rows": 12.0,
+    "mean_true_days_on_late_rows": 17.98876404494382,
+    "median_true_days_on_late_rows": 12.0
+  },
+  "feature_importance_pr_auc_drop": {
+    "fulfillment_route": 0.09749618342222482,
+    "vendor": 0.03812861400735322,
+    "prior_late_rate_vendor": 0.029755886617819784,
+    "country": 0.024938489987159817,
+    "planned_lead_time_days": 0.023553084267245738,
+    "quantity": 0.013920307469219984,
+    "shipment_mode": 0.0104652538361515,
+    "prior_late_rate_fulfillment_route": 0.008778664325518614,
+    "product_group": 0.0072238893706520705,
+    "prior_late_rate_country": 0.005928542727051544,
+    "prior_known_vendor": 0.0008479041957854206,
+    "prior_known_country": 0.00022541463250338455,
+    "managed_by": 0.0,
+    "decision_date_known": 0.0,
+    "prior_known_fulfillment_route": 0.0,
+    "manufacturing_site": -0.003456175433351971
+  }
+}

@@ -1,0 +1,9 @@
+# Files Docker should NOT send into image builds (keeps builds fast; data is mounted, not baked in)
+.git
+data/
+docs/
+notebooks/
+tests/
+**/*.ipynb
+**/__pycache__
+**/.ipynb_checkpoints

@@ -1,0 +1,13 @@
+# conda env create -f environment-linuxone.yml && conda activate v12e
+name: v12e
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - pip
+  - pip:
+      - snapml
