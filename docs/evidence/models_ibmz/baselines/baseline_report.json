@@ -1,0 +1,178 @@
+{
+  "split": "fit <=2012 / validate 2013 / refit <=2013 / test 2014-2015",
+  "rows": {
+    "fit": 6507,
+    "validation": 1272,
+    "train": 7779,
+    "test": 2545
+  },
+  "late": {
+    "fit": 602,
+    "validation": 228,
+    "train": 830,
+    "test": 356
+  },
+  "classifier": {
+    "no_skill": {
+      "validation": {
+        "pr_auc": 0.1792,
+        "late_rate": 0.1792,
+        "recall_top10pct": null
+      },
+      "test": {
+        "pr_auc": 0.1399,
+        "late_rate": 0.1399,
+        "recall_top10pct": null
+      },
+      "note": "constant score 0.1067; PR-AUC equals each split's late rate"
+    },
+    "route_lookup": {
+      "validation": {
+        "pr_auc": 0.2083,
+        "late_rate": 0.1792,
+        "recall_top10pct": 0.0614,
+        "threshold": 0.1268,
+        "flagged_share": 0.1093,
+        "recall_at_threshold": 0.0702,
+        "precision_at_threshold": 0.1151,
+        "confusion": {
+          "tp": 16,
+          "fp": 123,
+          "fn": 212,
+          "tn": 921
+        },
+        "error_breakdown": {
+          "correct": 0.7366,
+          "type1": 0.0967,
+          "type2": 0.1667
+        }
+      },
+      "test": {
+        "pr_auc": 0.2967,
+        "late_rate": 0.1399,
+        "recall_top10pct": 0.2275,
+        "threshold": 0.1268,
+        "flagged_share": 0.3324,
+        "recall_at_threshold": 0.7107,
+        "precision_at_threshold": 0.2991,
+        "confusion": {
+          "tp": 253,
+          "fp": 593,
+          "fn": 103,
+          "tn": 1596
+        },
+        "error_breakdown": {
+          "correct": 0.7265,
+          "type1": 0.233,
+          "type2": 0.0405
+        }
+      },
+      "note": "score = leakage-safe prior late rate of the shipment's fulfillment route"
+    },
+    "logistic": {
+      "validation": {
+        "pr_auc": 0.2865,
+        "late_rate": 0.1792,
+        "recall_top10pct": 0.1447,
+        "threshold": 0.7958,
+        "flagged_share": 0.1006,
+        "recall_at_threshold": 0.1491,
+        "precision_at_threshold": 0.2656,
+        "confusion": {
+          "tp": 34,
+          "fp": 94,
+          "fn": 194,
+          "tn": 950
+        },
+        "error_breakdown": {
+          "correct": 0.7736,
+          "type1": 0.0739,
+          "type2": 0.1525
+        }
+      },
+      "test": {
+        "pr_auc": 0.1632,
+        "late_rate": 0.1399,
+        "recall_top10pct": 0.0197,
+        "threshold": 0.7958,
+        "flagged_share": 0.1473,
+        "recall_at_threshold": 0.118,
+        "precision_at_threshold": 0.112,
+        "confusion": {
+          "tp": 42,
+          "fp": 333,
+          "fn": 314,
+          "tn": 1856
+        },
+        "error_breakdown": {
+          "correct": 0.7458,
+          "type1": 0.1308,
+          "type2": 0.1234
+        }
+      },
+      "note": "class-weighted; one-hot (rare values grouped); log1p + median fill on numerics; threshold from the <=2012 model's 2013 scores, applied to the refit model"
+    },
+    "logistic_without_decision_date_known": {
+      "validation": {
+        "pr_auc": 0.2583,
+        "late_rate": 0.1792,
+        "recall_top10pct": 0.1491,
+        "threshold": 0.6897,
+        "flagged_share": 0.1006,
+        "recall_at_threshold": 0.1491,
+        "precision_at_threshold": 0.2656,
+        "confusion": {
+          "tp": 34,
+          "fp": 94,
+          "fn": 194,
+          "tn": 950
+        },
+        "error_breakdown": {
+          "correct": 0.7736,
+          "type1": 0.0739,
+          "type2": 0.1525
+        }
+      },
+      "test": {
+        "pr_auc": 0.1462,
+        "late_rate": 0.1399,
+        "recall_top10pct": 0.0197,
+        "threshold": 0.6897,
+        "flagged_share": 0.3139,
+        "recall_at_threshold": 0.2781,
+        "precision_at_threshold": 0.1239,
+        "confusion": {
+          "tp": 99,
+          "fp": 700,
+          "fn": 257,
+          "tn": 1489
+        },
+        "error_breakdown": {
+          "correct": 0.624,
+          "type1": 0.275,
+          "type2": 0.101
+        }
+      },
+      "note": "class-weighted; one-hot (rare values grouped); log1p + median fill on numerics; threshold from the <=2012 model's 2013 scores, applied to the refit model"
+    }
+  },
+  "days_late": {
+    "n_late_train": 830,
+    "n_late_test": 356,
+    "global_median": {
+      "mae_days": 11.71,
+      "prediction": 12.0
+    },
+    "route_median": {
+      "mae_days": 12.24,
+      "prediction_by_route": {
+        "Direct Drop": 16.0,
+        "From RDC": 10.0
+      }
+    },
+    "linear_late": {
+      "mae_days": 13.29
+    },
+    "note": "evaluated on late test shipments only: 'how late, if late'"
+  }
+}
