@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-10-18 04:16 UTC",
+  "captured_at": "2026-10-18 04:22",
   "host": "v12-engines",
   "arch": "s390x",
   "cpus": 3,
@@ -7,45 +7,32 @@
   "disk_total_gb": 49.1,
   "machine_type": "9175",
   "nnpa": true,
-  "cpu_features": [
-    "esan3",
-    "zarch",
-    "stfle",
-    "msa",
-    "ldisp",
-    "eimm",
-    "dfp",
-    "edat",
-    "etf3eh",
-    "highgprs",
-    "te",
-    "vx",
-    "vxd",
-    "vxe",
-    "gs",
-    "vxe2",
-    "vxp",
-    "sort",
-    "dflt",
-    "vxp2",
-    "nnpa",
-    "sie"
-  ],
-  "tls": false,
-  "lscpu": "Architecture:                            s390x\nCPU op-mode(s):                          32-bit, 64-bit\nByte Order:                              Big Endian\nCPU(s):                                  3\nOn-line CPU(s) list:                     0-2\nVendor ID:                               IBM/S390\nModel name:                              -\nMachine type:                            9175\nThread(s) per core:                      1\nCore(s) per socket:                      1\nSocket(s) per book:                      1\nBook(s) per drawer:                      1\nDrawer(s):                               3\nCPU dynamic MHz:                         5508\nCPU static MHz:                          5508\nBogoMIPS:                                28901.00\nDispatching mode:                        horizontal\nFlags:                                   esan3 zarch stfle msa ldisp eimm dfp edat etf3eh highgprs te vx vxd vxe gs vxe2 vxp sort dflt vxp2 nnpa sie\nHypervisor:                              z/VM 7.3.0\nHypervisor vendor:                       IBM\nVirtualization type:                     full\nL1d cache:                               384 KiB (3 instances)\nL1i cache:                               384 KiB (3 instances)\nL2 cache:                                108 MiB (3 instances)\nL3 cache:                                360 MiB\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-2\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Not affected\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; etokens\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
-  "docker_ps": "NAME         IMAGE      STATUS                    PORTS\nv12e-api-1   v12e-api   Up 10 minutes (healthy)   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp\nv12e-web-1   v12e-web   Up 10 minutes             80/tcp, 127.0.0.1:8080->8080/tcp",
+  "lscpu": "Architecture:                            s390x\nCPU op-mode(s):                          32-bit, 64-bit\nByte Order:                              Big Endian\nCPU(s):                                  3\nVendor ID:                               IBM/S390\nModel name:                              -\nMachine type:                            9175\nHypervisor vendor:                       IBM\nVirtualization type:                     full",
+  "docker_ps": "NAME            SERVICE   STATUS\nv12e-api-1      api       Up 2 minutes (healthy)\nv12e-replay-1   replay    Up Less than a second\nv12e-web-1      web       Up 2 minutes",
   "containers": [
     {
-      "name": "v12e-api-1",
-      "status": "running",
-      "cpu": "0.25%",
-      "mem": "145.5MiB / 7.821GiB"
+      "name": "v12e-replay-1",
+      "cpu": "0.04%",
+      "mem": "59.52MiB",
+      "status": "running"
     },
     {
       "name": "v12e-web-1",
-      "status": "running",
       "cpu": "0.00%",
-      "mem": "4.23MiB / 7.821GiB"
+      "mem": "4.199MiB",
+      "status": "running"
+    },
+    {
+      "name": "v12e-api-1",
+      "cpu": "1.67%",
+      "mem": "145.4MiB",
+      "status": "running"
+    },
+    {
+      "name": "notebook",
+      "cpu": "0.00%",
+      "mem": "124.3MiB",
+      "status": "running"
     }
   ]
 }
