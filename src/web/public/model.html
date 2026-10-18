@@ -2,23 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Delivery-delay early warning: model view</title>
-<script src="./vendor/react.js"></script>
-<script src="./vendor/react-dom.js"></script>
-<script src="./support.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>
+  .cm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .cm > div { padding: 16px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .cm .v { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .legend-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .feat { display: flex; gap: 12px; align-items: center; }
+  .feat .n { flex: 0 0 250px; } .feat .v { flex: 0 0 84px; text-align: right; font-weight: 600; white-space: nowrap; }
+  @media (max-width: 720px) { .feat .n { flex-basis: 140px; } }
+</style>
 </head>
 <body>
-<x-dc>
-<helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
-<style>
-body{margin:0}
-a{color:#0A3BA8}a:hover{color:#06246B}
-button{font:inherit}
-</style>
-</helmet>
-<div style="min-height: 100vh; background: #F2F4F8; color: #161C2D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45">
+<header class="top" id="top"></header>
+<main>
+  <div class="head">
+    <h1>Model results on the held-out test set</h1>
+    <span class="small muted" id="subtitle">loading /api/metrics…</span>
+  </div>
+  <p class="caption">Evaluated once on later shipments the model never saw (trained on 2010–2013, tested on 2014–2015 orders
+    from historical USAID data); not a live 2026 feed. Alerts are the top 10% of orders placed in the previous 30 days.</p>
+  <p class="banner" id="banner" hidden></p>
 
+<<<<<<< HEAD
 <header style="background: #161C2D; color: #FFFFFF">
 <div style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 20px 32px 0; display: flex; flex-direction: column; gap: 16px">
 <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
@@ -40,9 +50,29 @@ button{font:inherit}
   <a href="platform.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Platform</a>
 </nav>
 </header>
+=======
+  <section class="row" aria-label="Headline metrics" id="kpis"></section>
+>>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 
-<main style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 24px">
+  <div class="row">
+    <section class="card" style="flex:1.6 1 520px" aria-label="Precision-recall curve">
+      <div class="head"><h2>Precision–recall curve</h2><span class="small muted" id="pr-sub"></span></div>
+      <div id="pr"></div>
+      <p class="small muted" style="margin:0" id="pr-note"></p>
+    </section>
+    <section class="card" style="flex:1 1 340px" aria-label="Confusion matrix">
+      <div class="head"><h2>Confusion matrix</h2>
+        <span class="seg-btns" role="group" aria-label="Alert rule">
+          <button data-rule="live" aria-pressed="true">Live 30-day rule</button><button data-rule="month" aria-pressed="false">Month-end best case</button>
+        </span></div>
+      <div class="small muted" id="cm-sub"></div>
+      <div class="cm" id="cm"></div>
+      <p class="small muted" style="margin:0">A missed late shipment can mean a clinic stockout; a false alarm costs a follow-up call.
+        Flagging more than 10% of orders catches more late ones at the cost of more false alarms.</p>
+    </section>
+  </div>
 
+<<<<<<< HEAD
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
 <h1 style="margin: 0; font-size: 20px; font-weight: 600">Model results on the held-out test set</h1>
 <span style="font-size: 13px; color: #525A6E">Snap ML boosted trees · threshold 0.50</span>
@@ -124,8 +154,42 @@ button{font:inherit}
 </section>
 
 </div>
+=======
+  <div class="row">
+    <section class="card" style="flex:1.4 1 420px" aria-label="What drives the predictions">
+      <div class="head"><h2>What drives the predictions</h2><span class="small muted">drop in alerts caught when the feature is shuffled · 2013 validation year</span></div>
+      <div id="features" style="display:flex;flex-direction:column;gap:10px"></div>
+      <p class="small muted" style="margin:0">Lane features compare a vendor, country or route's late rate over the past year with the overall
+        late rate in the same window, using only shipments delivered before the order was placed.</p>
+    </section>
+    <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <section class="card" aria-label="Error breakdown">
+        <div class="head"><h2>Error breakdown</h2><span class="small muted" id="eb-sub">share of the test set</span></div>
+        <div class="seg" id="eb-bar"></div>
+        <div id="eb"></div>
+      </section>
+      <section class="card" aria-label="Delay estimate">
+        <h2>If an order is late: how late?</h2>
+        <div id="delay"></div>
+      </section>
+    </div>
+  </div>
 
+  <div class="row">
+    <section class="card" style="flex:1.4 1 520px" aria-label="Baselines">
+      <div class="head"><h2>Final model against simpler approaches</h2><span class="small muted">2014–2015 test set</span></div>
+      <div style="overflow-x:auto"><table id="baselines"></table></div>
+    </section>
+    <section class="card" style="flex:1 1 340px" aria-label="How the model was chosen">
+      <h2>How the model was chosen</h2>
+      <div id="validation" class="small"></div>
+    </section>
+  </div>
+>>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
+
+  <section class="card" aria-label="Caveats"><h2>Read these numbers with care</h2><ul id="caveats" style="margin:0;padding-left:18px"></ul></section>
 </main>
+<<<<<<< HEAD
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F62FE","options":["#0F62FE","#0A3BA8","#005D5D"]},"$preview":{"width":1440,"height":1320}}'>
@@ -164,6 +228,153 @@ tp: tp, flagged: tp + fp
 };
 }
 }
+=======
+
+<script src="app.js"></script>
+<script>
+(async function () {
+  const { esc, pct, int, num, apiOrSample, header, setPills, healthPills } = V12;
+  header('Model', [{ kind: 'warn', text: 'Loading…' }]);
+
+  const [mRes, hRes] = await Promise.all([apiOrSample('/metrics', 'samples/metrics.json'),
+                                          apiOrSample('/health', 'samples/health.json')]);
+  setPills(healthPills(hRes.data, hRes.live));
+  const m = mRes.data;
+  if (!mRes.live) {
+    const b = document.getElementById('banner');
+    b.hidden = false;
+    b.textContent = m ? `Sample data: /api/metrics is not reachable (${mRes.error}). Showing samples/metrics.json from an earlier laptop run, not the LinuxONE results.`
+                      : `No data: /api/metrics is not reachable (${mRes.error}) and no sample file was found.`;
+  }
+  if (!m) return;
+
+  const T = m.test, B = T.boosted, live = m.live_alert_rule_test || {};
+  const late = B.late, n = B.n;
+  document.getElementById('subtitle').textContent =
+    `${m.backend === 'snapml' ? 'Snap ML' : m.backend} boosted trees · model ${m.model_version} · ${mRes.live ? 'live /api/metrics' : 'sample data'}`;
+
+  // ---- KPIs (live rule = what the demo runs)
+  const ltp = live.confusion ? live.confusion.tp : Math.round(live.recall * late);
+  const lflag = live.confusion ? live.confusion.tp + live.confusion.fp : Math.round(live.flagged_share * n);
+  const dl = m.days_late || {}, dp = dl.production || {};
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="label">Late shipments caught</div><div class="value">${pct(live.recall)}</div>
+      <div class="sub">${int(ltp)} of ${int(late)} late shipments, flagging ${pct(live.flagged_share)} of orders</div></div>
+    <div class="kpi"><div class="label">Alerts that were late</div><div class="value">${pct(live.precision)}</div>
+      <div class="sub">${int(ltp)} of ${int(lflag)} alerts · ${pct(B.late_rate)} of all orders were late</div></div>
+    <div class="kpi"><div class="label">PR-AUC</div><div class="value">${num(B.pr_auc)}</div>
+      <div class="sub">${num(B.lift, 1)}× the no-skill ${num(T.baselines.no_skill.pr_auc)} · logistic ${num(T.baselines.logistic_benchmark.pr_auc)}</div></div>
+    <div class="kpi"><div class="label">Typical delay, if late</div><div class="value">${num(dp.median, 0)} days</div>
+      <div class="sub">middle half ${num(dp.q25, 0)}–${num(dp.q75, 0)} days · historical estimate</div></div>`;
+
+  // ---- PR curve
+  (function () {
+    const W = 560, H = 360, x0 = 56, x1 = 536, y0 = 308, y1 = 20;
+    const px = (r) => x0 + (x1 - x0) * r, py = (p) => y0 - (y0 - y1) * p;
+    const pts = (m.pr_curve || []).slice().sort((a, b) => a.recall - b.recall)
+      .map((p) => `${px(p.recall).toFixed(1)},${py(p.precision).toFixed(1)}`).join(' ');
+    const base = B.late_rate;
+    const op = { r: live.recall, p: live.precision };
+    const grid = [0.25, 0.5, 0.75, 1].map((v) => `<line x1="${x0}" y1="${py(v)}" x2="${x1}" y2="${py(v)}" stroke="#EDEFF4"/>`).join('');
+    const yl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="48" y="${py(v) + 4}" font-size="12" fill="#525A6E" text-anchor="end">${v.toFixed(2)}</text>`).join('');
+    const xl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="${px(v)}" y="328" font-size="12" fill="#525A6E" text-anchor="middle">${v.toFixed(2)}</text>`).join('');
+    document.getElementById('pr').innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Precision against recall on the 2014-2015 test set; PR-AUC ${num(B.pr_auc)} against a no-skill rate of ${num(base)}"
+        style="width:100%;height:auto;font-family:'IBM Plex Sans',system-ui,sans-serif">
+        ${grid}<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#8D95A8"/>
+        <line x1="${x0}" y1="${py(base)}" x2="${x1}" y2="${py(base)}" stroke="#8D95A8" stroke-dasharray="2 4"/>
+        <text x="${x1 - 4}" y="${py(base) - 6}" font-size="12" fill="#525A6E" text-anchor="end">No-skill rate ${num(base)}</text>
+        <polyline points="${pts}" fill="none" stroke="#0F62FE" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="${px(op.r)}" cy="${py(op.p)}" r="6" fill="#fff" stroke="#161C2D" stroke-width="2"/>
+        <text x="${px(op.r) + 12}" y="${py(op.p) - 8}" font-size="13" font-weight="600" fill="#161C2D">Live alert rule</text>
+        ${yl}${xl}
+        <text x="${(x0 + x1) / 2}" y="352" font-size="12" fill="#525A6E" text-anchor="middle">Recall (share of late shipments caught)</text>
+        <text x="${x0}" y="12" font-size="12" fill="#525A6E">Precision (share of alerts that were late)</text>
+      </svg>`;
+    document.getElementById('pr-sub').textContent = `Test 2014–2015 · late rate ${pct(base)}`;
+    document.getElementById('pr-note').textContent =
+      `Live alert rule: recall ${num(op.r)}, precision ${num(op.p)}. The curve shows every other alert budget the same model could run at.`;
+  })();
+
+  // ---- confusion matrix + error breakdown (live by default, month-end on toggle)
+  function renderCM(rule) {
+    const c = rule === 'live' ? live.confusion : T.confusion;
+    const e = rule === 'live' ? live.error_breakdown : T.error_breakdown;
+    if (!c) {
+      document.getElementById('cm').innerHTML = '<div class="empty" style="grid-column:span 2">Live confusion matrix not in this metrics.json: re-run <code>v12e_model.py evaluate</code>.</div>';
+      return;
+    }
+    document.getElementById('cm-sub').textContent = rule === 'live'
+      ? `Live 30-day rule (what the demo runs) · ${int(n)} test shipments`
+      : `Top 10% of each order month (needs the whole month; best case) · ${int(n)} test shipments`;
+    document.getElementById('cm').innerHTML = `
+      <div style="background:#DCE7FF"><span class="small" style="color:#0A3BA8">Late, flagged</span><span class="v">${int(c.tp)}</span><span class="small">caught in time to act</span></div>
+      <div style="background:#FBE3D0"><span class="small" style="color:#7A2E00">Late, missed</span><span class="v">${int(c.fn)}</span><span class="small">no warning given</span></div>
+      <div style="background:#FBE3D0"><span class="small" style="color:#7A2E00">On time, flagged</span><span class="v">${int(c.fp)}</span><span class="small">false alarms</span></div>
+      <div style="background:#EDEFF4"><span class="small muted">On time, not flagged</span><span class="v">${int(c.tn)}</span><span class="small muted">correctly left alone</span></div>`;
+    const okN = c.tp + c.tn;
+    document.getElementById('eb-sub').textContent = rule === 'live' ? 'share of the test set · live rule' : 'share of the test set · month-end best case';
+    document.getElementById('eb-bar').innerHTML =
+      `<span style="flex:${okN} 1 0;background:#8D95A8"></span><span style="flex:${c.fp} 1 0;background:#E08A4A"></span><span style="flex:${c.fn} 1 0;background:#B8470A"></span>`;
+    const line = (color, title, sub, share, count) => `<div class="legend-row" style="padding:6px 0">
+      <span style="display:flex;gap:10px;align-items:center"><span class="sw" style="background:${color}"></span>
+      <span>${title}<span class="small muted" style="display:block">${sub}</span></span></span>
+      <span class="num" style="text-align:right"><b>${pct(share)}</b><span class="small muted" style="display:block">${int(count)} of ${int(n)}</span></span></div>`;
+    document.getElementById('eb').innerHTML =
+      line('#8D95A8', 'Correct', 'on time and not flagged, or late and flagged', e.correct, okN) +
+      line('#E08A4A', 'Type I · false alarm', 'flagged but arrived on time (alert fatigue)', e.type1_false_alarm, c.fp) +
+      line('#B8470A', 'Type II · missed late', 'not flagged but arrived late (no warning)', e.type2_missed_late, c.fn);
+  }
+  document.querySelectorAll('[data-rule]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-rule]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    renderCM(b.dataset.rule);
+  }));
+  renderCM('live');
+
+  // ---- feature importance
+  const fi = (m.feature_importance || []).slice().sort((a, b) => b.recall_monthly10_drop - a.recall_monthly10_drop);
+  const maxDrop = Math.max(0.0001, ...fi.map((f) => Math.max(0, f.recall_monthly10_drop)));
+  document.getElementById('features').innerHTML = fi.map((f, i) => {
+    const v = Math.max(0, f.recall_monthly10_drop);
+    return `<div class="feat"><span class="n"${i === 0 ? ' style="font-weight:600"' : ''}>${esc(V12.featureLabel(f.feature))}</span>
+      <span class="bar"><span style="width:${(v / maxDrop * 100).toFixed(1)}%;background:${i === 0 ? '#0F62FE' : '#A9BEF2'}"></span></span>
+      <span class="v">−${(v * 100).toFixed(1)} pts</span></div>`;
+  }).join('') || '<div class="empty">No feature importance in this metrics.json.</div>';
+
+  // ---- delay
+  document.getElementById('delay').innerHTML = `
+    <p style="margin:0">A late shipment is typically <b>${num(dp.median, 0)} days</b> late; half fall between
+      <b>${num(dp.q25, 0)} and ${num(dp.q75, 0)} days</b>.</p>
+    <p class="small muted" style="margin:0">Shown as a historical range, not a per-order prediction: no model beat the median.
+      On the test set, the median estimate is off by ${num(dl.test_mae_of_that_median, 1)} days on average.</p>`;
+
+  // ---- baselines
+  const rows = [['Boosted trees (final)', B, true], ['Logistic regression', T.baselines.logistic_benchmark],
+                ['Route late-rate lookup', T.baselines.route_excess_lookup], ['No skill (random)', T.baselines.no_skill]];
+  document.getElementById('baselines').innerHTML = `
+    <thead><tr><th>Approach</th><th class="r">Caught</th><th class="r">Alerts late</th><th class="r">PR-AUC</th><th class="r">Lift</th></tr></thead>
+    <tbody>${rows.map(([name, r, bold]) => `<tr${bold ? ' style="font-weight:600"' : ''}><td>${esc(name)}</td>
+      <td class="r num">${pct(r.recall_monthly10)}</td><td class="r num">${pct(r.precision_monthly10)}</td>
+      <td class="r num">${num(r.pr_auc)}</td><td class="r num">${num(r.lift, 2)}×</td></tr>`).join('')}</tbody>`;
+  document.getElementById('baselines').insertAdjacentHTML('afterend',
+    '<p class="small muted" style="margin:8px 0 0">Caught / alerts late: top 10% of each order month, the same budget for every approach.</p>');
+
+  // ---- validation
+  const v = m.validation || {};
+  document.getElementById('validation').innerHTML = `
+    <p style="margin:0 0 8px">Chosen on three validation years (2011, 2012, 2013), each trained only on earlier years, before the test set was scored:
+      <b>${esc(v.chosen || '')}</b>.</p>
+    <p class="muted" style="margin:0 0 8px">Rule fixed in advance: ${esc(v.selection_rule || '')}.</p>
+    <table><thead><tr><th>Candidate</th><th class="r">Mean caught</th><th class="r">Worst year</th></tr></thead><tbody>
+      ${(v.top_candidates || []).map((c) => `<tr${c.name === v.chosen ? ' style="font-weight:600"' : ''}><td class="mono tiny">${esc(c.name)}</td>
+        <td class="r num">${pct(c.mean_recall_monthly10)}</td><td class="r num">${pct(c.min_recall_monthly10)}</td></tr>`).join('')}
+      ${v.benchmark ? `<tr><td>Logistic benchmark</td><td class="r num">${pct(v.benchmark.mean_recall_monthly10)}</td><td class="r num">${pct(v.benchmark.min_recall_monthly10)}</td></tr>` : ''}
+    </tbody></table>`;
+
+  document.getElementById('caveats').innerHTML = (m.caveats || []).map((c) => `<li>${esc(c)}</li>`).join('') +
+    (live.used_reference_fallback ? `<li>${int(live.used_reference_fallback)} test orders arrived when fewer than 30 orders had been placed in the previous 30 days; they were ranked against a fixed reference distribution instead.</li>` : '');
+})();
+>>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 </script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V12 Engines platform check</title></head>
+<body style="font-family: sans-serif; padding: 24px; max-width: 860px">
+  <h1>V12 Engines platform check</h1>
+  <p>This page is served by nginx. The checks below come from the API through <code>/api/health</code>.
+     The dashboard is at <a href="index.html">/</a>.</p>
+  <ul id="checks"><li>loading…</li></ul>
+  <pre id="out" style="background:#f3f5f7;padding:12px;border-radius:6px;overflow-x:auto">loading...</pre>
+  <script>
+    const li = (ok, text) => `<li>${ok ? '✅' : '❌'} ${text}</li>`;
+    fetch('/api/health')
+      .then(r => r.json().then(j => ({ status: r.status, j })))
+      .then(({ status, j }) => {
+        document.getElementById('out').textContent = `HTTP ${status}\n` + JSON.stringify(j, null, 2);
+        const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+        document.getElementById('checks').innerHTML = [
+          li(status === 200, `API reachable through nginx (HTTP ${status})`),
+          li(j.machine === 's390x', `architecture: ${esc(j.machine || '?')}`),
+          li(!!j.model_version, `model mounted: ${esc(j.model_version || 'none')} (${esc(j.model_file || '?')}, trained ${esc(j.trained_on || '?')})`),
+          li(j.backend === 'snapml', `scoring backend: ${esc(j.backend || '?')}`),
+          li((j.history_deliveries || 0) > 0, `delivery history loaded: ${esc(j.history_deliveries || 0)} deliveries`),
+          li(String(j.granite || '').startsWith('ok'), `Granite: ${esc(j.granite || '?')}`),
+        ].join('');
+      })
+      .catch(e => { document.getElementById('out').textContent = 'API not reachable: ' + e; document.getElementById('checks').innerHTML = li(false, 'API not reachable'); });
+  </script>
+</body>
+</html>

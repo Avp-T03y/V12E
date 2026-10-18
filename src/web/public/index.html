@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<<<<<<< HEAD
 <title>Delivery-delay early warning: live view</title>
 <script src="./vendor/react.js"></script>
 <script src="./vendor/react-dom.js"></script>
@@ -268,6 +269,247 @@ segs: segs, thumbX: full ? '100%' : '0%', viewCaption: 'Live replay stream (/api
 };
 }
 }
+=======
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delivery-delay early warning: live view</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>
+  .live-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .queue { flex: 1.7 1 620px; min-width: 0; }
+  #queue { max-height: 1150px; overflow-y: auto; padding-right: 4px; }
+  #feed { max-height: 900px; overflow-y: auto; }
+  .feed { flex: 1 1 340px; min-width: 0; }
+  .alert { border: 1px solid var(--line); border-left: 4px solid var(--grey); border-radius: 6px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px; background: #fff; }
+  .alert.high { border-left-color: var(--high); } .alert.elevated { border-left-color: var(--elevated); }
+  .alert.reviewed { opacity: 0.62; }
+  .a-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+  .a-title { font-weight: 600; }
+  .runway { padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .runway.short { background: #FCE4E4; color: #A2191F; } .runway.medium { background: var(--warn-bg); color: var(--warn-ink); }
+  .runway.long { background: var(--line2); color: var(--muted2); }
+  .drivers { margin: 0; padding-left: 18px; font-size: 14px; color: var(--muted2); }
+  .drivers li span.dir { font-size: 12px; color: var(--muted); }
+  .explain { background: #F7F8FB; border-radius: 4px; padding: 10px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .actions button { border: 1px solid var(--line); background: #fff; border-radius: 4px; padding: 6px 12px; cursor: pointer; min-height: 36px; }
+  .actions button:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .actions button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .frow { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 0; border-top: 1px solid var(--line2); font-size: 14px; }
+  .frow:first-child { border-top: 0; }
+  .officer { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+  .officer input { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 4px; width: 160px; }
+  .slot { display: flex; flex-wrap: wrap; gap: 8px; }
+  .slot .chip { opacity: .7; }
+</style>
+</head>
+<body>
+<header class="top" id="top"></header>
+<main>
+  <div class="head">
+    <h1>Live alert queue</h1>
+    <span class="small muted" id="clock">Replay clock: waiting for the first order…</span>
+  </div>
+  <p class="caption">Replay of historical 2014–2015 orders, scored one at a time as if placed today. This is not a live 2026 feed.
+    Each order is ranked against the orders placed in the previous 30 days; the top 10% are flagged high.</p>
+  <p class="banner" id="banner" hidden></p>
+
+  <section class="row" aria-label="Session figures">
+    <div class="kpi"><div class="label">Orders scored</div><div class="value" id="k-scored">0</div><div class="sub" id="k-scored-sub">this session</div></div>
+    <div class="kpi"><div class="label">High-risk alerts</div><div class="value" id="k-high">0</div><div class="sub">top 10% of the previous 30 days</div></div>
+    <div class="kpi"><div class="label">Awaiting review</div><div class="value" id="k-open">0</div><div class="sub" id="k-open-sub">high and elevated, not yet reviewed</div></div>
+    <div class="kpi"><div class="label">Explanations</div><div class="value" id="k-gran">0</div><div class="sub" id="k-gran-sub">written by IBM Granite</div></div>
+  </section>
+
+  <div class="live-grid">
+    <section class="card queue" aria-label="Alert queue">
+      <div class="head">
+        <h2>Alerts to review</h2>
+        <div class="officer"><label for="officer">Reviewing as</label><input id="officer" placeholder="Your name" maxlength="40"></div>
+      </div>
+      <div class="actions small muted" style="gap:6px">
+        Show:
+        <span class="seg-btns" role="group" aria-label="Filter">
+          <button data-f="open" aria-pressed="true">Open</button><button data-f="all" aria-pressed="false">All</button>
+        </span>
+      </div>
+      <div id="queue" style="display:flex;flex-direction:column;gap:12px"><div class="empty">Connecting…</div></div>
+    </section>
+
+    <section class="card feed" aria-label="Scored orders">
+      <div class="head"><h2>Every scored order</h2><span class="small muted">newest first</span></div>
+      <div id="feed"><div class="empty">No orders scored yet. Start the replay to see them arrive.</div></div>
+      <div style="margin-top:8px">
+        <div class="small muted" style="margin-bottom:6px">External signals · future slot (not in the current data)</div>
+        <div class="slot"><span class="chip grey">Port congestion</span><span class="chip grey">Weather</span><span class="chip grey">Customs holds</span></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+(async function () {
+  const { esc, pct, int, num, api, apiOrSample, post, header, setPills, healthPills } = V12;
+  header('Live', [{ kind: 'warn', text: 'Connecting…' }]);
+
+  const alerts = new Map();          // order_id -> alert (high / elevated)
+  const feed = [];                   // recent scored orders
+  let scored = 0, granite = 0, template = 0, filter = 'open', live = false;
+
+  const officerEl = document.getElementById('officer');
+  try { officerEl.value = localStorage.getItem('v12-officer') || ''; } catch (e) { /* storage blocked */ }
+  officerEl.addEventListener('change', () => { try { localStorage.setItem('v12-officer', officerEl.value.trim()); } catch (e) {} });
+
+  document.querySelectorAll('.seg-btns button').forEach((b) => b.addEventListener('click', () => {
+    filter = b.dataset.f;
+    document.querySelectorAll('.seg-btns button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    renderQueue();
+  }));
+
+  function runwayBadge(o) {
+    const d = o.runway_days;
+    const txt = d < 0 ? `Due ${-d} days ago` : d === 0 ? 'Due today' : `Promised in ${d} days`;
+    return `<span class="runway ${esc(o.runway_tier)}" title="Runway tier: ${esc(o.runway_tier)}">${txt}</span>`;
+  }
+
+  function bandText(o) {
+    const basis = o.alert_basis && o.alert_basis.rule === 'reference'
+      ? 'vs recent scores (few orders in the last 30 days)' : 'of orders in the previous 30 days';
+    return `Riskier than ${num(o.risk_percentile, 0)}% ${basis}`;
+  }
+
+  function card(o) {
+    const c = o.context || {};
+    const ex = o.explanation;
+    const d = o.typical_days_late_if_late || {};
+    const reviewed = o.status && o.status !== 'open';
+    const statusLabel = { acknowledged: 'Acknowledged', action_taken: 'Action taken', dismissed: 'Dismissed' }[o.status];
+    return `
+    <article class="alert ${esc(o.risk_band)}${reviewed ? ' reviewed' : ''}" data-id="${esc(o.order_id)}">
+      <div class="a-top">
+        <div><span class="a-title">Order ${esc(o.order_id)}</span>
+          <span class="small muted"> · ${esc(c.country || '?')} · ${esc(c.vendor || '?')} · ${esc(c.fulfillment_route || '?')}
+          ${c.product_group ? ' · ' + esc(c.product_group) : ''} · ${int(c.quantity)} units</span></div>
+        <div style="display:flex;gap:8px;align-items:center">${runwayBadge(o)}<span class="chip ${esc(o.risk_band)}">${esc(o.risk_band)}</span></div>
+      </div>
+      <div class="small muted">${bandText(o)} · risk score ${num(o.risk_score, 3)} · ordered ${esc(o.decision_date || '')}
+        · if late, typically ${num(d.median, 0)} days (usually ${num(d.q25, 0)}–${num(d.q75, 0)})</div>
+      ${(o.top_drivers || []).length ? `<ul class="drivers">${o.top_drivers.map((x) =>
+        `<li>${esc(x.text)} <span class="dir">${x.direction === 'raises risk' ? '↑ raises risk' : x.direction === 'lowers risk' ? '↓ lowers risk' : ''}</span></li>`).join('')}</ul>` : ''}
+      ${ex ? `<div class="explain">
+          <div>${esc(ex.risk_summary)}</div>
+          <div><b>Recommended:</b> ${esc(ex.recommended_action)}</div>
+          <div class="tiny muted">${esc(ex.caveat)} · ${ex.source === 'granite' ? 'Written by IBM Granite' : 'Template explanation (Granite unavailable)'}</div>
+        </div>` : ''}
+      <div class="actions">
+        ${reviewed
+          ? `<span class="chip ${o.status === 'dismissed' ? 'grey' : 'green'}">${esc(statusLabel)}</span>
+             <span class="small muted">Reviewed by ${esc(o.reviewed_by || '?')} · ${esc((o.reviewed_at || '').replace('T', ' '))}</span>
+             <button data-act="open">Reopen</button>`
+          : `<button class="primary" data-act="acknowledged">Acknowledge</button>
+             <button data-act="action_taken">Take action</button>
+             <button data-act="dismissed">Dismiss</button>`}
+      </div>
+    </article>`;
+  }
+
+  function renderQueue() {
+    const list = [...alerts.values()]
+      .filter((a) => filter === 'all' || !a.status || a.status === 'open')
+      .sort((a, b) => (b.risk_band === 'high') - (a.risk_band === 'high') || b.risk_score - a.risk_score || a.runway_days - b.runway_days);
+    const q = document.getElementById('queue');
+    q.innerHTML = list.length ? list.slice(0, 60).map(card).join('')
+      : `<div class="empty">${filter === 'open' ? 'No open alerts.' : 'No alerts yet.'} ${live ? 'Waiting for the replay…' : ''}</div>`;
+    const open = [...alerts.values()].filter((a) => !a.status || a.status === 'open').length;
+    document.getElementById('k-open').textContent = int(open);
+    document.getElementById('k-high').textContent = int([...alerts.values()].filter((a) => a.risk_band === 'high').length);
+  }
+
+  function renderFeed() {
+    const f = document.getElementById('feed');
+    if (!feed.length) return;
+    f.innerHTML = feed.slice(0, 25).map((o) => `
+      <div class="frow"><div><b>${esc(o.order_id)}</b> <span class="muted small">${esc((o.context || {}).country || '')} · ${esc((o.context || {}).fulfillment_route || '')}</span></div>
+        <div><span class="chip ${esc(o.risk_band)}">${esc(o.risk_band)}</span></div>
+        <div class="small muted">score ${num(o.risk_score, 3)} · pct ${num(o.risk_percentile, 0)} · ${o.runway_days} days runway</div>
+        <div class="small muted">${esc(o.as_of || '')}</div></div>`).join('');
+  }
+
+  function renderCounts() {
+    document.getElementById('k-scored').textContent = int(scored);
+    document.getElementById('k-gran').textContent = int(granite);
+    document.getElementById('k-gran-sub').textContent = `written by IBM Granite · ${int(template)} from template`;
+  }
+
+  function ingest(o, fromStream) {
+    if (fromStream) { scored += 1; feed.unshift(o); if (feed.length > 200) feed.pop(); }
+    if (o.explanation && fromStream) { o.explanation.source === 'granite' ? granite++ : template++; }
+    if (o.risk_band && o.risk_band !== 'normal') {
+      const prev = alerts.get(o.order_id) || {};
+      alerts.set(o.order_id, { ...o, status: prev.status || o.status || 'open',
+        reviewed_by: prev.reviewed_by || o.reviewed_by, reviewed_at: prev.reviewed_at || o.reviewed_at });
+    }
+    if (o.as_of) document.getElementById('clock').textContent = `Replay clock: ${o.as_of}`;
+  }
+
+  document.getElementById('queue').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]');
+    if (!b) return;
+    const id = b.closest('[data-id]').dataset.id;
+    const status = b.dataset.act;
+    const officer = officerEl.value.trim() || 'officer';
+    const a = alerts.get(id);
+    if (!live) {                                    // sample mode: update on screen only
+      Object.assign(a, { status, reviewed_by: officer, reviewed_at: new Date().toISOString().slice(0, 19) });
+      return renderQueue();
+    }
+    b.disabled = true;
+    try {
+      const r = await post(`/alerts/${encodeURIComponent(id)}/status?status=${status}&officer=${encodeURIComponent(officer)}`);
+      Object.assign(a, { status: r.status, reviewed_by: r.reviewed_by, reviewed_at: r.reviewed_at });
+    } catch (e) {
+      showBanner(`Could not save the review: ${e.message}`, true);
+    }
+    renderQueue();
+  });
+
+  function showBanner(text, bad) {
+    const b = document.getElementById('banner');
+    b.hidden = false; b.className = 'banner' + (bad ? ' bad' : ''); b.textContent = text;
+  }
+
+  // ---- start: health, existing alerts, then the stream
+  const h = await apiOrSample('/health', 'samples/health.json');
+  live = h.live;
+  setPills(healthPills(h.data, h.live));
+  if (!h.live) {
+    showBanner(`Sample data: the scoring API is not reachable (${h.error}). Numbers below are examples, not results.`, false);
+    const s = await V12.staticJson('samples/alerts.json');
+    (s && s.alerts || []).forEach((o) => ingest(o, false));
+    scored = (s && s.alerts || []).length;
+    document.getElementById('k-scored-sub').textContent = 'sample data';
+    renderQueue(); renderCounts();
+    return;
+  }
+  try {
+    const a = await api('/alerts?limit=200');
+    a.alerts.forEach((o) => ingest(o, false));
+  } catch (e) { showBanner(`Could not load existing alerts: ${e.message}`, true); }
+  scored = h.data.scored_since_start || 0;
+  renderQueue(); renderCounts();
+
+  const es = new EventSource('/api/stream');
+  es.addEventListener('scored', (ev) => {
+    const o = JSON.parse(ev.data);
+    ingest(o, true);
+    renderQueue(); renderFeed(); renderCounts();
+  });
+  es.onopen = () => setPills(healthPills(h.data, true));
+  es.onerror = () => setPills([{ kind: 'warn', text: 'Stream reconnecting…' }, ...healthPills(h.data, true).slice(1)]);
+})();
+>>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 </script>
 </body>
 </html>
