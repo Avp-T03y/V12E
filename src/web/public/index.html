@@ -1,16 +1,273 @@
 <!doctype html>
-<!-- PLACEHOLDER: the dashboard owner replaces this folder's contents. -->
 <html lang="en">
-<head><meta charset="utf-8"><title>V12 Engines platform check</title></head>
-<body style="font-family: sans-serif; padding: 24px">
-  <h1>V12 Engines platform check</h1>
-  <p>This page is served by nginx. The box below is fetched from the API through <code>/api/health</code>.</p>
-  <pre id="out">loading...</pre>
-  <script>
-    fetch('/api/health')
-      .then(r => r.json())
-      .then(j => { document.getElementById('out').textContent = JSON.stringify(j, null, 2); })
-      .catch(e => { document.getElementById('out').textContent = 'API not reachable: ' + e; });
-  </script>
+<head>
+<meta charset="utf-8">
+<title>Delivery-delay early warning: live view</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0A3BA8}a:hover{color:#06246B}
+button{font:inherit}
+@keyframes feedInA{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes feedInB{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F2F4F8; color: #161C2D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45">
+
+<header style="background: #161C2D; color: #FFFFFF">
+<div style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 20px 32px 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">Delivery-Delay Early Warning</div>
+<div style="font-size: 14px; color: #C3CAD9">Health commodity shipments scored at order time</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<button type="button" onClick="{{togglePause}}" aria-pressed="{{paused}}" style="display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 6px 12px; background: transparent; color: #FFFFFF; border: 1px solid #47506A; border-radius: 4px; font-size: 13px; cursor: pointer">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{dot}}"></span>
+<span>{{replayLabel}}</span>
+</button>
+<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · live stream (/api/stream)</div>
+</div>
+</div>
+<nav aria-label="Dashboard sections" style="display: flex; gap: 4px">
+<button type="button" aria-current="page" style="min-height: 44px; padding: 0 16px; background: transparent; border: 0; border-bottom: 3px solid {{accent}}; color: #FFFFFF; font-weight: 600; cursor: pointer">Live</button>
+<a href="model.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Model</a>
+<a href="platform.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Platform</a>
+</nav>
+</header>
+
+<main style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+<div role="group" aria-label="View depth" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 340px; max-width: 100%; box-sizing: border-box; padding: 4px; background: #DDE1E9; border-radius: 8px">
+<span style="position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 3px rgba(22, 28, 45, 0.25); transform: translateX({{thumbX}}); transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1)"></span>
+<sc-for list="{{segs}}" as="s" hint-placeholder-count="2">
+<button type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="position: relative; min-height: 44px; padding: 0 12px; background: transparent; border: 0; border-radius: 6px; color: {{s.fg}}; font-weight: {{s.weight}}; cursor: pointer; transition: color 200ms">{{s.name}}</button>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #525A6E">{{viewCaption}}</span>
+</div>
+
+<p style="margin: 0; font-size: 14px; color: #33405E; background: #EDEFF4; border-left: 3px solid #0F62FE; padding: 10px 14px; border-radius: 0 4px 4px 0">Replay of shipments stream. Pending full backend endpoints (/api/stream, /api/alerts, /api/metrics), active feeds display sample data.</p>
+
+<section aria-label="Key figures" style="display: flex; flex-wrap: wrap; gap: 16px">
+<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
+<div style="font-size: 13px; color: #525A6E">Shipments scored</div>
+<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{scored}}</div>
+<div style="font-size: 13px; color: #525A6E">since replay start (sample data)</div>
+</div>
+<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
+<div style="font-size: 13px; color: #525A6E">Open alerts</div>
+<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; color: #B8470A">37</div>
+<div style="font-size: 13px; color: #525A6E">top ~10% by risk (sample data)</div>
+</div>
+<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
+<div style="font-size: 13px; color: #525A6E">Median scoring latency</div>
+<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">4.2 ms</div>
+<div style="font-size: 13px; color: #525A6E">p95 9.8 ms (sample data)</div>
+</div>
+<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
+<div style="font-size: 13px; color: #525A6E">Units at risk</div>
+<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">412k</div>
+<div style="font-size: 13px; color: #525A6E">packs in open alerts (sample data)</div>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+
+<section aria-label="Live feed" style="flex: 0.8 1 230px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 8px; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Live feed (/api/stream)</h2>
+<span style="font-size: 13px; color: #525A6E">Newest first · sample data</span>
+</div>
+<div style="position: relative; height: 420px; overflow: hidden">
+<sc-for list="{{feed}}" as="f" hint-placeholder-count="7">
+<div style="position: absolute; top: 0; left: 0; right: 0; height: 60px; box-sizing: border-box; display: flex; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #EDEFF4; background: #FFFFFF; transform: translateY({{f.y}}); transition: {{f.transition}}; animation: {{f.anim}}">
+<div style="display: flex; flex-direction: column; min-width: 0">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{f.id}}</span>
+<span style="font-size: 13px; color: #525A6E">{{f.time}} · {{f.country}}</span>
+</div>
+<span style="flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{f.tagBg}}; color: {{f.tagFg}}">{{f.pct}}% · {{f.level}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Ranked alerts" style="flex: 2.4 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">At-risk shipments (/api/alerts)</h2>
+<span style="font-size: 13px; color: #525A6E">Ranked by risk × quantity · sample data</span>
+</div>
+<div style="overflow-x: auto">
+<div style="min-width: 560px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 24px 84px 104px 56px 60px minmax(0, 1fr) 92px; gap: 8px; padding: 8px 12px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em; color: #525A6E">
+<span>#</span><span>Shipment</span><span>Destination</span><span>Product</span><span>Mode</span><span>Late risk</span><span>Promised in</span>
+</div>
+<div style="position: relative; height: 336px">
+<sc-for list="{{alerts}}" as="a" hint-placeholder-count="6">
+<button type="button" onClick="{{a.pick}}" aria-pressed="{{a.selected}}" style="position: absolute; top: 0; left: 0; right: 0; height: 56px; box-sizing: border-box; display: grid; grid-template-columns: 24px 84px 104px 56px 60px minmax(0, 1fr) 92px; gap: 8px; align-items: center; width: 100%; padding: 8px 12px; text-align: left; color: #161C2D; background: {{a.rowBg}}; border: 0; border-top: 1px solid #EDEFF4; box-shadow: inset 0 0 0 2px {{a.ring}}; border-radius: 4px; cursor: pointer; transform: translateY({{a.y}}); transition: transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1), background 200ms">
+<span style="color: #525A6E">{{a.rank}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{a.id}}</span>
+<span>{{a.country}}</span>
+<span>{{a.product}}</span>
+<span>{{a.modeShown}}</span>
+<span style="display: flex; gap: 8px; align-items: center">
+<span style="flex-grow: 1; height: 8px; background: #EDEFF4; border-radius: 4px; overflow: hidden"><span style="display: block; height: 8px; width: {{a.w}}; background: {{a.bar}}; transition: width 650ms cubic-bezier(0.2, 0.7, 0.2, 1), background 400ms"></span></span>
+<span style="width: 40px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums">{{a.pct}}%</span>
+</span>
+<span style="justify-self: start; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{a.rwBg}}; color: {{a.rwFg}}">{{a.rwLabel}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-label="Alert detail" style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 12px; align-items: flex-start; justify-content: space-between">
+<div style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 500">{{sel.id}}</h2>
+<span style="font-size: 13px; color: #525A6E">{{sel.country}} · {{sel.vendor}} · {{sel.qty}} packs</span>
+</div>
+<span style="flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{sel.tagBg}}; color: {{sel.tagFg}}">{{sel.level}}</span>
+</div>
+<div style="display: flex; gap: 24px">
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 13px; color: #525A6E">Late risk</span>
+<span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{sel.pct}}%</span>
+</div>
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 13px; color: #525A6E">Estimated delay</span>
+<span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">{{sel.daysShown}} days</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 6px; background: {{sel.rwBg}}; color: {{sel.rwFg}}">
+<span style="font-size: 15px; font-weight: 600">Promised in {{sel.runway}} days</span>
+<span style="font-size: 13px">Order date {{sel.decision}} · Promised {{sel.promised}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Top drivers (sample data)</h3>
+<sc-for list="{{sel.drivers}}" as="d" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; gap: 8px; justify-content: space-between; font-size: 14px"><span>{{d.label}}</span><span style="font-weight: 600">{{d.value}}</span></div>
+<div style="height: 6px; background: #EDEFF4; border-radius: 3px; overflow: hidden"><div style="height: 6px; width: {{d.w}}; background: {{accent}}; transition: width 500ms cubic-bezier(0.2, 0.7, 0.2, 1)"></div></div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: #F2F4F8; border-radius: 6px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Why this is flagged</h3>
+<p style="margin: 0">{{sel.why}}</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid {{accent}}; border-radius: 6px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Recommended action</h3>
+<p style="margin: 0; font-weight: 600">{{sel.action}}</p>
+</div>
+</section>
+
+</div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F62FE","options":["#0F62FE","#0A3BA8","#005D5D"]},"$preview":{"width":1440,"height":1580}}'>
+class Component extends DCLogic {
+componentDidMount() {
+var self = this;
+this._grow = setTimeout(function () { self.setState({ grown: true }); }, 80);
+this._tick = setInterval(function () {
+var s = self.state || {};
+if (s.paused) return;
+self.setState({ n: (s.n || 0) + 1 });
+}, 2500);
+}
+componentWillUnmount() {
+clearTimeout(this._grow);
+clearInterval(this._tick);
+}
+renderVals() {
+var self = this;
+var st = this.state || {};
+var accent = this.props.accent ?? '#0F62FE';
+var n = st.n || 0;
+var grown = !!st.grown;
+var full = st.view === 'full';
+var paused = !!st.paused;
+function tone(pct) {
+if (pct >= 70) return { level: 'High', bar: '#B8470A', tagBg: '#B8470A', tagFg: '#FFFFFF' };
+if (pct >= 50) return { level: 'Elevated', bar: '#E08A4A', tagBg: '#FBE3D0', tagFg: '#7A2E00' };
+return { level: 'Moderate', bar: '#0F62FE', tagBg: '#DCE7FF', tagFg: '#0A3BA8' };
+}
+function clamp(v) { return Math.max(1, Math.min(99, v)); }
+function pad(v) { return (v < 10 ? '0' : '') + v; }
+var raw = [
+{ id: 'ASN-2291', country: 'Nigeria', product: 'ARV', vendor: 'Vendor 014', qty: '86,400', mode: 'Ocean', wt: 1.0, drift: [0, 2, -1, 1, -2, 0],
+risk: { Air: 41, Truck: 63, Ocean: 87 }, days: { Air: 3, Truck: 9, Ocean: 21 },
+drivers: [{ label: 'Fulfillment route (From RDC)', value: '+24 pts', w: '88%' }, { label: 'Ocean mode, long planned lead time', value: '+17 pts', w: '62%' }, { label: 'Lane late rate (prior 12 mo)', value: '+9 pts', w: '33%' }],
+why: 'This order ships From RDC, the route that runs late most often, and ocean freight with a long planned lead time adds to the risk.',
+action: 'Switch mode to air for the first tranche and warn the receiving facility.' },
+{ id: 'ASN-2304', country: 'Mozambique', product: 'ARV', vendor: 'Vendor 007', qty: '52,000', mode: 'Truck', wt: 0.95, drift: [0, -3, -8, -4, 2, 1],
+risk: { Air: 38, Truck: 79, Ocean: 84 }, days: { Air: 2, Truck: 14, Ocean: 19 },
+drivers: [{ label: 'Vendor late rate', value: '+21 pts', w: '78%' }, { label: 'Destination late rate', value: '+14 pts', w: '52%' }, { label: 'Fulfillment route (From RDC)', value: '+6 pts', w: '22%' }],
+why: 'This vendor has a high share of late deliveries on recent orders, and the destination shows above-average delays for truck shipments.',
+action: 'Expedite with the vendor and pre-position buffer stock at the central store.' }
+];
+var meta = {
+'ASN-2291': { rw0: 151, decision: '12 Jan 2015', promised: '12 Jun 2015' },
+'ASN-2304': { rw0: 69, decision: '20 Feb 2015', promised: '30 Apr 2015' }
+};
+var frame = Math.floor(n / 2);
+var picked = st.picked || raw[0].id;
+var alerts = raw.map(function (a) {
+var selected = a.id === picked;
+var shown = selected && st.mode ? st.mode : a.mode;
+var pct = clamp(a.risk[shown] + a.drift[frame % 6]);
+var t = tone(pct);
+var m = meta[a.id] || { rw0: 50, decision: 'N/A', promised: 'N/A' };
+var rwv = Math.max(0, m.rw0 - frame);
+return Object.assign({}, a, t, {
+selected: selected, modeShown: shown, pct: pct, score: pct * a.wt, w: grown ? pct + '%' : '0%', daysShown: a.days[shown],
+runway: rwv, rwLabel: rwv + ' days', rwBg: '#DCE7FF', rwFg: '#0A3BA8', decision: m.decision, promised: m.promised,
+rowBg: selected ? '#EEF3FF' : '#FFFFFF', ring: selected ? accent : 'transparent',
+drivers: a.drivers.map(function (d) { return { label: d.label, value: d.value, w: grown ? d.w : '0%' }; }),
+pick: function () { self.setState({ picked: a.id, mode: null }); }
+});
+});
+alerts.forEach(function (a, i) { a.rank = i + 1; a.y = (i * 56) + 'px'; });
+var sel = alerts.filter(function (a) { return a.selected; })[0] || alerts[0];
+var fCountry = ['Nigeria', 'Mozambique', 'Zambia', 'Haiti', 'Tanzania'];
+var feed = [0, 1, 2, 3, 4, 5, 6].map(function (k) {
+var s = n + k;
+var pos = k;
+var secs = 43469 + s * 4;
+var pct = 45 + (s * 7) % 40;
+return Object.assign({
+id: 'ASN-' + (2312 + s), country: fCountry[s % 5], pct: pct,
+time: pad(Math.floor(secs / 3600) % 24) + ':' + pad(Math.floor(secs / 60) % 60) + ':' + pad(secs % 60),
+y: (pos * 60) + 'px', transition: 'transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1)', anim: 'none'
+}, tone(pct));
+});
+var segs = [{ key: 'live', name: 'Live only (sample data)' }, { key: 'full', name: 'Live + history (sample data)' }].map(function (s) {
+var on = (s.key === 'full') === full;
+return { name: s.name, pressed: on, fg: on ? '#161C2D' : '#525A6E', weight: on ? 600 : 500,
+pick: function () { self.setState({ view: s.key }); } };
+});
+return {
+accent: accent, alerts: alerts, sel: sel, feed: feed,
+scored: (1284 + n).toLocaleString('en-US'),
+paused: paused, dot: paused ? '#8D95A8' : '#7FB0FF', replayLabel: paused ? 'Replay paused · sample data' : 'Replay running · sample data',
+togglePause: function () { self.setState({ paused: !paused }); },
+segs: segs, thumbX: full ? '100%' : '0%', viewCaption: 'Live replay stream (/api/stream)'
+};
+}
+}
+</script>
 </body>
 </html>

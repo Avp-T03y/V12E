@@ -31,7 +31,7 @@ button{font:inherit}
 <span style="width: 8px; height: 8px; border-radius: 50%; background: #7FB0FF"></span>
 <span>Replay running · sample data</span>
 </div>
-<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · to confirm</div>
+<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · pending /api/metrics</div>
 </div>
 </div>
 <nav aria-label="Dashboard sections" style="display: flex; gap: 4px">
@@ -45,10 +45,10 @@ button{font:inherit}
 
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
 <h1 style="margin: 0; font-size: 20px; font-weight: 600">Model results on the held-out test set</h1>
-<span style="font-size: 13px; color: #525A6E">Snap ML boosted trees · single time-based split · threshold 0.50 · illustrative values</span>
+<span style="font-size: 13px; color: #525A6E">Snap ML boosted trees · threshold 0.50</span>
 </div>
 
-<p style="margin: 0; font-size: 14px; color: #33405E; background: #EDEFF4; border-left: 3px solid #0F62FE; padding: 10px 14px; border-radius: 0 4px 4px 0">Evaluated once on held-out later shipments (2006–2015 data); not a live 2026 feed.</p>
+<p style="margin: 0; font-size: 14px; color: #33405E; background: #EDEFF4; border-left: 3px solid #0F62FE; padding: 10px 14px; border-radius: 0 4px 4px 0">Awaiting live metrics from /api/metrics. Displayed figures are sample/placeholder values.</p>
 
 <section aria-label="Headline metrics" style="display: flex; flex-wrap: wrap; gap: 16px">
 <div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
@@ -59,7 +59,7 @@ button{font:inherit}
 <div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
 <div style="font-size: 13px; color: #525A6E">Recall at threshold</div>
 <div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{recallPct}}%</div>
-<div style="font-size: 13px; color: #525A6E">{{tp}} of 356 late shipments flagged</div>
+<div style="font-size: 13px; color: #525A6E">{{tp}} late shipments flagged</div>
 </div>
 <div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
 <div style="font-size: 13px; color: #525A6E">Precision at threshold</div>
@@ -67,9 +67,9 @@ button{font:inherit}
 <div style="font-size: 13px; color: #525A6E">{{tp}} of {{flagged}} alerts were late</div>
 </div>
 <div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Delay estimate error</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{mae}} days</div>
-<div style="font-size: 13px; color: #525A6E">mean absolute error, late shipments</div>
+<div style="font-size: 13px; color: #525A6E">API Endpoint status</div>
+<div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #0F62FE; margin-top: 8px">Pending API</div>
+<div style="font-size: 13px; color: #525A6E">Will load /api/metrics once ready</div>
 </div>
 </section>
 
@@ -78,16 +78,14 @@ button{font:inherit}
 <section aria-label="Precision-recall curve" style="flex: 1.6 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
 <h2 style="margin: 0; font-size: 16px; font-weight: 600">Precision-recall curve</h2>
-<span style="font-size: 13px; color: #525A6E">Test set 2014–2015 · overall late rate 11.5%</span>
+<span style="font-size: 13px; color: #525A6E">Test set evaluation</span>
 </div>
-<svg viewBox="0 0 560 360" role="img" aria-label="{{prAria}}" style="width: 100%; height: auto; font-family: 'IBM Plex Sans', system-ui, sans-serif">
+<svg viewBox="0 0 560 360" role="img" aria-label="PR Curve" style="width: 100%; height: auto; font-family: 'IBM Plex Sans', system-ui, sans-serif">
 <line x1="56" y1="236" x2="536" y2="236" style="stroke: #EDEFF4; stroke-width: 1px"></line>
 <line x1="56" y1="164" x2="536" y2="164" style="stroke: #EDEFF4; stroke-width: 1px"></line>
 <line x1="56" y1="92" x2="536" y2="92" style="stroke: #EDEFF4; stroke-width: 1px"></line>
 <line x1="56" y1="20" x2="536" y2="20" style="stroke: #EDEFF4; stroke-width: 1px"></line>
 <line x1="56" y1="308" x2="536" y2="308" style="stroke: #8D95A8; stroke-width: 1px"></line>
-<line x1="56" y1="274.9" x2="536" y2="274.9" style="stroke: #8D95A8; stroke-width: 1px; stroke-dasharray: 2 4"></line>
-<text x="532" y="268" style="font-size: 12px; fill: #525A6E; text-anchor: end">No-skill rate 0.115</text>
 <polyline points="{{basePts}}" style="fill: none; stroke: #525A6E; stroke-width: 2px; stroke-dasharray: 6 4"></polyline>
 <polyline points="{{modelPts}}" style="fill: none; stroke: {{accent}}; stroke-width: 3px; stroke-linejoin: round"></polyline>
 <circle cx="{{tx}}" cy="{{ty}}" r="6" style="fill: #FFFFFF; stroke: #161C2D; stroke-width: 2px"></circle>
@@ -107,50 +105,15 @@ button{font:inherit}
 <text x="296" y="352" style="font-size: 12px; fill: #525A6E; text-anchor: middle">Recall</text>
 <text x="56" y="12" style="font-size: 12px; fill: #525A6E">Precision</text>
 </svg>
-<p style="margin: 0; font-size: 14px; color: #525A6E">At the 0.50 threshold: recall {{mRecall}}, precision {{mPrec}}.</p>
 </section>
-
-<section aria-label="Confusion matrix" style="flex: 1 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Confusion matrix</h2>
-<span style="font-size: 13px; color: #525A6E">Test set · 2,545 shipments, 2014–2015</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
-<div style="padding: 16px; border-radius: 6px; background: #DCE7FF; display: flex; flex-direction: column; gap: 4px">
-<span style="font-size: 13px; color: #0A3BA8">Late, flagged</span>
-<span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{tp}}</span>
-<span style="font-size: 13px; color: #33405E">caught in time to act</span>
-</div>
-<div style="padding: 16px; border-radius: 6px; background: #FBE3D0; display: flex; flex-direction: column; gap: 4px">
-<span style="font-size: 13px; color: #7A2E00">Late, missed</span>
-<span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{fn}}</span>
-<span style="font-size: 13px; color: #5A3A22">no warning given</span>
-</div>
-<div style="padding: 16px; border-radius: 6px; background: #FBE3D0; display: flex; flex-direction: column; gap: 4px">
-<span style="font-size: 13px; color: #7A2E00">On time, flagged</span>
-<span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{fp}}</span>
-<span style="font-size: 13px; color: #5A3A22">false alarms</span>
-</div>
-<div style="padding: 16px; border-radius: 6px; background: #EDEFF4; display: flex; flex-direction: column; gap: 4px">
-<span style="font-size: 13px; color: #525A6E">On time, not flagged</span>
-<span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{tn}}</span>
-<span style="font-size: 13px; color: #525A6E">correctly left alone</span>
-</div>
-</div>
-<p style="margin: 0; font-size: 14px; color: #525A6E">The threshold favours recall: a missed late shipment can mean a clinic stockout, while a false alarm costs a follow-up call.</p>
-</section>
-
-</div>
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
 
 <section aria-label="Feature importance" style="flex: 1.4 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
 <h2 style="margin: 0; font-size: 16px; font-weight: 600">What drives the predictions</h2>
-<span style="font-size: 13px; color: #525A6E">Share of total feature attribution · illustrative</span>
+<span style="font-size: 13px; color: #525A6E">Share of total feature attribution · sample data</span>
 </div>
 <div style="display: flex; flex-direction: column; gap: 10px">
-<sc-for list="{{features}}" as="f" hint-placeholder-count="8">
+<sc-for list="{{features}}" as="f" hint-placeholder-count="6">
 <div style="display: flex; gap: 12px; align-items: center">
 <span style="flex: 0 0 210px; font-weight: {{f.fw}}">{{f.name}}</span>
 <span style="flex-grow: 1; height: 12px; background: #EDEFF4; border-radius: 3px; overflow: hidden"><span style="display: block; height: 12px; width: {{f.w}}; background: {{f.color}}"></span></span>
@@ -158,59 +121,7 @@ button{font:inherit}
 </div>
 </sc-for>
 </div>
-<p style="margin: 0; font-size: 14px; color: #525A6E">Direct Drop shipments are late 5.3% of the time against 17.2% for From RDC, which accounts for 78% of all late shipments. Late-rate features use only shipments delivered before the one being scored.</p>
 </section>
-
-<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
-
-<section aria-label="Error breakdown" style="background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Error breakdown</h2>
-<span style="font-size: 13px; color: #525A6E">Share of the test set</span>
-</div>
-<div style="display: flex; height: 12px; border-radius: 3px; overflow: hidden; gap: 2px">
-<span style="flex: {{okF}} 1 0; background: #8D95A8"></span>
-<span style="flex: {{t1F}} 1 0; background: #E08A4A"></span>
-<span style="flex: {{t2F}} 1 0; background: #B8470A"></span>
-</div>
-<div style="display: flex; gap: 12px; align-items: center; justify-content: space-between"><span style="display: flex; gap: 10px; align-items: center"><span style="width: 12px; height: 12px; border-radius: 3px; background: #8D95A8"></span><span>Correct<span style="display: block; font-size: 13px; color: #525A6E">on time and not flagged, or late and flagged</span></span></span><span style="text-align: right; font-variant-numeric: tabular-nums"><b>{{okPct}}%</b><span style="display: block; font-size: 13px; color: #525A6E">{{okN}}</span></span></div>
-<div style="display: flex; gap: 12px; align-items: center; justify-content: space-between"><span style="display: flex; gap: 10px; align-items: center"><span style="width: 12px; height: 12px; border-radius: 3px; background: #E08A4A"></span><span>Type I · false alarm<span style="display: block; font-size: 13px; color: #525A6E">flagged but arrived on time (alert fatigue)</span></span></span><span style="text-align: right; font-variant-numeric: tabular-nums"><b>{{t1Pct}}%</b><span style="display: block; font-size: 13px; color: #525A6E">{{t1N}}</span></span></div>
-<div style="display: flex; gap: 12px; align-items: center; justify-content: space-between"><span style="display: flex; gap: 10px; align-items: center"><span style="width: 12px; height: 12px; border-radius: 3px; background: #B8470A"></span><span>Type II · missed late<span style="display: block; font-size: 13px; color: #525A6E">not flagged but arrived late (no warning)</span></span></span><span style="text-align: right; font-variant-numeric: tabular-nums"><b>{{t2Pct}}%</b><span style="display: block; font-size: 13px; color: #525A6E">{{t2N}}</span></span></div>
-</section>
-
-<section aria-label="Baseline comparison" style="background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Baseline against final model</h2>
-<table style="width: 100%; border-collapse: collapse; font-size: 14px">
-<thead>
-<tr>
-<th scope="col" style="padding: 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Metric</th>
-<th scope="col" style="padding: 8px 0; text-align: right; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Logistic</th>
-<th scope="col" style="padding: 8px 0; text-align: right; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Boosted trees</th>
-</tr>
-</thead>
-<tbody>
-<tr style="border-top: 1px solid #EDEFF4"><th scope="row" style="padding: 10px 0; text-align: left; font-weight: 400">PR-AUC</th><td style="padding: 10px 0; text-align: right">{{bAuc}}</td><td style="padding: 10px 0; text-align: right; font-weight: 600">{{mAuc}}</td></tr>
-<tr style="border-top: 1px solid #EDEFF4"><th scope="row" style="padding: 10px 0; text-align: left; font-weight: 400">Precision at 0.50</th><td style="padding: 10px 0; text-align: right">{{bPrec}}</td><td style="padding: 10px 0; text-align: right; font-weight: 600">{{mPrec}}</td></tr>
-<tr style="border-top: 1px solid #EDEFF4"><th scope="row" style="padding: 10px 0; text-align: left; font-weight: 400">Recall at 0.50</th><td style="padding: 10px 0; text-align: right">{{bRecall}}</td><td style="padding: 10px 0; text-align: right; font-weight: 600">{{mRecall}}</td></tr>
-<tr style="border-top: 1px solid #EDEFF4"><th scope="row" style="padding: 10px 0; text-align: left; font-weight: 400">Recall in top 10% by risk</th><td style="padding: 10px 0; text-align: right">{{bTop}}</td><td style="padding: 10px 0; text-align: right; font-weight: 600">{{mTop}}</td></tr>
-</tbody>
-</table>
-</section>
-
-<section aria-label="Data and split" style="background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Data and split</h2>
-<div style="display: flex; height: 12px; border-radius: 3px; overflow: hidden; gap: 2px">
-<span style="flex: 7779 1 0; background: #8D95A8"></span>
-<span style="flex: 2545 1 0; background: {{accent}}"></span>
-</div>
-<div style="display: flex; gap: 16px; justify-content: space-between; font-size: 14px">
-<span>Train · scheduled 2013 or earlier · 7,779 shipments, 830 late</span>
-<span style="font-weight: 600">Test · 2014–2015 · 2,545 shipments, 356 late</span>
-</div>
-<p style="margin: 0; font-size: 14px; color: #525A6E">USAID shipment records, split in time order by scheduled delivery date. Inputs are limited to fields known when the order is placed.</p>
-</section>
-
-</div>
 
 </div>
 
@@ -222,17 +133,14 @@ class Component extends DCLogic {
 renderVals() {
 var accent = this.props.accent ?? '#0F62FE';
 var raw = [
-{ name: 'Fulfillment route', pct: 27 },
-{ name: 'Vendor late rate (prior)', pct: 17 },
-{ name: 'Planned lead time', pct: 14 },
-{ name: 'Country late rate (prior)', pct: 11 },
-{ name: 'Shipment mode', pct: 8 },
-{ name: 'Order quantity', pct: 7 },
-{ name: 'Manufacturing site', pct: 6 },
-{ name: 'Product group', pct: 5 },
-{ name: 'All other features', pct: 5 }
+{ name: 'Fulfillment route', pct: 35 },
+{ name: 'Vendor late rate (prior)', pct: 22 },
+{ name: 'Planned lead time', pct: 18 },
+{ name: 'Country late rate (prior)', pct: 14 },
+{ name: 'Order quantity', pct: 6 },
+{ name: 'Product group', pct: 5 }
 ];
-var features = raw.map(function (f, i) { return { name: f.name, pct: f.pct, w: (f.pct * 3.4) + '%', color: i === 0 ? accent : '#A9BEF2', fw: i === 0 ? 600 : 400 }; });
+var features = raw.map(function (f, i) { return { name: f.name, pct: f.pct, w: (f.pct * 2.5) + '%', color: i === 0 ? accent : '#A9BEF2', fw: i === 0 ? 600 : 400 }; });
 var baseM = [1.0, 0.93, 0.88, 0.84, 0.79, 0.74, 0.69, 0.624, 0.47, 0.30, 0.115];
 var baseB = [0.85, 0.70, 0.62, 0.56, 0.52, 0.48, 0.43, 0.36, 0.28, 0.19, 0.115];
 function auc(c) { var a = 0; for (var i = 0; i < 10; i++) { a += (c[i] + c[i + 1]) / 2 * 0.1; } return a; }
@@ -242,25 +150,17 @@ function py(p) { return 308 - 288 * p; }
 function pts(c) { return c.map(function (p, i) { return px(i / 10).toFixed(1) + ',' + py(p).toFixed(1); }).join(' '); }
 var N = 2545, LATE = 356;
 var rM = 0.70, rB = 0.58;
-var pM = at(baseM, rM), pB = at(baseB, rB);
-var tp = Math.round(rM * LATE), fn = LATE - tp, fp = Math.round(tp * (1 - pM) / pM), tn = N - LATE - fp;
-var ok = tp + tn;
-function share(n) { return (n / N * 100).toFixed(1); }
-function fmt(n) { return n.toLocaleString('en-US'); }
+var pM = at(baseM, rM);
+var tp = Math.round(rM * LATE), fp = Math.round(tp * (1 - pM) / pM);
 var tx = px(rM), ty = py(pM);
 return {
 accent: accent, features: features,
 mAuc: auc(baseM).toFixed(2), bAuc: auc(baseB).toFixed(2),
 modelPts: pts(baseM), basePts: pts(baseB),
-tx: tx.toFixed(1), ty: ty.toFixed(1), tlx: (tx + 12).toFixed(1), tly1: (ty - 6).toFixed(1), tly2: (ty + 11).toFixed(1),
+tx: tx.toFixed(1), ty: ty.toFixed(1), tlx: (tx + 12).toFixed(1), tly1: (ty - 6).toFixed(1),
 modelLabelY: (py(at(baseM, 0.45)) - 16).toFixed(1), baseLabelY: (py(at(baseB, 0.43)) + 26).toFixed(1),
-mRecall: (tp / LATE).toFixed(2), mPrec: (tp / (tp + fp)).toFixed(2), bRecall: rB.toFixed(2), bPrec: pB.toFixed(2),
-mTop: '0.57', bTop: '0.41',
 recallPct: Math.round(tp / LATE * 100), precPct: Math.round(tp / (tp + fp) * 100),
-tp: tp, fn: fn, fp: fp, flagged: tp + fp, tn: fmt(tn), mae: '4.1',
-okF: ok, t1F: fp, t2F: fn, okN: fmt(ok) + ' of ' + fmt(N), t1N: fmt(fp) + ' of ' + fmt(N), t2N: fmt(fn) + ' of ' + fmt(N),
-okPct: share(ok), t1Pct: share(fp), t2Pct: share(fn),
-prAria: 'Precision against recall on the 2014 to 2015 test set. Boosted trees PR-AUC ' + auc(baseM).toFixed(2) + ' against ' + auc(baseB).toFixed(2) + ' for the logistic baseline; at the 0.50 threshold recall is ' + (tp / LATE).toFixed(2) + ' and precision ' + (tp / (tp + fp)).toFixed(2) + '. Illustrative values.'
+tp: tp, flagged: tp + fp
 };
 }
 }
