@@ -126,8 +126,6 @@ Data is de-identified, shipment-level only (no patient data). Officer reviews ar
 
 ## How to run
 
-> _TODO: confirm exact commands with the Platform owner._
-
 <details>
 <summary>Deploy on LinuxONE (click to expand)</summary>
 
@@ -183,20 +181,11 @@ IBM LinuxONE (s390x, no GPU) · Snap ML 1.17.2 · scikit-learn (baselines) · Fa
 
 | Member | Role |
 |---|---|
-| Ethan | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
-| Jihye | Data & preprocessing: data audit, labels, features, time-based split, baselines |
-| Vishnu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
-| Adi | Pipeline: scoring API, score log, replay, explanation layer |
-| Indra | Research & docs: source research, README, data and model cards, decision log, video script |
-| Daniel | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
-
-| Member | Role |
-|---|---|
 | Ethan Ong | Platform: demo VM, Docker containers, SSH tunnel, platform evidence |
 | Jihye Noh | Data & preprocessing: data audit, labels, features, time-based split, baselines |
 | Vishnu Jegan Babu | IBM Z ML: Snap ML training on s390x, model versioning, accelerator check |
 | Aditya Pavuluri | Pipeline: scoring API, score log, replay, generative layer |
 | Indra Erdenebat | Research & docs: source research, README, data and model cards, decision log, video script |
-| Jongmin (Daniel) Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
+| Daniel Baek | Dashboard: Live / Model / Platform views, architecture flowchart, video edit |
 
 <img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/9b4b39e6-bebe-4550-ae97-3d9a41dd900c" />
