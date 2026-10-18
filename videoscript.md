@@ -3,9 +3,8 @@ Slide 1: Title Slide
 
 "Welcome to V12 Engines. We built an order-time delivery-delay early-warning engine for global health supply chains, running on IBM LinuxONE."
 
->Slide 2:
-01. The Challenge
-(On-Screen: Problem Statement & Operational Context)
+>Slide 2:01. The Challenge
+>(On-Screen: Problem Statement & Operational Context)
 
 "A rideshare app can tell you when your driver will arrive, almost to the minute. Health supply chains rarely get that warning when an order is placed. In 10,324 USAID and PEPFAR shipments, 11.5 percent arrived late, and 17.2 percent of From RDC orders. For HIV medicines and test kits, that can interrupt treatment. Yet the median planned lead time is 128 days. Warn at order time, and that becomes runway to act."
 
