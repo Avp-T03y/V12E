@@ -78,8 +78,10 @@
   }
 
   const pick = (...v) => v.find((x) => x !== undefined && x !== null && x !== '');
+  const capturedAt = (value) => value == null || value === '' || String(value).endsWith('UTC') ? value : `${value} UTC`;
   const be = h.backend === 'snapml' ? 'Snap ML' : h.backend ? `${h.backend} (fallback)` : '?';
   const cs = (ev && ev.containers) || [];
+  const composeContainers = cs.filter((c) => String(c.name || '').startsWith('v12e-'));
   const running = (name) => cs.some((c) => String(c.name || '').includes(name));
   const graniteOk = String(hv.granite || '').startsWith('ok');
   const cpus = pick(hv.cpus, ev && ev.cpus), mem = pick(hv.mem_total_gb, ev && ev.mem_total_gb);
@@ -98,7 +100,7 @@
     <div class="kpi"><div class="label">Scoring latency</div><div class="value">${lm ? num(lm.median_ms, 1) + ' ms' : '–'}</div>
       <div class="sub">${lm ? `median · p95 ${num(lm.p95_ms, 1)} ms · ${int(lm.n)} orders · measured` : 'no orders scored yet'}</div></div>
     <div class="kpi"><div class="label">Explanations</div><div class="value" style="font-size:24px">${graniteOk ? 'IBM Granite' : 'Template'}</div>
-      <div class="sub">${lg ? `Granite median ${num(lg.median_ms / 1000, 1)} s · ${int(lg.n)} explanations` : graniteOk ? 'Granite reachable · no explanations yet' : 'template explanations now · Granite planned'}</div></div>`;
+      <div class="sub">${lg ? `Granite median ${num(lg.median_ms / 1000, 1)} s · ${int(lg.n)} explanations` : graniteOk ? 'Granite reachable · no explanations yet' : 'template explanations now · Granite off'}</div></div>`;
 
   // ---- architecture: dashed boxes are planned (not running in this deployment)
   const box = (title, text, tag, state) => `<div class="box${state === 'main' ? ' main' : state === 'planned' ? ' planned' : ''}"><b>${title}</b>
@@ -106,19 +108,19 @@
   const arrow = (t) => `<div class="arrow"><span class="mono tiny muted">${t}</span><span aria-hidden="true">→</span></div>`;
   const replayOn = running('replay');
   document.getElementById('boxes').innerHTML =
-    box('Replay', 'Sends historical 2014–2015 orders one at a time, with only the fields a new order has',
+    box('Replay', 'Sends historical orders (due 2014–2015, placed from Feb 2014) one at a time, with only the fields a new order has',
         replayOn ? 'container: replay' : 'planned · demo profile, started manually', replayOn ? '' : 'planned') +
     arrow('POST /score') +
     box('Scoring API', `Builds past-performance features from the delivery history, scores with a ${esc(be)} boosted-tree classifier, ranks against the last 30 days`, 'container: api', 'main') +
     arrow('flagged only') +
     box('Explanation', graniteOk ? 'IBM Granite turns the score and drivers into a reason and one action from a fixed list'
-                                 : 'Template explanations now, built from the score and drivers; IBM Granite planned',
-        graniteOk ? 'container: granite' : 'in api now · Granite planned', graniteOk ? '' : 'planned') +
+                                 : 'Template explanations now, built from the score and drivers; IBM Granite off',
+        graniteOk ? 'container: granite' : 'in api now · Granite off', graniteOk ? '' : 'planned') +
     arrow('GET /stream') +
     box('Dashboard', 'nginx serves these pages and forwards /api to the scoring API', 'container: web', '');
 
   // ---- containers (evidence.json, written on the host by scripts/capture_evidence.sh)
-  document.getElementById('ct-sub').textContent = ev ? `docker stats · captured ${ev.captured_at}` : 'not captured yet';
+  document.getElementById('ct-sub').textContent = ev ? `docker stats · captured ${capturedAt(ev.captured_at)}` : 'not captured yet';
   document.getElementById('containers').innerHTML = cs.length ? `
     <thead><tr><th>Name</th><th>Status</th><th class="r">CPU</th><th class="r">Memory</th></tr></thead>
     <tbody>${cs.map((c) => `<tr><td class="mono small">${esc(c.name)}</td><td><span class="chip blue">${esc(c.status || 'running')}</span></td>
@@ -144,7 +146,7 @@
     `snapml          ${hv.snapml_version ?? 'not installed'}`,
     `tree format     ${fmtText}`,
   ].join('\n') : '# /api/health not reachable';
-  document.getElementById('ev-sub').textContent = ev ? `captured ${ev.captured_at} on ${ev.host}` : '/api/health only · host capture not run yet';
+  document.getElementById('ev-sub').textContent = ev ? `captured ${capturedAt(ev.captured_at)} on ${ev.host}` : '/api/health only · host capture not run yet';
   document.getElementById('evidence').textContent = facts + (ev
     ? `\n\n$ lscpu\n${ev.lscpu}\n\n$ docker compose ps\n${ev.docker_ps}`
     : '\n\n# host capture (lscpu, docker compose ps, docker stats):\n#   bash scripts/capture_evidence.sh');
@@ -162,8 +164,9 @@
       `model tree format: ${fmtText}`],
     ['Snap ML on s390x', hv.backend === 'snapml' && hv.machine === 's390x' ? ok : todo,
       hv.backend === 'snapml' ? `scoring backend: Snap ML ${hv.snapml_version || ''}` : hv.backend ? `scoring backend: ${hv.backend} fallback (Snap ML not loaded)` : 'scoring backend: ?'],
-    ['IBM Granite on the server', graniteOk ? ok : live ? off('Planned') : todo, graniteOk ? 'Granite server reachable' : 'template explanations now'],
-    ['Containerised services (Docker Compose)', cs.length ? ok : todo, cs.length ? cs.map((c) => c.name).join(', ') : 'from docker compose ps'],
+    ['IBM Granite on the server', graniteOk ? ok : live ? off('Off') : todo, graniteOk ? 'Granite server reachable' : 'template explanations now'],
+    ['Containerised services (Docker Compose)', composeContainers.length ? ok : todo,
+      composeContainers.length ? `${composeContainers.length} containers: ${composeContainers.map((c) => c.name).join(', ')}` : 'from docker compose ps'],
     ['TLS on the scoring API', off('Not enabled'), 'No TLS; reachable only through the SSH tunnel'],
     ['Quantum-safe cryptography', no, 'Roadmap item; not exercised by this project'],
   ];
