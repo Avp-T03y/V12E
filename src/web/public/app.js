@@ -64,8 +64,8 @@
   };
   const featureLabel = (f) => FEATURE_LABELS[f] || f;
 
-  /** Header with tabs and two status pills. kind: ok | warn | bad. */
-  function header(active, pills) {
+  /** Header with tabs and status pills (kind: ok | warn | bad); `extra` is HTML placed before the pills. */
+  function header(active, pills, extra) {
     const tabs = [['index.html', 'Live'], ['model.html', 'Model'], ['platform.html', 'Platform']];
     const el = document.getElementById('top');
     el.innerHTML = `
@@ -73,7 +73,7 @@
         <div class="top-row">
           <div><div class="brand">Delivery-Delay Early Warning</div>
             <div class="brand-sub">Health commodity shipments scored at order time</div></div>
-          <div class="pills" id="pills"></div>
+          <div class="pills">${extra || ''}<div class="pills" id="pills"></div></div>
         </div>
         <nav class="tabs" aria-label="Dashboard sections">
           ${tabs.map(([href, name]) => `<a href="${href}"${name === active ? ' aria-current="page"' : ''}>${name}</a>`).join('')}

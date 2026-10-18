@@ -2,348 +2,125 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<<<<<<< HEAD
-<title>Delivery-delay early warning: live view</title>
-<script src="./vendor/react.js"></script>
-<script src="./vendor/react-dom.js"></script>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
-<style>
-body{margin:0}
-a{color:#0A3BA8}a:hover{color:#06246B}
-button{font:inherit}
-@keyframes feedInA{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes feedInB{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
-</style>
-</helmet>
-<div style="min-height: 100vh; background: #F2F4F8; color: #161C2D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45">
-
-<header style="background: #161C2D; color: #FFFFFF">
-<div style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 20px 32px 0; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
-<div style="display: flex; flex-direction: column; gap: 2px">
-<div style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">Delivery-Delay Early Warning</div>
-<div style="font-size: 14px; color: #C3CAD9">Health commodity shipments scored at order time</div>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
-<button type="button" onClick="{{togglePause}}" aria-pressed="{{paused}}" style="display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 6px 12px; background: transparent; color: #FFFFFF; border: 1px solid #47506A; border-radius: 4px; font-size: 13px; cursor: pointer">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: {{dot}}"></span>
-<span>{{replayLabel}}</span>
-</button>
-<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · live stream (/api/stream)</div>
-</div>
-</div>
-<nav aria-label="Dashboard sections" style="display: flex; gap: 4px">
-<button type="button" aria-current="page" style="min-height: 44px; padding: 0 16px; background: transparent; border: 0; border-bottom: 3px solid {{accent}}; color: #FFFFFF; font-weight: 600; cursor: pointer">Live</button>
-<a href="model.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Model</a>
-<a href="platform.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Platform</a>
-</nav>
-</header>
-
-<main style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 24px">
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
-<div role="group" aria-label="View depth" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 340px; max-width: 100%; box-sizing: border-box; padding: 4px; background: #DDE1E9; border-radius: 8px">
-<span style="position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 3px rgba(22, 28, 45, 0.25); transform: translateX({{thumbX}}); transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1)"></span>
-<sc-for list="{{segs}}" as="s" hint-placeholder-count="2">
-<button type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="position: relative; min-height: 44px; padding: 0 12px; background: transparent; border: 0; border-radius: 6px; color: {{s.fg}}; font-weight: {{s.weight}}; cursor: pointer; transition: color 200ms">{{s.name}}</button>
-</sc-for>
-</div>
-<span style="font-size: 13px; color: #525A6E">{{viewCaption}}</span>
-</div>
-
-<p style="margin: 0; font-size: 14px; color: #33405E; background: #EDEFF4; border-left: 3px solid #0F62FE; padding: 10px 14px; border-radius: 0 4px 4px 0">Replay of shipments stream. Pending full backend endpoints (/api/stream, /api/alerts, /api/metrics), active feeds display sample data.</p>
-
-<section aria-label="Key figures" style="display: flex; flex-wrap: wrap; gap: 16px">
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Shipments scored</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{scored}}</div>
-<div style="font-size: 13px; color: #525A6E">since replay start (sample data)</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Open alerts</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; color: #B8470A">37</div>
-<div style="font-size: 13px; color: #525A6E">top ~10% by risk (sample data)</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Median scoring latency</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">4.2 ms</div>
-<div style="font-size: 13px; color: #525A6E">p95 9.8 ms (sample data)</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Units at risk</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">412k</div>
-<div style="font-size: 13px; color: #525A6E">packs in open alerts (sample data)</div>
-</div>
-</section>
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
-
-<section aria-label="Live feed" style="flex: 0.8 1 230px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Live feed (/api/stream)</h2>
-<span style="font-size: 13px; color: #525A6E">Newest first · sample data</span>
-</div>
-<div style="position: relative; height: 420px; overflow: hidden">
-<sc-for list="{{feed}}" as="f" hint-placeholder-count="7">
-<div style="position: absolute; top: 0; left: 0; right: 0; height: 60px; box-sizing: border-box; display: flex; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #EDEFF4; background: #FFFFFF; transform: translateY({{f.y}}); transition: {{f.transition}}; animation: {{f.anim}}">
-<div style="display: flex; flex-direction: column; min-width: 0">
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{f.id}}</span>
-<span style="font-size: 13px; color: #525A6E">{{f.time}} · {{f.country}}</span>
-</div>
-<span style="flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{f.tagBg}}; color: {{f.tagFg}}">{{f.pct}}% · {{f.level}}</span>
-</div>
-</sc-for>
-</div>
-</section>
-
-<section aria-label="Ranked alerts" style="flex: 2.4 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">At-risk shipments (/api/alerts)</h2>
-<span style="font-size: 13px; color: #525A6E">Ranked by risk × quantity · sample data</span>
-</div>
-<div style="overflow-x: auto">
-<div style="min-width: 560px; display: flex; flex-direction: column">
-<div style="display: grid; grid-template-columns: 24px 84px 104px 56px 60px minmax(0, 1fr) 92px; gap: 8px; padding: 8px 12px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em; color: #525A6E">
-<span>#</span><span>Shipment</span><span>Destination</span><span>Product</span><span>Mode</span><span>Late risk</span><span>Promised in</span>
-</div>
-<div style="position: relative; height: 336px">
-<sc-for list="{{alerts}}" as="a" hint-placeholder-count="6">
-<button type="button" onClick="{{a.pick}}" aria-pressed="{{a.selected}}" style="position: absolute; top: 0; left: 0; right: 0; height: 56px; box-sizing: border-box; display: grid; grid-template-columns: 24px 84px 104px 56px 60px minmax(0, 1fr) 92px; gap: 8px; align-items: center; width: 100%; padding: 8px 12px; text-align: left; color: #161C2D; background: {{a.rowBg}}; border: 0; border-top: 1px solid #EDEFF4; box-shadow: inset 0 0 0 2px {{a.ring}}; border-radius: 4px; cursor: pointer; transform: translateY({{a.y}}); transition: transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1), background 200ms">
-<span style="color: #525A6E">{{a.rank}}</span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{a.id}}</span>
-<span>{{a.country}}</span>
-<span>{{a.product}}</span>
-<span>{{a.modeShown}}</span>
-<span style="display: flex; gap: 8px; align-items: center">
-<span style="flex-grow: 1; height: 8px; background: #EDEFF4; border-radius: 4px; overflow: hidden"><span style="display: block; height: 8px; width: {{a.w}}; background: {{a.bar}}; transition: width 650ms cubic-bezier(0.2, 0.7, 0.2, 1), background 400ms"></span></span>
-<span style="width: 40px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums">{{a.pct}}%</span>
-</span>
-<span style="justify-self: start; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{a.rwBg}}; color: {{a.rwFg}}">{{a.rwLabel}}</span>
-</button>
-</sc-for>
-</div>
-</div>
-</div>
-</section>
-
-<section aria-label="Alert detail" style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; gap: 12px; align-items: flex-start; justify-content: space-between">
-<div style="display: flex; flex-direction: column">
-<h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 500">{{sel.id}}</h2>
-<span style="font-size: 13px; color: #525A6E">{{sel.country}} · {{sel.vendor}} · {{sel.qty}} packs</span>
-</div>
-<span style="flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{sel.tagBg}}; color: {{sel.tagFg}}">{{sel.level}}</span>
-</div>
-<div style="display: flex; gap: 24px">
-<div style="display: flex; flex-direction: column">
-<span style="font-size: 13px; color: #525A6E">Late risk</span>
-<span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{sel.pct}}%</span>
-</div>
-<div style="display: flex; flex-direction: column">
-<span style="font-size: 13px; color: #525A6E">Estimated delay</span>
-<span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">{{sel.daysShown}} days</span>
-</div>
-</div>
-<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 6px; background: {{sel.rwBg}}; color: {{sel.rwFg}}">
-<span style="font-size: 15px; font-weight: 600">Promised in {{sel.runway}} days</span>
-<span style="font-size: 13px">Order date {{sel.decision}} · Promised {{sel.promised}}</span>
-</div>
-<div style="display: flex; flex-direction: column; gap: 8px">
-<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Top drivers (sample data)</h3>
-<sc-for list="{{sel.drivers}}" as="d" hint-placeholder-count="3">
-<div style="display: flex; flex-direction: column; gap: 4px">
-<div style="display: flex; gap: 8px; justify-content: space-between; font-size: 14px"><span>{{d.label}}</span><span style="font-weight: 600">{{d.value}}</span></div>
-<div style="height: 6px; background: #EDEFF4; border-radius: 3px; overflow: hidden"><div style="height: 6px; width: {{d.w}}; background: {{accent}}; transition: width 500ms cubic-bezier(0.2, 0.7, 0.2, 1)"></div></div>
-</div>
-</sc-for>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: #F2F4F8; border-radius: 6px">
-<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Why this is flagged</h3>
-<p style="margin: 0">{{sel.why}}</p>
-</div>
-<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid {{accent}}; border-radius: 6px">
-<h3 style="margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Recommended action</h3>
-<p style="margin: 0; font-weight: 600">{{sel.action}}</p>
-</div>
-</section>
-
-</div>
-
-</main>
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F62FE","options":["#0F62FE","#0A3BA8","#005D5D"]},"$preview":{"width":1440,"height":1580}}'>
-class Component extends DCLogic {
-componentDidMount() {
-var self = this;
-this._grow = setTimeout(function () { self.setState({ grown: true }); }, 80);
-this._tick = setInterval(function () {
-var s = self.state || {};
-if (s.paused) return;
-self.setState({ n: (s.n || 0) + 1 });
-}, 2500);
-}
-componentWillUnmount() {
-clearTimeout(this._grow);
-clearInterval(this._tick);
-}
-renderVals() {
-var self = this;
-var st = this.state || {};
-var accent = this.props.accent ?? '#0F62FE';
-var n = st.n || 0;
-var grown = !!st.grown;
-var full = st.view === 'full';
-var paused = !!st.paused;
-function tone(pct) {
-if (pct >= 70) return { level: 'High', bar: '#B8470A', tagBg: '#B8470A', tagFg: '#FFFFFF' };
-if (pct >= 50) return { level: 'Elevated', bar: '#E08A4A', tagBg: '#FBE3D0', tagFg: '#7A2E00' };
-return { level: 'Moderate', bar: '#0F62FE', tagBg: '#DCE7FF', tagFg: '#0A3BA8' };
-}
-function clamp(v) { return Math.max(1, Math.min(99, v)); }
-function pad(v) { return (v < 10 ? '0' : '') + v; }
-var raw = [
-{ id: 'ASN-2291', country: 'Nigeria', product: 'ARV', vendor: 'Vendor 014', qty: '86,400', mode: 'Ocean', wt: 1.0, drift: [0, 2, -1, 1, -2, 0],
-risk: { Air: 41, Truck: 63, Ocean: 87 }, days: { Air: 3, Truck: 9, Ocean: 21 },
-drivers: [{ label: 'Fulfillment route (From RDC)', value: '+24 pts', w: '88%' }, { label: 'Ocean mode, long planned lead time', value: '+17 pts', w: '62%' }, { label: 'Lane late rate (prior 12 mo)', value: '+9 pts', w: '33%' }],
-why: 'This order ships From RDC, the route that runs late most often, and ocean freight with a long planned lead time adds to the risk.',
-action: 'Switch mode to air for the first tranche and warn the receiving facility.' },
-{ id: 'ASN-2304', country: 'Mozambique', product: 'ARV', vendor: 'Vendor 007', qty: '52,000', mode: 'Truck', wt: 0.95, drift: [0, -3, -8, -4, 2, 1],
-risk: { Air: 38, Truck: 79, Ocean: 84 }, days: { Air: 2, Truck: 14, Ocean: 19 },
-drivers: [{ label: 'Vendor late rate', value: '+21 pts', w: '78%' }, { label: 'Destination late rate', value: '+14 pts', w: '52%' }, { label: 'Fulfillment route (From RDC)', value: '+6 pts', w: '22%' }],
-why: 'This vendor has a high share of late deliveries on recent orders, and the destination shows above-average delays for truck shipments.',
-action: 'Expedite with the vendor and pre-position buffer stock at the central store.' }
-];
-var meta = {
-'ASN-2291': { rw0: 151, decision: '12 Jan 2015', promised: '12 Jun 2015' },
-'ASN-2304': { rw0: 69, decision: '20 Feb 2015', promised: '30 Apr 2015' }
-};
-var frame = Math.floor(n / 2);
-var picked = st.picked || raw[0].id;
-var alerts = raw.map(function (a) {
-var selected = a.id === picked;
-var shown = selected && st.mode ? st.mode : a.mode;
-var pct = clamp(a.risk[shown] + a.drift[frame % 6]);
-var t = tone(pct);
-var m = meta[a.id] || { rw0: 50, decision: 'N/A', promised: 'N/A' };
-var rwv = Math.max(0, m.rw0 - frame);
-return Object.assign({}, a, t, {
-selected: selected, modeShown: shown, pct: pct, score: pct * a.wt, w: grown ? pct + '%' : '0%', daysShown: a.days[shown],
-runway: rwv, rwLabel: rwv + ' days', rwBg: '#DCE7FF', rwFg: '#0A3BA8', decision: m.decision, promised: m.promised,
-rowBg: selected ? '#EEF3FF' : '#FFFFFF', ring: selected ? accent : 'transparent',
-drivers: a.drivers.map(function (d) { return { label: d.label, value: d.value, w: grown ? d.w : '0%' }; }),
-pick: function () { self.setState({ picked: a.id, mode: null }); }
-});
-});
-alerts.forEach(function (a, i) { a.rank = i + 1; a.y = (i * 56) + 'px'; });
-var sel = alerts.filter(function (a) { return a.selected; })[0] || alerts[0];
-var fCountry = ['Nigeria', 'Mozambique', 'Zambia', 'Haiti', 'Tanzania'];
-var feed = [0, 1, 2, 3, 4, 5, 6].map(function (k) {
-var s = n + k;
-var pos = k;
-var secs = 43469 + s * 4;
-var pct = 45 + (s * 7) % 40;
-return Object.assign({
-id: 'ASN-' + (2312 + s), country: fCountry[s % 5], pct: pct,
-time: pad(Math.floor(secs / 3600) % 24) + ':' + pad(Math.floor(secs / 60) % 60) + ':' + pad(secs % 60),
-y: (pos * 60) + 'px', transition: 'transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1)', anim: 'none'
-}, tone(pct));
-});
-var segs = [{ key: 'live', name: 'Live only (sample data)' }, { key: 'full', name: 'Live + history (sample data)' }].map(function (s) {
-var on = (s.key === 'full') === full;
-return { name: s.name, pressed: on, fg: on ? '#161C2D' : '#525A6E', weight: on ? 600 : 500,
-pick: function () { self.setState({ view: s.key }); } };
-});
-return {
-accent: accent, alerts: alerts, sel: sel, feed: feed,
-scored: (1284 + n).toLocaleString('en-US'),
-paused: paused, dot: paused ? '#8D95A8' : '#7FB0FF', replayLabel: paused ? 'Replay paused · sample data' : 'Replay running · sample data',
-togglePause: function () { self.setState({ paused: !paused }); },
-segs: segs, thumbX: full ? '100%' : '0%', viewCaption: 'Live replay stream (/api/stream)'
-};
-}
-}
-=======
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Delivery-delay early warning: live view</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="app.css">
 <style>
-  .live-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-  .queue { flex: 1.7 1 620px; min-width: 0; }
-  #queue { max-height: 1150px; overflow-y: auto; padding-right: 4px; }
-  #feed { max-height: 900px; overflow-y: auto; }
-  .feed { flex: 1 1 340px; min-width: 0; }
-  .alert { border: 1px solid var(--line); border-left: 4px solid var(--grey); border-radius: 6px; padding: 14px 16px;
-    display: flex; flex-direction: column; gap: 8px; background: #fff; }
-  .alert.high { border-left-color: var(--high); } .alert.elevated { border-left-color: var(--elevated); }
-  .alert.reviewed { opacity: 0.62; }
-  .a-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
-  .a-title { font-weight: 600; }
-  .runway { padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; white-space: nowrap; }
-  .runway.short { background: #FCE4E4; color: #A2191F; } .runway.medium { background: var(--warn-bg); color: var(--warn-ink); }
-  .runway.long { background: var(--line2); color: var(--muted2); }
-  .drivers { margin: 0; padding-left: 18px; font-size: 14px; color: var(--muted2); }
-  .drivers li span.dir { font-size: 12px; color: var(--muted); }
-  .explain { background: #F7F8FB; border-radius: 4px; padding: 10px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .actions button { border: 1px solid var(--line); background: #fff; border-radius: 4px; padding: 6px 12px; cursor: pointer; min-height: 36px; }
-  .actions button:hover { border-color: var(--accent); color: var(--accent-ink); }
-  .actions button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .frow { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 0; border-top: 1px solid var(--line2); font-size: 14px; }
+  /* Live view: Daniel's three-panel layout, wired to /api/stream and /api/alerts */
+  .bar-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+  .depth { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 340px; max-width: 100%;
+    padding: 4px; background: var(--line); border-radius: 8px; }
+  .depth .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: #fff; border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(22, 28, 45, .25); transition: transform 320ms cubic-bezier(.2, .7, .2, 1); }
+  .depth[data-v="history"] .thumb { transform: translateX(100%); }
+  .depth button { position: relative; min-height: 44px; padding: 0 12px; background: transparent; border: 0; border-radius: 6px;
+    color: var(--muted); font-weight: 500; cursor: pointer; }
+  .depth button[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+  .panels { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .p-feed { flex: .8 1 230px; } .p-alerts { flex: 2.4 1 520px; } .p-detail { flex: 1 1 300px; }
+
+  .feed-list { height: 520px; overflow-y: auto; }
+  .frow { display: flex; gap: 12px; align-items: center; justify-content: space-between; min-height: 58px; border-top: 1px solid var(--line2);
+    animation: feedIn 450ms cubic-bezier(.2, .7, .2, 1); }
   .frow:first-child { border-top: 0; }
-  .officer { display: flex; gap: 8px; align-items: center; font-size: 14px; }
-  .officer input { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 4px; width: 160px; }
-  .slot { display: flex; flex-wrap: wrap; gap: 8px; }
-  .slot .chip { opacity: .7; }
+  @keyframes feedIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+
+  .tag { flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .tag.high { background: #B8470A; color: #fff; } .tag.elevated { background: var(--warn-bg); color: var(--warn-ink); }
+  .tag.normal { background: var(--accent-bg); color: var(--accent-ink); }
+
+  .grid-cols { display: grid; grid-template-columns: 26px 92px minmax(90px, 1.1fr) 64px 70px minmax(110px, 1.4fr) 104px; gap: 8px; align-items: center; }
+  .t-head { padding: 8px 12px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
+  .t-body { max-height: 520px; overflow-y: auto; }
+  .arow { width: 100%; min-height: 54px; padding: 8px 12px; text-align: left; color: var(--ink); background: #fff; border: 0;
+    border-top: 1px solid var(--line2); border-radius: 4px; cursor: pointer; font: inherit; }
+  .arow:hover { background: #F7F9FD; }
+  .arow[aria-pressed="true"] { background: #EEF3FF; box-shadow: inset 0 0 0 2px var(--accent); }
+  .arow.reviewed { opacity: .55; }
+  .riskbar { display: flex; gap: 8px; align-items: center; }
+  .riskbar .track { flex-grow: 1; height: 8px; background: var(--line2); border-radius: 4px; overflow: hidden; }
+  .riskbar .fill { display: block; height: 8px; transition: width 650ms cubic-bezier(.2, .7, .2, 1); }
+  .rw { justify-self: start; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .rw.short { background: #FCE4E4; color: #A2191F; } .rw.medium { background: var(--warn-bg); color: var(--warn-ink); }
+  .rw.long { background: var(--accent-bg); color: var(--accent-ink); }
+  .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .big { font-size: 32px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .runway-box { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 6px; }
+  .runway-box.short { background: #FCE4E4; color: #A2191F; } .runway-box.medium { background: var(--warn-bg); color: var(--warn-ink); }
+  .runway-box.long { background: var(--accent-bg); color: var(--accent-ink); }
+  h3 { margin: 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .drv { display: flex; flex-direction: column; gap: 4px; }
+  .drv .dtop { display: flex; gap: 8px; justify-content: space-between; font-size: 14px; }
+  .drv .track { height: 6px; background: var(--line2); border-radius: 3px; overflow: hidden; }
+  .drv .track > div { height: 6px; background: var(--accent); transition: width 500ms cubic-bezier(.2, .7, .2, 1); }
+  .why { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: var(--bg); border-radius: 6px; }
+  .act { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid var(--accent); border-radius: 6px; }
+  .review { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .review button { border: 1px solid var(--line); background: #fff; border-radius: 4px; padding: 6px 12px; cursor: pointer; min-height: 40px; font: inherit; }
+  .review button:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .review button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .review input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; width: 150px; }
+  .pausebtn { display: flex; gap: 8px; align-items: center; min-height: 40px; padding: 6px 12px; background: transparent; color: #fff;
+    border: 1px solid #47506A; border-radius: 4px; font-size: 13px; cursor: pointer; }
+  .slot { display: flex; flex-wrap: wrap; gap: 6px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
 <header class="top" id="top"></header>
 <main>
-  <div class="head">
-    <h1>Live alert queue</h1>
+  <div class="bar-row">
+    <div class="depth" id="depth" data-v="live" role="group" aria-label="View depth">
+      <span class="thumb"></span>
+      <button data-v="live" aria-pressed="true">Live only</button>
+      <button data-v="history" aria-pressed="false">Live + history</button>
+    </div>
     <span class="small muted" id="clock">Replay clock: waiting for the first order…</span>
   </div>
-  <p class="caption">Replay of historical 2014–2015 orders, scored one at a time as if placed today. This is not a live 2026 feed.
-    Each order is ranked against the orders placed in the previous 30 days; the top 10% are flagged high.</p>
+
+  <p class="caption">Replay of historical 2014–2015 orders through the live scoring API, one at a time as if placed today; not a live 2026 feed.
+    Each order is ranked against the orders placed in the previous 30 days: the top 10% are <b>high</b>, the next 15% <b>elevated</b>.</p>
   <p class="banner" id="banner" hidden></p>
 
-  <section class="row" aria-label="Session figures">
-    <div class="kpi"><div class="label">Orders scored</div><div class="value" id="k-scored">0</div><div class="sub" id="k-scored-sub">this session</div></div>
-    <div class="kpi"><div class="label">High-risk alerts</div><div class="value" id="k-high">0</div><div class="sub">top 10% of the previous 30 days</div></div>
-    <div class="kpi"><div class="label">Awaiting review</div><div class="value" id="k-open">0</div><div class="sub" id="k-open-sub">high and elevated, not yet reviewed</div></div>
-    <div class="kpi"><div class="label">Explanations</div><div class="value" id="k-gran">0</div><div class="sub" id="k-gran-sub">written by IBM Granite</div></div>
+  <section class="row" aria-label="Key figures">
+    <div class="kpi"><div class="label">Shipments scored</div><div class="value" id="k-scored">0</div><div class="sub" id="k-scored-sub">since the API started</div></div>
+    <div class="kpi"><div class="label">Open alerts</div><div class="value" id="k-open" style="color:#B8470A">0</div><div class="sub" id="k-open-sub">high and elevated, not yet reviewed</div></div>
+    <div class="kpi"><div class="label">Median scoring latency</div><div class="value" id="k-lat">–</div><div class="sub" id="k-lat-sub">measured in the scoring API</div></div>
+    <div class="kpi"><div class="label">Units at risk</div><div class="value" id="k-units">0</div><div class="sub">packs in open alerts</div></div>
   </section>
 
-  <div class="live-grid">
-    <section class="card queue" aria-label="Alert queue">
-      <div class="head">
-        <h2>Alerts to review</h2>
-        <div class="officer"><label for="officer">Reviewing as</label><input id="officer" placeholder="Your name" maxlength="40"></div>
-      </div>
-      <div class="actions small muted" style="gap:6px">
-        Show:
-        <span class="seg-btns" role="group" aria-label="Filter">
-          <button data-f="open" aria-pressed="true">Open</button><button data-f="all" aria-pressed="false">All</button>
-        </span>
-      </div>
-      <div id="queue" style="display:flex;flex-direction:column;gap:12px"><div class="empty">Connecting…</div></div>
-    </section>
-
-    <section class="card feed" aria-label="Scored orders">
-      <div class="head"><h2>Every scored order</h2><span class="small muted">newest first</span></div>
-      <div id="feed"><div class="empty">No orders scored yet. Start the replay to see them arrive.</div></div>
-      <div style="margin-top:8px">
-        <div class="small muted" style="margin-bottom:6px">External signals · future slot (not in the current data)</div>
+  <div class="panels">
+    <section class="card p-feed" aria-label="Live feed">
+      <div class="head"><h2>Live feed</h2><span class="small muted" id="feed-sub">newest first</span></div>
+      <div class="feed-list" id="feed"><div class="empty">No orders yet. Start the replay to see them arrive.</div></div>
+      <div>
+        <div class="tiny muted" style="margin-bottom:6px">External signals · future slot (not in the current data)</div>
         <div class="slot"><span class="chip grey">Port congestion</span><span class="chip grey">Weather</span><span class="chip grey">Customs holds</span></div>
       </div>
+    </section>
+
+    <section class="card p-alerts" aria-label="Ranked alerts">
+      <div class="head">
+        <h2>At-risk shipments</h2>
+        <span class="small muted" style="display:flex;gap:8px;align-items:center">Rank by
+          <span class="seg-btns" role="group" aria-label="Ranking">
+            <button data-sort="qty" aria-pressed="true">Risk × quantity</button><button data-sort="risk" aria-pressed="false">Risk</button>
+          </span>
+          <label style="display:flex;gap:4px;align-items:center"><input type="checkbox" id="show-reviewed"> reviewed</label>
+        </span>
+      </div>
+      <div style="overflow-x:auto"><div style="min-width:620px">
+        <div class="grid-cols t-head"><span>#</span><span>Shipment</span><span>Destination</span><span>Product</span><span>Mode</span><span>Risk rank</span><span>Promised in</span></div>
+        <div class="t-body" id="alerts"><div class="empty">Connecting…</div></div>
+      </div></div>
+      <p class="tiny muted" style="margin:0">Risk rank: how this order's score compares with orders placed in the previous 30 days (P96 = riskier than 96% of them).
+        It is a ranking, not a probability of being late.</p>
+    </section>
+
+    <section class="card p-detail" aria-label="Alert detail" id="detail">
+      <div class="empty">Select a shipment to see why it was flagged.</div>
     </section>
   </div>
 </main>
@@ -351,165 +128,224 @@ segs: segs, thumbX: full ? '100%' : '0%', viewCaption: 'Live replay stream (/api
 <script src="app.js"></script>
 <script>
 (async function () {
-  const { esc, pct, int, num, api, apiOrSample, post, header, setPills, healthPills } = V12;
+  const { esc, int, num, api, apiOrSample, post, staticJson, header, setPills, healthPills } = V12;
   header('Live', [{ kind: 'warn', text: 'Connecting…' }]);
 
-  const alerts = new Map();          // order_id -> alert (high / elevated)
-  const feed = [];                   // recent scored orders
-  let scored = 0, granite = 0, template = 0, filter = 'open', live = false;
+  // ---- state
+  const alerts = new Map();        // order_id -> alert
+  const feed = [];                 // newest first
+  let live = false, paused = false, buffered = [], view = 'live', sortBy = 'qty', selected = null;
+  let scoredBase = 0, scoredSession = 0, health = null;
+  const sessionIds = new Set();    // alerts that arrived through the stream in this session
+  let reviewer = '';
+  try { reviewer = localStorage.getItem('v12-officer') || ''; } catch (e) { /* storage blocked */ }
 
-  const officerEl = document.getElementById('officer');
-  try { officerEl.value = localStorage.getItem('v12-officer') || ''; } catch (e) { /* storage blocked */ }
-  officerEl.addEventListener('change', () => { try { localStorage.setItem('v12-officer', officerEl.value.trim()); } catch (e) {} });
-
-  document.querySelectorAll('.seg-btns button').forEach((b) => b.addEventListener('click', () => {
-    filter = b.dataset.f;
-    document.querySelectorAll('.seg-btns button').forEach((x) => x.setAttribute('aria-pressed', x === b));
-    renderQueue();
-  }));
-
-  function runwayBadge(o) {
-    const d = o.runway_days;
-    const txt = d < 0 ? `Due ${-d} days ago` : d === 0 ? 'Due today' : `Promised in ${d} days`;
-    return `<span class="runway ${esc(o.runway_tier)}" title="Runway tier: ${esc(o.runway_tier)}">${txt}</span>`;
+  // ---- header pills: pause button + platform pill
+  function pills() {
+    const base = healthPills(health, live);
+    const top = document.getElementById('pills');
+    if (!top) return;
+    setPills(base.slice(1).length ? base.slice(1) : base);
+    if (!live) return;
+    const btn = document.createElement('button');
+    btn.className = 'pausebtn'; btn.type = 'button';
+    btn.setAttribute('aria-pressed', paused);
+    btn.innerHTML = `<span class="dot ${paused ? '' : 'ok'}" style="${paused ? 'background:#8D95A8' : ''}"></span>
+      <span>${paused ? `View paused · ${buffered.length} new` : `Live stream · ${esc(health.backend === 'snapml' ? 'Snap ML' : health.backend)} · ${esc(health.model_version)}`}</span>`;
+    btn.title = paused ? 'Resume updating the view (the replay keeps running on the server)' : 'Pause updating the view (the replay keeps running on the server)';
+    btn.onclick = () => { paused = !paused; if (!paused) { buffered.forEach(apply); buffered = []; renderAll(); } pills(); };
+    top.prepend(btn);
   }
 
-  function bandText(o) {
-    const basis = o.alert_basis && o.alert_basis.rule === 'reference'
-      ? 'vs recent scores (few orders in the last 30 days)' : 'of orders in the previous 30 days';
-    return `Riskier than ${num(o.risk_percentile, 0)}% ${basis}`;
+  // ---- helpers
+  const level = (b) => ({ high: 'High', elevated: 'Elevated', normal: 'Normal' }[b] || b);
+  const pctl = (o) => `P${num(o.risk_percentile, 0)}`;
+  const barColor = (b) => (b === 'high' ? '#B8470A' : b === 'elevated' ? '#E08A4A' : '#0F62FE');
+  const isOpen = (a) => !a.status || a.status === 'open';
+  function runwayText(d) { return d < 0 ? `${-d} days overdue` : d === 0 ? 'today' : `${d} days`; }
+  function showBanner(text, bad) { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner' + (bad ? ' bad' : ''); b.textContent = text; }
+
+  function visibleAlerts() {
+    const showReviewed = document.getElementById('show-reviewed').checked;
+    const key = sortBy === 'qty'
+      ? (a) => a.risk_score * Math.max(1, (a.context || {}).quantity || 1)
+      : (a) => a.risk_score;
+    return [...alerts.values()]
+      .filter((a) => (view === 'history' || sessionIds.has(a.order_id)) && (showReviewed || isOpen(a)))
+      .sort((a, b) => key(b) - key(a) || a.runway_days - b.runway_days);
   }
 
-  function card(o) {
-    const c = o.context || {};
-    const ex = o.explanation;
-    const d = o.typical_days_late_if_late || {};
-    const reviewed = o.status && o.status !== 'open';
-    const statusLabel = { acknowledged: 'Acknowledged', action_taken: 'Action taken', dismissed: 'Dismissed' }[o.status];
-    return `
-    <article class="alert ${esc(o.risk_band)}${reviewed ? ' reviewed' : ''}" data-id="${esc(o.order_id)}">
-      <div class="a-top">
-        <div><span class="a-title">Order ${esc(o.order_id)}</span>
-          <span class="small muted"> · ${esc(c.country || '?')} · ${esc(c.vendor || '?')} · ${esc(c.fulfillment_route || '?')}
-          ${c.product_group ? ' · ' + esc(c.product_group) : ''} · ${int(c.quantity)} units</span></div>
-        <div style="display:flex;gap:8px;align-items:center">${runwayBadge(o)}<span class="chip ${esc(o.risk_band)}">${esc(o.risk_band)}</span></div>
-      </div>
-      <div class="small muted">${bandText(o)} · risk score ${num(o.risk_score, 3)} · ordered ${esc(o.decision_date || '')}
-        · if late, typically ${num(d.median, 0)} days (usually ${num(d.q25, 0)}–${num(d.q75, 0)})</div>
-      ${(o.top_drivers || []).length ? `<ul class="drivers">${o.top_drivers.map((x) =>
-        `<li>${esc(x.text)} <span class="dir">${x.direction === 'raises risk' ? '↑ raises risk' : x.direction === 'lowers risk' ? '↓ lowers risk' : ''}</span></li>`).join('')}</ul>` : ''}
-      ${ex ? `<div class="explain">
-          <div>${esc(ex.risk_summary)}</div>
-          <div><b>Recommended:</b> ${esc(ex.recommended_action)}</div>
-          <div class="tiny muted">${esc(ex.caveat)} · ${ex.source === 'granite' ? 'Written by IBM Granite' : 'Template explanation (Granite unavailable)'}</div>
-        </div>` : ''}
-      <div class="actions">
-        ${reviewed
-          ? `<span class="chip ${o.status === 'dismissed' ? 'grey' : 'green'}">${esc(statusLabel)}</span>
-             <span class="small muted">Reviewed by ${esc(o.reviewed_by || '?')} · ${esc((o.reviewed_at || '').replace('T', ' '))}</span>
-             <button data-act="open">Reopen</button>`
-          : `<button class="primary" data-act="acknowledged">Acknowledge</button>
-             <button data-act="action_taken">Take action</button>
-             <button data-act="dismissed">Dismiss</button>`}
-      </div>
-    </article>`;
-  }
-
-  function renderQueue() {
-    const list = [...alerts.values()]
-      .filter((a) => filter === 'all' || !a.status || a.status === 'open')
-      .sort((a, b) => (b.risk_band === 'high') - (a.risk_band === 'high') || b.risk_score - a.risk_score || a.runway_days - b.runway_days);
-    const q = document.getElementById('queue');
-    q.innerHTML = list.length ? list.slice(0, 60).map(card).join('')
-      : `<div class="empty">${filter === 'open' ? 'No open alerts.' : 'No alerts yet.'} ${live ? 'Waiting for the replay…' : ''}</div>`;
-    const open = [...alerts.values()].filter((a) => !a.status || a.status === 'open').length;
-    document.getElementById('k-open').textContent = int(open);
-    document.getElementById('k-high').textContent = int([...alerts.values()].filter((a) => a.risk_band === 'high').length);
-  }
-
+  // ---- renderers
   function renderFeed() {
-    const f = document.getElementById('feed');
+    const el = document.getElementById('feed');
     if (!feed.length) return;
-    f.innerHTML = feed.slice(0, 25).map((o) => `
-      <div class="frow"><div><b>${esc(o.order_id)}</b> <span class="muted small">${esc((o.context || {}).country || '')} · ${esc((o.context || {}).fulfillment_route || '')}</span></div>
-        <div><span class="chip ${esc(o.risk_band)}">${esc(o.risk_band)}</span></div>
-        <div class="small muted">score ${num(o.risk_score, 3)} · pct ${num(o.risk_percentile, 0)} · ${o.runway_days} days runway</div>
-        <div class="small muted">${esc(o.as_of || '')}</div></div>`).join('');
+    el.innerHTML = feed.slice(0, 40).map((o) => `
+      <div class="frow"><div style="display:flex;flex-direction:column;min-width:0">
+          <span class="mono small">${esc(o.order_id)}</span>
+          <span class="small muted ellipsis">${esc(o.as_of || '')} · ${esc((o.context || {}).country || '')}</span></div>
+        <span class="tag ${esc(o.risk_band)}">${pctl(o)} · ${level(o.risk_band)}</span></div>`).join('');
   }
 
-  function renderCounts() {
-    document.getElementById('k-scored').textContent = int(scored);
-    document.getElementById('k-gran').textContent = int(granite);
-    document.getElementById('k-gran-sub').textContent = `written by IBM Granite · ${int(template)} from template`;
+  function renderAlerts() {
+    const list = visibleAlerts();
+    const el = document.getElementById('alerts');
+    if (!list.length) {
+      el.innerHTML = `<div class="empty">${view === 'live' && alerts.size ? 'No new alerts this session yet. Switch to “Live + history” to see earlier ones.'
+        : live ? 'No alerts yet. Waiting for the replay…' : 'No alerts.'}</div>`;
+    } else {
+      el.innerHTML = list.slice(0, 80).map((a, i) => {
+        const c = a.context || {};
+        return `<button type="button" class="arow grid-cols${isOpen(a) ? '' : ' reviewed'}" data-id="${esc(a.order_id)}" aria-pressed="${a.order_id === selected}">
+          <span class="muted">${i + 1}</span>
+          <span class="mono small ellipsis">${esc(a.order_id)}</span>
+          <span class="ellipsis">${esc(c.country || '?')}</span>
+          <span class="ellipsis">${esc(c.product_group || '–')}</span>
+          <span class="ellipsis">${esc(c.shipment_mode || '–')}</span>
+          <span class="riskbar"><span class="track"><span class="fill" style="width:${num(a.risk_percentile, 0)}%;background:${barColor(a.risk_band)}"></span></span>
+            <span style="width:40px;text-align:right;font-weight:600" class="num">${pctl(a)}</span></span>
+          <span class="rw ${esc(a.runway_tier)}">${runwayText(a.runway_days)}</span></button>`;
+      }).join('');
+    }
+    if (!selected && list.length) { selected = list[0].order_id; renderDetail(); el.querySelector('.arow').setAttribute('aria-pressed', 'true'); }
   }
 
-  function ingest(o, fromStream) {
-    if (fromStream) { scored += 1; feed.unshift(o); if (feed.length > 200) feed.pop(); }
-    if (o.explanation && fromStream) { o.explanation.source === 'granite' ? granite++ : template++; }
-    if (o.risk_band && o.risk_band !== 'normal') {
+  function renderDetail() {
+    const el = document.getElementById('detail');
+    const a = selected && alerts.get(selected);
+    if (!a) { el.innerHTML = '<div class="empty">Select a shipment to see why it was flagged.</div>'; return; }
+    const c = a.context || {}, d = a.typical_days_late_if_late || {}, ex = a.explanation;
+    const maxEff = Math.max(0.0001, ...(a.top_drivers || []).map((x) => Math.abs(x.effect || 0)));
+    const statusLabel = { acknowledged: 'Acknowledged', action_taken: 'Action taken', dismissed: 'Dismissed' }[a.status];
+    el.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between">
+        <div style="display:flex;flex-direction:column;min-width:0">
+          <h2 class="mono" style="font-weight:500">${esc(a.order_id)}</h2>
+          <span class="small muted">${esc(c.country || '?')} · ${esc(c.vendor || '?')} · ${int(c.quantity)} packs</span>
+          <span class="small muted">${esc(c.fulfillment_route || '')}${c.product_group ? ' · ' + esc(c.product_group) : ''}${c.shipment_mode ? ' · ' + esc(c.shipment_mode) : ''}</span>
+        </div>
+        <span class="tag ${esc(a.risk_band)}">${level(a.risk_band)}</span>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column"><span class="small muted">Risk rank</span><span class="big">${pctl(a)}</span>
+          <span class="tiny muted">riskier than ${num(a.risk_percentile, 0)}% of the last 30 days${a.alert_basis && a.alert_basis.rule === 'reference' ? ' (reference)' : ''}</span></div>
+        <div style="display:flex;flex-direction:column"><span class="small muted">Typical delay if late</span><span class="big">${num(d.median, 0)} days</span>
+          <span class="tiny muted">usually ${num(d.q25, 0)}–${num(d.q75, 0)} · historical, not a prediction</span></div>
+      </div>
+      <div class="runway-box ${esc(a.runway_tier)}">
+        <span style="font-size:15px;font-weight:600">${a.runway_days >= 0 ? `Promised in ${a.runway_days} days` : `${-a.runway_days} days overdue`}</span>
+        <span class="small">Order date ${esc(a.decision_date || '?')} · Promised ${esc(a.scheduled_delivery_date || '?')} · ${esc(a.runway_tier)} runway</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h3>Top drivers</h3>
+        ${(a.top_drivers || []).map((x) => `<div class="drv"><div class="dtop"><span>${esc(x.text)}</span>
+            <span style="font-weight:600;white-space:nowrap">${x.effect == null ? 'unknown' : (x.effect >= 0 ? '+' : '−') + num(Math.abs(x.effect) * 100, 0) + ' pts'}</span></div>
+          <div class="track"><div style="width:${x.effect == null ? 0 : (Math.abs(x.effect) / maxEff * 100).toFixed(0)}%;${x.effect < 0 ? 'background:#8D95A8' : ''}"></div></div></div>`).join('')
+          || '<span class="small muted">No single feature stood out for this order.</span>'}
+        <span class="tiny muted">pts = change in the risk score when that factor is reset to a typical value</span>
+      </div>
+      ${ex ? `<div class="why"><h3>Why this is flagged</h3><p style="margin:0">${esc(ex.risk_summary)}</p>
+          <span class="tiny muted">${ex.source === 'granite' ? 'Written by IBM Granite' : 'Template explanation (Granite unavailable)'} · ${esc(ex.caveat)}</span></div>
+        <div class="act"><h3>Recommended action</h3><p style="margin:0;font-weight:600">${esc(ex.recommended_action)}</p></div>` : ''}
+      <div class="review">
+        ${isOpen(a)
+          ? `<input id="reviewer" placeholder="Your name" maxlength="40" value="${esc(reviewer)}" aria-label="Reviewer name">
+             <button class="primary" data-act="acknowledged">Acknowledge</button><button data-act="action_taken">Take action</button><button data-act="dismissed">Dismiss</button>`
+          : `<span class="chip ${a.status === 'dismissed' ? 'grey' : 'green'}">${esc(statusLabel)}</span>
+             <span class="small muted">by ${esc(a.reviewed_by || '?')} · ${esc((a.reviewed_at || '').replace('T', ' '))}</span><button data-act="open">Reopen</button>`}
+      </div>`;
+  }
+
+  function renderKpis() {
+    document.getElementById('k-scored').textContent = int(scoredBase + scoredSession);
+    const open = [...alerts.values()].filter(isOpen);
+    document.getElementById('k-open').textContent = int(open.length);
+    document.getElementById('k-units').textContent = compact(open.reduce((s, a) => s + ((a.context || {}).quantity || 0), 0));
+    const lm = health && health.latency && health.latency.model_ms;
+    document.getElementById('k-lat').textContent = lm ? `${num(lm.median_ms, 1)} ms` : '–';
+    document.getElementById('k-lat-sub').textContent = lm ? `p95 ${num(lm.p95_ms, 1)} ms · ${int(lm.n)} orders · measured` : (live ? 'no orders scored yet' : 'sample data');
+  }
+  const compact = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : int(n));
+  function renderAll() { renderFeed(); renderAlerts(); renderDetail(); renderKpis(); }
+
+  // ---- data in
+  function apply(o) {
+    scoredSession += 1;
+    feed.unshift(o); if (feed.length > 300) feed.pop();
+    if (o.risk_band !== 'normal') {
       const prev = alerts.get(o.order_id) || {};
-      alerts.set(o.order_id, { ...o, status: prev.status || o.status || 'open',
-        reviewed_by: prev.reviewed_by || o.reviewed_by, reviewed_at: prev.reviewed_at || o.reviewed_at });
+      alerts.set(o.order_id, { ...o, status: prev.status || 'open', reviewed_by: prev.reviewed_by, reviewed_at: prev.reviewed_at });
+      sessionIds.add(o.order_id);
     }
     if (o.as_of) document.getElementById('clock').textContent = `Replay clock: ${o.as_of}`;
   }
 
-  document.getElementById('queue').addEventListener('click', async (ev) => {
-    const b = ev.target.closest('button[data-act]');
-    if (!b) return;
-    const id = b.closest('[data-id]').dataset.id;
-    const status = b.dataset.act;
-    const officer = officerEl.value.trim() || 'officer';
-    const a = alerts.get(id);
-    if (!live) {                                    // sample mode: update on screen only
-      Object.assign(a, { status, reviewed_by: officer, reviewed_at: new Date().toISOString().slice(0, 19) });
-      return renderQueue();
-    }
+  // ---- interactions
+  document.getElementById('depth').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-v]'); if (!b) return;
+    view = b.dataset.v; document.getElementById('depth').dataset.v = view;
+    document.querySelectorAll('#depth button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    renderAlerts();
+  });
+  document.querySelectorAll('[data-sort]').forEach((b) => b.addEventListener('click', () => {
+    sortBy = b.dataset.sort; document.querySelectorAll('[data-sort]').forEach((x) => x.setAttribute('aria-pressed', x === b)); renderAlerts();
+  }));
+  document.getElementById('show-reviewed').addEventListener('change', renderAlerts);
+  document.getElementById('alerts').addEventListener('click', (ev) => {
+    const b = ev.target.closest('.arow'); if (!b) return;
+    selected = b.dataset.id;
+    document.querySelectorAll('.arow').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    renderDetail();
+  });
+  document.getElementById('detail').addEventListener('input', (ev) => {
+    if (ev.target.id === 'reviewer') { reviewer = ev.target.value.trim(); try { localStorage.setItem('v12-officer', reviewer); } catch (e) {} }
+  });
+  document.getElementById('detail').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]'); if (!b) return;
+    const a = alerts.get(selected); if (!a) return;
+    const status = b.dataset.act, officer = reviewer || 'officer';
+    if (!live) { Object.assign(a, { status, reviewed_by: officer, reviewed_at: new Date().toISOString().slice(0, 19) }); return renderAll(); }
     b.disabled = true;
     try {
-      const r = await post(`/alerts/${encodeURIComponent(id)}/status?status=${status}&officer=${encodeURIComponent(officer)}`);
+      const r = await post(`/alerts/${encodeURIComponent(a.order_id)}/status?status=${status}&officer=${encodeURIComponent(officer)}`);
       Object.assign(a, { status: r.status, reviewed_by: r.reviewed_by, reviewed_at: r.reviewed_at });
-    } catch (e) {
-      showBanner(`Could not save the review: ${e.message}`, true);
-    }
-    renderQueue();
+    } catch (e) { showBanner(`Could not save the review: ${e.message}`, true); }
+    renderAll();
   });
 
-  function showBanner(text, bad) {
-    const b = document.getElementById('banner');
-    b.hidden = false; b.className = 'banner' + (bad ? ' bad' : ''); b.textContent = text;
-  }
-
-  // ---- start: health, existing alerts, then the stream
+  // ---- start
   const h = await apiOrSample('/health', 'samples/health.json');
-  live = h.live;
-  setPills(healthPills(h.data, h.live));
-  if (!h.live) {
-    showBanner(`Sample data: the scoring API is not reachable (${h.error}). Numbers below are examples, not results.`, false);
-    const s = await V12.staticJson('samples/alerts.json');
-    (s && s.alerts || []).forEach((o) => ingest(o, false));
-    scored = (s && s.alerts || []).length;
+  live = h.live; health = h.data;
+  pills();
+  if (!live) {
+    showBanner(`Sample data: the scoring API is not reachable (${h.error}). Everything below is an example, not a result.`, false);
+    const s = await staticJson('samples/alerts.json');
+    (s && s.alerts || []).forEach((o) => { feed.push(o); alerts.set(o.order_id, { ...o }); sessionIds.add(o.order_id); });
+    scoredBase = (s && s.alerts || []).length;
     document.getElementById('k-scored-sub').textContent = 'sample data';
-    renderQueue(); renderCounts();
+    document.getElementById('feed-sub').textContent = 'sample data';
+    renderAll();
     return;
   }
+  scoredBase = health.scored_since_start || 0;
   try {
-    const a = await api('/alerts?limit=200');
-    a.alerts.forEach((o) => ingest(o, false));
-  } catch (e) { showBanner(`Could not load existing alerts: ${e.message}`, true); }
-  scored = h.data.scored_since_start || 0;
-  renderQueue(); renderCounts();
+    const a = await api('/alerts?limit=500');
+    a.alerts.forEach((o) => alerts.set(o.order_id, o));            // history: scored before this page opened
+    if (!a.alerts.length) view = 'live';
+  } catch (e) { showBanner(`Could not load earlier alerts: ${e.message}`, true); }
+  renderAll();
 
   const es = new EventSource('/api/stream');
   es.addEventListener('scored', (ev) => {
     const o = JSON.parse(ev.data);
-    ingest(o, true);
-    renderQueue(); renderFeed(); renderCounts();
+    if (paused) { buffered.push(o); pills(); return; }
+    apply(o); renderAll();
   });
-  es.onopen = () => setPills(healthPills(h.data, true));
-  es.onerror = () => setPills([{ kind: 'warn', text: 'Stream reconnecting…' }, ...healthPills(h.data, true).slice(1)]);
+  es.onerror = () => { setPills([{ kind: 'warn', text: 'Stream reconnecting…' }]); };
+  es.onopen = () => pills();
+  setInterval(async () => {                                          // refresh measured latency
+    try { health = await api('/health'); scoredBase = (health.scored_since_start || 0) - scoredSession; renderKpis(); } catch (e) { /* keep last */ }
+  }, 5000);
 })();
->>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 </script>
 </body>
 </html>

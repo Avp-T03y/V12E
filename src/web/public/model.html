@@ -28,31 +28,7 @@
     from historical USAID data); not a live 2026 feed. Alerts are the top 10% of orders placed in the previous 30 days.</p>
   <p class="banner" id="banner" hidden></p>
 
-<<<<<<< HEAD
-<header style="background: #161C2D; color: #FFFFFF">
-<div style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 20px 32px 0; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
-<div style="display: flex; flex-direction: column; gap: 2px">
-<div style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">Delivery-Delay Early Warning</div>
-<div style="font-size: 14px; color: #C3CAD9">Health commodity shipments scored at order time&nbsp;</div>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
-<div style="display: flex; gap: 8px; align-items: center; padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-size: 13px">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #7FB0FF"></span>
-<span>Replay running · sample data</span>
-</div>
-<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · pending /api/metrics</div>
-</div>
-</div>
-<nav aria-label="Dashboard sections" style="display: flex; gap: 4px">
-  <a href="index.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Live</a>
-  <a href="model.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid {{accent}}; color: #FFFFFF; font-weight: 600; text-decoration: none">Model</a>
-  <a href="platform.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Platform</a>
-</nav>
-</header>
-=======
   <section class="row" aria-label="Headline metrics" id="kpis"></section>
->>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 
   <div class="row">
     <section class="card" style="flex:1.6 1 520px" aria-label="Precision-recall curve">
@@ -72,89 +48,6 @@
     </section>
   </div>
 
-<<<<<<< HEAD
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h1 style="margin: 0; font-size: 20px; font-weight: 600">Model results on the held-out test set</h1>
-<span style="font-size: 13px; color: #525A6E">Snap ML boosted trees · threshold 0.50</span>
-</div>
-
-<p style="margin: 0; font-size: 14px; color: #33405E; background: #EDEFF4; border-left: 3px solid #0F62FE; padding: 10px 14px; border-radius: 0 4px 4px 0">Awaiting live metrics from /api/metrics. Displayed figures are sample/placeholder values.</p>
-
-<section aria-label="Headline metrics" style="display: flex; flex-wrap: wrap; gap: 16px">
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">PR-AUC</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{mAuc}}</div>
-<div style="font-size: 13px; color: #525A6E">baseline {{bAuc}}</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Recall at threshold</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{recallPct}}%</div>
-<div style="font-size: 13px; color: #525A6E">{{tp}} late shipments flagged</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Precision at threshold</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{precPct}}%</div>
-<div style="font-size: 13px; color: #525A6E">{{tp}} of {{flagged}} alerts were late</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">API Endpoint status</div>
-<div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #0F62FE; margin-top: 8px">Pending API</div>
-<div style="font-size: 13px; color: #525A6E">Will load /api/metrics once ready</div>
-</div>
-</section>
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
-
-<section aria-label="Precision-recall curve" style="flex: 1.6 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Precision-recall curve</h2>
-<span style="font-size: 13px; color: #525A6E">Test set evaluation</span>
-</div>
-<svg viewBox="0 0 560 360" role="img" aria-label="PR Curve" style="width: 100%; height: auto; font-family: 'IBM Plex Sans', system-ui, sans-serif">
-<line x1="56" y1="236" x2="536" y2="236" style="stroke: #EDEFF4; stroke-width: 1px"></line>
-<line x1="56" y1="164" x2="536" y2="164" style="stroke: #EDEFF4; stroke-width: 1px"></line>
-<line x1="56" y1="92" x2="536" y2="92" style="stroke: #EDEFF4; stroke-width: 1px"></line>
-<line x1="56" y1="20" x2="536" y2="20" style="stroke: #EDEFF4; stroke-width: 1px"></line>
-<line x1="56" y1="308" x2="536" y2="308" style="stroke: #8D95A8; stroke-width: 1px"></line>
-<polyline points="{{basePts}}" style="fill: none; stroke: #525A6E; stroke-width: 2px; stroke-dasharray: 6 4"></polyline>
-<polyline points="{{modelPts}}" style="fill: none; stroke: {{accent}}; stroke-width: 3px; stroke-linejoin: round"></polyline>
-<circle cx="{{tx}}" cy="{{ty}}" r="6" style="fill: #FFFFFF; stroke: #161C2D; stroke-width: 2px"></circle>
-<text x="{{tlx}}" y="{{tly1}}" style="font-size: 13px; font-weight: 600; fill: #161C2D">Threshold 0.50</text>
-<text x="270" y="{{modelLabelY}}" style="font-size: 13px; font-weight: 600; fill: #161C2D">Boosted trees</text>
-<text x="150" y="{{baseLabelY}}" style="font-size: 13px; fill: #525A6E">Logistic baseline</text>
-<text x="48" y="24" style="font-size: 12px; fill: #525A6E; text-anchor: end">1.00</text>
-<text x="48" y="96" style="font-size: 12px; fill: #525A6E; text-anchor: end">0.75</text>
-<text x="48" y="168" style="font-size: 12px; fill: #525A6E; text-anchor: end">0.50</text>
-<text x="48" y="240" style="font-size: 12px; fill: #525A6E; text-anchor: end">0.25</text>
-<text x="48" y="312" style="font-size: 12px; fill: #525A6E; text-anchor: end">0</text>
-<text x="56" y="328" style="font-size: 12px; fill: #525A6E; text-anchor: middle">0</text>
-<text x="176" y="328" style="font-size: 12px; fill: #525A6E; text-anchor: middle">0.25</text>
-<text x="296" y="328" style="font-size: 12px; fill: #525A6E; text-anchor: middle">0.50</text>
-<text x="416" y="328" style="font-size: 12px; fill: #525A6E; text-anchor: middle">0.75</text>
-<text x="536" y="328" style="font-size: 12px; fill: #525A6E; text-anchor: end">1.00</text>
-<text x="296" y="352" style="font-size: 12px; fill: #525A6E; text-anchor: middle">Recall</text>
-<text x="56" y="12" style="font-size: 12px; fill: #525A6E">Precision</text>
-</svg>
-</section>
-
-<section aria-label="Feature importance" style="flex: 1.4 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">What drives the predictions</h2>
-<span style="font-size: 13px; color: #525A6E">Share of total feature attribution · sample data</span>
-</div>
-<div style="display: flex; flex-direction: column; gap: 10px">
-<sc-for list="{{features}}" as="f" hint-placeholder-count="6">
-<div style="display: flex; gap: 12px; align-items: center">
-<span style="flex: 0 0 210px; font-weight: {{f.fw}}">{{f.name}}</span>
-<span style="flex-grow: 1; height: 12px; background: #EDEFF4; border-radius: 3px; overflow: hidden"><span style="display: block; height: 12px; width: {{f.w}}; background: {{f.color}}"></span></span>
-<span style="flex: 0 0 44px; font-weight: 600; text-align: right">{{f.pct}}%</span>
-</div>
-</sc-for>
-</div>
-</section>
-
-</div>
-=======
   <div class="row">
     <section class="card" style="flex:1.4 1 420px" aria-label="What drives the predictions">
       <div class="head"><h2>What drives the predictions</h2><span class="small muted">drop in alerts caught when the feature is shuffled · 2013 validation year</span></div>
@@ -185,50 +78,9 @@
       <div id="validation" class="small"></div>
     </section>
   </div>
->>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 
   <section class="card" aria-label="Caveats"><h2>Read these numbers with care</h2><ul id="caveats" style="margin:0;padding-left:18px"></ul></section>
 </main>
-<<<<<<< HEAD
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F62FE","options":["#0F62FE","#0A3BA8","#005D5D"]},"$preview":{"width":1440,"height":1320}}'>
-class Component extends DCLogic {
-renderVals() {
-var accent = this.props.accent ?? '#0F62FE';
-var raw = [
-{ name: 'Fulfillment route', pct: 35 },
-{ name: 'Vendor late rate (prior)', pct: 22 },
-{ name: 'Planned lead time', pct: 18 },
-{ name: 'Country late rate (prior)', pct: 14 },
-{ name: 'Order quantity', pct: 6 },
-{ name: 'Product group', pct: 5 }
-];
-var features = raw.map(function (f, i) { return { name: f.name, pct: f.pct, w: (f.pct * 2.5) + '%', color: i === 0 ? accent : '#A9BEF2', fw: i === 0 ? 600 : 400 }; });
-var baseM = [1.0, 0.93, 0.88, 0.84, 0.79, 0.74, 0.69, 0.624, 0.47, 0.30, 0.115];
-var baseB = [0.85, 0.70, 0.62, 0.56, 0.52, 0.48, 0.43, 0.36, 0.28, 0.19, 0.115];
-function auc(c) { var a = 0; for (var i = 0; i < 10; i++) { a += (c[i] + c[i + 1]) / 2 * 0.1; } return a; }
-function at(c, r) { var i = Math.min(9, Math.floor(r * 10)); var f = r * 10 - i; return c[i] + (c[i + 1] - c[i]) * f; }
-function px(r) { return 56 + 480 * r; }
-function py(p) { return 308 - 288 * p; }
-function pts(c) { return c.map(function (p, i) { return px(i / 10).toFixed(1) + ',' + py(p).toFixed(1); }).join(' '); }
-var N = 2545, LATE = 356;
-var rM = 0.70, rB = 0.58;
-var pM = at(baseM, rM);
-var tp = Math.round(rM * LATE), fp = Math.round(tp * (1 - pM) / pM);
-var tx = px(rM), ty = py(pM);
-return {
-accent: accent, features: features,
-mAuc: auc(baseM).toFixed(2), bAuc: auc(baseB).toFixed(2),
-modelPts: pts(baseM), basePts: pts(baseB),
-tx: tx.toFixed(1), ty: ty.toFixed(1), tlx: (tx + 12).toFixed(1), tly1: (ty - 6).toFixed(1),
-modelLabelY: (py(at(baseM, 0.45)) - 16).toFixed(1), baseLabelY: (py(at(baseB, 0.43)) + 26).toFixed(1),
-recallPct: Math.round(tp / LATE * 100), precPct: Math.round(tp / (tp + fp) * 100),
-tp: tp, flagged: tp + fp
-};
-}
-}
-=======
 
 <script src="app.js"></script>
 <script>
@@ -374,7 +226,6 @@ tp: tp, flagged: tp + fp
   document.getElementById('caveats').innerHTML = (m.caveats || []).map((c) => `<li>${esc(c)}</li>`).join('') +
     (live.used_reference_fallback ? `<li>${int(live.used_reference_fallback)} test orders arrived when fewer than 30 orders had been placed in the previous 30 days; they were ranked against a fixed reference distribution instead.</li>` : '');
 })();
->>>>>>> 4838dd9ae992e5885ee8831269b725acceace8d8
 </script>
 </body>
 </html>
