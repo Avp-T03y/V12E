@@ -2,253 +2,137 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Delivery-delay early warning: platform view</title>
-<script src="./vendor/react.js"></script>
-<script src="./vendor/react-dom.js"></script>
-<script src="./support.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>
+  .flow { border: 1px dashed var(--grey); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .boxes { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+  .box { flex: 1 1 170px; border: 1px solid #C9CFDB; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .box.main { border: 2px solid var(--accent); }
+  .box .tag { align-self: flex-start; margin-top: auto; padding: 2px 8px; border-radius: 3px; background: var(--line2); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .arrow { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .cap { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--line2); }
+</style>
 </head>
 <body>
-<x-dc>
-<helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
-<style>
-body{margin:0}
-a{color:#0A3BA8}a:hover{color:#06246B}
-button{font:inherit}
-</style>
-</helmet>
-<div style="min-height: 100vh; background: #F2F4F8; color: #161C2D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45">
+<header class="top" id="top"></header>
+<main>
+  <div class="head">
+    <h1>Running on IBM LinuxONE</h1>
+    <span class="small muted">Every service below runs in a container on one s390x virtual server</span>
+  </div>
+  <p class="banner" id="banner" hidden></p>
 
-<header style="background: #161C2D; color: #FFFFFF">
-<div style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 20px 32px 0; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
-<div style="display: flex; flex-direction: column; gap: 2px">
-<div style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">Delivery-Delay Early Warning</div>
-<div style="font-size: 14px; color: #C3CAD9">Health commodity shipments scored at order time</div>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
-<div style="display: flex; gap: 8px; align-items: center; padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-size: 13px">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #7FB0FF"></span>
-<span>Replay running · sample data</span>
-</div>
-<div style="padding: 6px 12px; border: 1px solid #47506A; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px">LinuxONE · s390x · to confirm</div>
-</div>
-</div>
-<nav aria-label="Dashboard sections" style="display: flex; gap: 4px">
-  <a href="index.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Live</a>
-  <a href="model.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid transparent; color: #C3CAD9; text-decoration: none">Model</a>
-  <a href="platform.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 3px solid {{accent}}; color: #FFFFFF; font-weight: 600; text-decoration: none">Platform</a>
-</nav>
-</header>
+  <section class="row" id="kpis" aria-label="Platform figures"></section>
 
-<main style="max-width: 1440px; margin: 0 auto; box-sizing: border-box; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 24px">
+  <section class="card" aria-label="Architecture">
+    <div class="head"><h2>How an order moves through the system</h2><span class="small muted">order fields in, ranked alert with explanation out</span></div>
+    <div class="flow">
+      <div class="mono small muted">LinuxONE virtual server · s390x · Docker Compose</div>
+      <div class="boxes">
+        <div class="box"><b>Replay</b><span class="small muted">Sends historical 2014–2015 orders one at a time, with only the fields a new order has</span><span class="tag">container: replay</span></div>
+        <div class="arrow"><span class="mono tiny muted">POST /score</span><span aria-hidden="true">→</span></div>
+        <div class="box main"><b>Scoring API</b><span class="small muted">Builds past-performance features from the delivery history, scores with a Snap ML boosted-tree classifier, ranks against the last 30 days</span><span class="tag" style="background:#DCE7FF;color:#0A3BA8">container: api</span></div>
+        <div class="arrow"><span class="mono tiny muted">flagged only</span><span aria-hidden="true">→</span></div>
+        <div class="box"><b>Explanation</b><span class="small muted">IBM Granite turns the score and drivers into a reason and one action from a fixed list; a template if Granite is unavailable</span><span class="tag">container: granite</span></div>
+        <div class="arrow"><span class="mono tiny muted">GET /stream</span><span aria-hidden="true">→</span></div>
+        <div class="box"><b>Dashboard</b><span class="small muted">nginx serves these pages and forwards /api to the scoring API</span><span class="tag">container: web</span></div>
+      </div>
+    </div>
+  </section>
 
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h1 style="margin: 0; font-size: 20px; font-weight: 600">Running on IBM LinuxONE Community Cloud</h1>
-<span style="font-size: 13px; color: #525A6E">Every service below runs in a container on one s390x virtual server</span>
-</div>
+  <div class="row">
+    <section class="card" style="flex:1.5 1 520px" aria-label="Containers">
+      <div class="head"><h2>Containers</h2><span class="small muted" id="ct-sub"></span></div>
+      <div style="overflow-x:auto"><table id="containers"></table></div>
+    </section>
+    <section class="card" style="flex:1 1 380px" aria-label="Measured latency">
+      <div class="head"><h2>Measured latency</h2><span class="small muted">from the running API</span></div>
+      <div id="latency"></div>
+    </section>
+  </div>
 
-<section aria-label="Platform figures" style="display: flex; flex-wrap: wrap; gap: 16px">
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Architecture</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">s390x</div>
-<div style="font-size: 13px; color: #525A6E">3 vCPUs · 8 GB memory · 50 GB disk</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Containers running</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">3 of 3</div>
-<div style="font-size: 13px; color: #525A6E">replay, scoring API, web app · to confirm</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Scoring latency</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">4.2 ms</div>
-<div style="font-size: 13px; color: #525A6E">median · p95 9.8 ms · illustrative</div>
-</div>
-<div style="flex: 1 1 200px; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 16px 20px">
-<div style="font-size: 13px; color: #525A6E">Peak throughput</div>
-<div style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">212 / s</div>
-<div style="font-size: 13px; color: #525A6E">illustrative until a load test is run</div>
-</div>
-</section>
-
-<section aria-label="Architecture" style="background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">How a shipment moves through the system</h2>
-<span style="font-size: 13px; color: #525A6E">Order record in, ranked alert with explanation out</span>
-</div>
-<div style="border: 1px dashed #8D95A8; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #525A6E">LinuxONE virtual server · s390x · Podman</div>
-<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
-
-<div style="flex: 1 1 180px; border: 1px solid #C9CFDB; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<span style="font-weight: 600">Stream replay</span>
-<span style="font-size: 14px; color: #525A6E">Replays historical shipments one at a time, as if live</span>
-<span style="align-self: flex-start; margin-top: auto; padding: 2px 8px; border-radius: 3px; background: #EDEFF4; font-family: 'IBM Plex Mono', monospace; font-size: 12px">container: replay</span>
-</div>
-
-<div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #525A6E">POST /score</span>
-<svg viewBox="0 0 64 12" aria-hidden="true" style="width: 64px; height: 12px"><polyline points="0,6 60,6" style="fill: none; stroke: #525A6E; stroke-width: 1.5px"></polyline><polyline points="54,1 61,6 54,11" style="fill: none; stroke: #525A6E; stroke-width: 1.5px; stroke-linejoin: round"></polyline></svg>
-</div>
-
-<div style="flex: 1.3 1 220px; border: 2px solid {{accent}}; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<span style="font-weight: 600">Scoring API</span>
-<span style="font-size: 14px; color: #525A6E">FastAPI with two Snap ML models: late-risk classifier and days-late regressor</span>
-<span style="align-self: flex-start; margin-top: auto; padding: 2px 8px; border-radius: 3px; background: #DCE7FF; color: #0A3BA8; font-family: 'IBM Plex Mono', monospace; font-size: 12px">container: scoring-api</span>
-</div>
-
-<div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #525A6E">alerts only</span>
-<svg viewBox="0 0 64 12" aria-hidden="true" style="width: 64px; height: 12px"><polyline points="0,6 60,6" style="fill: none; stroke: #525A6E; stroke-width: 1.5px"></polyline><polyline points="54,1 61,6 54,11" style="fill: none; stroke: #525A6E; stroke-width: 1.5px; stroke-linejoin: round"></polyline></svg>
-</div>
-
-<div style="flex: 1 1 180px; border: 1px solid #C9CFDB; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<span style="font-weight: 600">Generative layer</span>
-<span style="font-size: 14px; color: #525A6E">Turns score and top drivers into a reason and one action from a fixed list</span>
-<span style="align-self: flex-start; margin-top: auto; padding: 2px 8px; border-radius: 3px; background: #EDEFF4; font-family: 'IBM Plex Mono', monospace; font-size: 12px">model: IBM Granite</span>
-</div>
-
-<div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #525A6E">GET /stream</span>
-<svg viewBox="0 0 64 12" aria-hidden="true" style="width: 64px; height: 12px"><polyline points="0,6 60,6" style="fill: none; stroke: #525A6E; stroke-width: 1.5px"></polyline><polyline points="54,1 61,6 54,11" style="fill: none; stroke: #525A6E; stroke-width: 1.5px; stroke-linejoin: round"></polyline></svg>
-</div>
-
-<div style="flex: 1 1 180px; border: 1px solid #C9CFDB; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
-<span style="font-weight: 600">Dashboard</span>
-<span style="font-size: 14px; color: #525A6E">Live, Model and Platform views served as one web page</span>
-<span style="align-self: flex-start; margin-top: auto; padding: 2px 8px; border-radius: 3px; background: #EDEFF4; font-family: 'IBM Plex Mono', monospace; font-size: 12px">container: web</span>
-</div>
-
-</div>
-</div>
-</section>
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
-
-<section aria-label="Containers" style="flex: 1.5 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Containers</h2>
-<span style="font-size: 13px; color: #525A6E">Resource use during the replay · illustrative</span>
-</div>
-<div style="overflow-x: auto">
-<table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px">
-<thead>
-<tr>
-<th scope="col" style="padding: 8px 12px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Name</th>
-<th scope="col" style="padding: 8px 12px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Role</th>
-<th scope="col" style="padding: 8px 12px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Status</th>
-<th scope="col" style="padding: 8px 12px 8px 0; text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">CPU</th>
-<th scope="col" style="padding: 8px 12px 8px 0; text-align: right; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Memory</th>
-<th scope="col" style="padding: 8px 0; text-align: right; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #525A6E">Uptime</th>
-</tr>
-</thead>
-<tbody>
-<sc-for list="{{containers}}" as="c" hint-placeholder-count="3">
-<tr style="border-top: 1px solid #EDEFF4">
-<td style="padding: 12px 12px 12px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px">{{c.name}}</td>
-<td style="padding: 12px 12px 12px 0">{{c.role}}</td>
-<td style="padding: 12px 12px 12px 0"><span style="padding: 2px 8px; border-radius: 3px; background: #DCE7FF; color: #0A3BA8; font-size: 13px; font-weight: 500">Running</span></td>
-<td style="padding: 12px 12px 12px 0">
-<span style="display: flex; gap: 8px; align-items: center">
-<span style="flex: 1 1 60px; height: 8px; background: #EDEFF4; border-radius: 4px; overflow: hidden"><span style="display: block; height: 8px; width: {{c.cpuW}}; background: {{accent}}"></span></span>
-<span style="flex: 0 0 36px; text-align: right">{{c.cpu}}%</span>
-</span>
-</td>
-<td style="padding: 12px 12px 12px 0; text-align: right">{{c.mem}}</td>
-<td style="padding: 12px 0; text-align: right">{{c.up}}</td>
-</tr>
-</sc-for>
-</tbody>
-</table>
-</div>
-</section>
-
-<section aria-label="Latency distribution" style="flex: 1 1 380px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Scoring latency per request</h2>
-<span style="font-size: 13px; color: #525A6E">Share of requests, by milliseconds · illustrative</span>
-</div>
-<div role="img" aria-label="Histogram of scoring latency. Most requests finish in 2 to 6 milliseconds; 5 percent take longer than 10." style="display: flex; gap: 8px; align-items: flex-end; height: 190px">
-<sc-for list="{{latency}}" as="b" hint-placeholder-count="7">
-<div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 4px">
-<span style="font-size: 13px; font-weight: 600">{{b.pct}}%</span>
-<span style="width: 100%; height: {{b.h}}; background: {{accent}}; border-radius: 3px 3px 0 0"></span>
-<span style="font-size: 12px; color: #525A6E">{{b.label}}</span>
-</div>
-</sc-for>
-</div>
-</section>
-
-</div>
-
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
-
-<section aria-label="System evidence" style="flex: 1.2 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">System evidence</h2>
-<span style="font-size: 13px; color: #525A6E">Mock-up output · replace with captured evidence</span>
-</div>
-<pre style="margin: 0; padding: 16px; background: #161C2D; color: #E6EAF2; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto">$ lscpu
-Architecture:        s390x
-CPU op-mode(s):      32-bit, 64-bit
-Byte Order:          Big Endian
-CPU(s):              3
-Vendor ID:           IBM/S390
-Machine type:        9175 (IBM z17)
-
-$ podman ps --format "{{psFormat}}"
-replay        Up 2 hours
-scoring-api   Up 2 hours
-web           Up 2 hours</pre>
-</section>
-
-<section aria-label="Platform capabilities" style="flex: 1 1 380px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE1E9; border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; font-weight: 600">Platform capabilities in use</h2>
-<div style="display: flex; flex-direction: column">
-<sc-for list="{{caps}}" as="k" hint-placeholder-count="6">
-<div style="display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 10px 0; border-top: 1px solid #EDEFF4">
-<div style="display: flex; flex-direction: column; min-width: 0">
-<span>{{k.name}}</span>
-<span style="font-size: 13px; color: #525A6E">{{k.note}}</span>
-</div>
-<span style="flex-shrink: 0; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: 500; background: {{k.bg}}; color: {{k.fg}}">{{k.status}}</span>
-</div>
-</sc-for>
-</div>
-</section>
-
-</div>
-
+  <div class="row">
+    <section class="card" style="flex:1.2 1 460px" aria-label="System evidence">
+      <div class="head"><h2>System evidence</h2><span class="small muted" id="ev-sub"></span></div>
+      <pre class="term" id="evidence">loading…</pre>
+    </section>
+    <section class="card" style="flex:1 1 380px" aria-label="Platform capabilities">
+      <h2>Platform capabilities in use</h2>
+      <div id="caps"></div>
+    </section>
+  </div>
 </main>
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F62FE","options":["#0F62FE","#0A3BA8","#005D5D"]},"$preview":{"width":1440,"height":1460}}'>
-class Component extends DCLogic {
-renderVals() {
-var containers = [
-{ name: 'scoring-api', role: 'Model scoring and explanations', cpu: 38, mem: '412 MB', up: '2 h 14 min' },
-{ name: 'replay', role: 'Shipment stream replay', cpu: 6, mem: '96 MB', up: '2 h 14 min' },
-{ name: 'web', role: 'Dashboard web app', cpu: 3, mem: '74 MB', up: '2 h 14 min' }
-].map(function (c) { return Object.assign({}, c, { cpuW: c.cpu + '%' }); });
-var latency = [
-{ label: '0–2', pct: 9 }, { label: '2–4', pct: 39 }, { label: '4–6', pct: 29 }, { label: '6–8', pct: 13 },
-{ label: '8–10', pct: 5 }, { label: '10–15', pct: 4 }, { label: '15+', pct: 1 }
-].map(function (b) { return { label: b.label, pct: b.pct, h: Math.max(2, Math.round(b.pct / 39 * 130)) + 'px' }; });
-var ok = { status: 'Verified', bg: '#DCE7FF', fg: '#0A3BA8' };
-var todo = { status: 'To confirm', bg: '#EDEFF4', fg: '#33405E' };
-var no = { status: 'Not demonstrated', bg: '#FBE3D0', fg: '#7A2E00' };
-var caps = [
-Object.assign({ name: 's390x architecture', note: 'October 16 check: S390X on z/VM; confirm with lscpu on the demo VM' }, todo),
-Object.assign({ name: 'Containerised services', note: 'Three containers under Podman, once the pod is up' }, todo),
-Object.assign({ name: 'Snap ML on s390x', note: 'Both models are trained on the VM during the event' }, todo),
-Object.assign({ name: 'TLS on the scoring API', note: 'Marked Verified only if enabled' }, todo),
-Object.assign({ name: 'IBM z17 (machine type 9175)', note: 'From the October 16 check of the instance' }, ok),
-Object.assign({ name: 'Integrated AI accelerator (NNPA)', note: 'nnpa reported enabled on October 16' }, ok),
-Object.assign({ name: 'Quantum-safe cryptography', note: 'Roadmap item; not exercised by this project' }, { status: 'Not demonstrated (roadmap)', bg: '#FBE3D0', fg: '#7A2E00' })
-];
-return { accent: this.props.accent ?? '#0F62FE', containers: containers, latency: latency, caps: caps, psFormat: '{{.Names}}  {{.Status}}' };
-}
-}
+
+<script src="app.js"></script>
+<script>
+(async function () {
+  const { esc, int, num, apiOrSample, staticJson, header, setPills, healthPills } = V12;
+  header('Platform', [{ kind: 'warn', text: 'Loading…' }]);
+
+  const [hRes, ev] = await Promise.all([apiOrSample('/health', 'samples/health.json'), staticJson('evidence.json')]);
+  const h = hRes.data || {};
+  setPills(healthPills(h, hRes.live));
+  const banner = document.getElementById('banner');
+  if (!hRes.live) {
+    banner.hidden = false;
+    banner.textContent = `Sample data: /api/health is not reachable (${hRes.error}). Values below are examples, not measurements.`;
+  }
+
+  const L = (h.latency || {});
+  const lm = L.model_ms, lg = L.granite_ms;
+  const up = h.uptime_s != null ? `${Math.floor(h.uptime_s / 3600)} h ${Math.floor(h.uptime_s % 3600 / 60)} min` : '–';
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="label">Architecture</div><div class="value">${esc(h.machine || (ev && ev.arch) || '–')}</div>
+      <div class="sub">${ev ? `${esc(ev.cpus)} vCPUs · ${esc(ev.mem_total_gb)} GB memory · ${esc(ev.disk_total_gb)} GB disk` : 'run scripts/capture_evidence.sh for CPU / memory'}</div></div>
+    <div class="kpi"><div class="label">Model</div><div class="value" style="font-size:24px">${h.backend === 'snapml' ? 'Snap ML' : esc(h.backend || '–')}</div>
+      <div class="sub">${esc(h.model_version || '')} · trained ${esc(h.trained_on || '')}</div></div>
+    <div class="kpi"><div class="label">Scoring latency</div><div class="value">${lm ? num(lm.median_ms, 1) + ' ms' : '–'}</div>
+      <div class="sub">${lm ? `median · p95 ${num(lm.p95_ms, 1)} ms · ${int(lm.n)} orders · measured` : 'no orders scored yet'}</div></div>
+    <div class="kpi"><div class="label">Granite explanation</div><div class="value">${lg ? num(lg.median_ms / 1000, 1) + ' s' : '–'}</div>
+      <div class="sub">${lg ? `median · p95 ${num(lg.p95_ms / 1000, 1)} s · ${int(lg.n)} explanations` : `status: ${esc(h.granite || '–')}`}</div></div>`;
+
+  // containers (from evidence.json written on the server)
+  const cs = (ev && ev.containers) || [];
+  document.getElementById('ct-sub').textContent = ev ? `docker stats · captured ${ev.captured_at}` : 'not captured yet';
+  document.getElementById('containers').innerHTML = cs.length ? `
+    <thead><tr><th>Name</th><th>Status</th><th class="r">CPU</th><th class="r">Memory</th></tr></thead>
+    <tbody>${cs.map((c) => `<tr><td class="mono small">${esc(c.name)}</td><td><span class="chip blue">${esc(c.status || 'running')}</span></td>
+      <td class="r num">${esc(c.cpu)}</td><td class="r num">${esc(c.mem)}</td></tr>`).join('')}</tbody>`
+    : `<tbody><tr><td><div class="empty">No captured evidence yet. On the server, run <code>bash scripts/capture_evidence.sh</code>; it writes <code>evidence.json</code> next to this page.</div></td></tr></tbody>`;
+
+  // latency detail
+  const row = (label, s, unit) => `<tr><td>${label}</td>${s ? `<td class="r num">${num(unit === 's' ? s.median_ms / 1000 : s.median_ms, unit === 's' ? 1 : 1)} ${unit}</td>
+      <td class="r num">${num(unit === 's' ? s.p95_ms / 1000 : s.p95_ms, 1)} ${unit}</td><td class="r num">${int(s.n)}</td>` : '<td class="r muted" colspan="3">no data yet</td>'}</tr>`;
+  document.getElementById('latency').innerHTML = `<table>
+    <thead><tr><th>Step</th><th class="r">Median</th><th class="r">p95</th><th class="r">Count</th></tr></thead>
+    <tbody>${row('Features + Snap ML score + ranking', lm, 'ms')}${row('IBM Granite explanation (flagged orders)', lg, 's')}${row('Whole /score request', L.score_total_ms, 'ms')}</tbody></table>
+    <p class="small muted" style="margin:8px 0 0">Measured inside the scoring API since it started (${esc(up)} ago, ${int(h.scored_since_start)} orders).</p>`;
+
+  // evidence terminal
+  document.getElementById('ev-sub').textContent = ev ? `captured ${ev.captured_at} on ${ev.host}` : 'not captured yet';
+  document.getElementById('evidence').textContent = ev
+    ? `$ lscpu\n${ev.lscpu}\n\n$ grep machine /proc/cpuinfo\nmachine type: ${ev.machine_type || '?'}\n\n$ docker compose ps\n${ev.docker_ps}`
+    : 'Run on the server:\n  bash scripts/capture_evidence.sh\nIt records lscpu, the machine type, NNPA, docker compose ps and docker stats\ninto src/web/public/evidence.json, which this page reads.';
+
+  // capabilities: Verified only from evidence or the LIVE API (never from sample data)
+  const hv = hRes.live ? h : {};
+  const ok = ['Verified', 'chip blue'], todo = ['To confirm', 'chip grey'], no = ['Not demonstrated (roadmap)', 'chip elevated'];
+  const caps = [
+    ['s390x architecture', hv.machine === 's390x' || (ev && ev.arch === 's390x') ? ok : todo, hv.machine ? `API reports ${hv.machine}` : 'from lscpu'],
+    ['IBM z17 (machine type 9175)', ev && String(ev.machine_type) === '9175' ? ok : todo, ev ? `machine type ${ev.machine_type || '?'}` : 'from /proc/cpuinfo'],
+    ['Integrated AI accelerator (NNPA)', ev && ev.nnpa ? ok : todo, ev ? (ev.nnpa ? 'nnpa in CPU features' : 'nnpa not in CPU features') : 'from /proc/cpuinfo'],
+    ['Snap ML on s390x', hv.backend === 'snapml' && hv.machine === 's390x' ? ok : todo, `scoring backend: ${hv.backend || '?'}`],
+    ['IBM Granite on the server', String(hv.granite || '').startsWith('ok') ? ok : todo, `status: ${hv.granite || '?'}`],
+    ['Containerised services (Docker Compose)', cs.length ? ok : todo, cs.length ? `${cs.length} containers in docker stats` : 'from docker compose ps'],
+    ['TLS on the scoring API', ev && ev.tls ? ok : todo, 'Verified only if enabled'],
+    ['Quantum-safe cryptography', no, 'Roadmap item; not exercised by this project'],
+  ];
+  document.getElementById('caps').innerHTML = caps.map(([name, [status, cls], note]) => `
+    <div class="cap"><div><div>${esc(name)}</div><div class="small muted">${esc(note)}</div></div><span class="${cls}">${status}</span></div>`).join('');
+})();
 </script>
 </body>
 </html>
