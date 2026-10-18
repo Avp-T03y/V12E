@@ -1,0 +1,1403 @@
+{
+  "model_version": "dev",
+  "backend": "snapml",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "training_era": "2010+",
+  "selection_rule": "max mean recall_monthly10; within 0.01, max worst-fold; then simplest",
+  "validation": {
+    "years": [
+      2011,
+      2012,
+      2013
+    ],
+    "benchmark": {
+      "name": "logistic benchmark (full features)",
+      "per_fold": {
+        "2011": {
+          "n": 1011,
+          "late": 238,
+          "late_rate": 0.2354,
+          "pr_auc": 0.2926,
+          "lift": 1.243,
+          "recall_top10": 0.0672,
+          "precision_top10": 0.1584,
+          "recall_monthly10": 0.1218,
+          "precision_monthly10": 0.2685
+        },
+        "2012": {
+          "n": 1273,
+          "late": 101,
+          "late_rate": 0.0793,
+          "pr_auc": 0.1032,
+          "lift": 1.3,
+          "recall_top10": 0.1089,
+          "precision_top10": 0.0866,
+          "recall_monthly10": 0.1089,
+          "precision_monthly10": 0.084
+        },
+        "2013": {
+          "n": 1272,
+          "late": 228,
+          "late_rate": 0.1792,
+          "pr_auc": 0.2318,
+          "lift": 1.293,
+          "recall_top10": 0.114,
+          "precision_top10": 0.2047,
+          "recall_monthly10": 0.1228,
+          "precision_monthly10": 0.2137
+        }
+      },
+      "summary": {
+        "mean_recall_monthly10": 0.1178,
+        "min_recall_monthly10": 0.1089,
+        "mean_precision_monthly10": 0.1887,
+        "mean_pr_auc": 0.2092,
+        "mean_lift": 1.279
+      }
+    },
+    "candidates": [
+      {
+        "name": "trees full r=300 lr=0.1  d=3",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3679,
+            "lift": 1.563,
+            "recall_top10": 0.1513,
+            "precision_top10": 0.3564,
+            "recall_monthly10": 0.131,
+            "precision_monthly10": 0.2886
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.116,
+            "lift": 1.462,
+            "recall_top10": 0.1386,
+            "precision_top10": 0.1102,
+            "recall_monthly10": 0.198,
+            "precision_monthly10": 0.1527
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2621,
+            "lift": 1.462,
+            "recall_top10": 0.1667,
+            "precision_top10": 0.2992,
+            "recall_monthly10": 0.1667,
+            "precision_monthly10": 0.2901
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1652,
+          "min_recall_monthly10": 0.131,
+          "mean_precision_monthly10": 0.2438,
+          "mean_pr_auc": 0.2487,
+          "mean_lift": 1.496
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.1  d=4",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 4,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3815,
+            "lift": 1.62,
+            "recall_top10": 0.1597,
+            "precision_top10": 0.3762,
+            "recall_monthly10": 0.134,
+            "precision_monthly10": 0.2953
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1144,
+            "lift": 1.442,
+            "recall_top10": 0.1683,
+            "precision_top10": 0.1339,
+            "recall_monthly10": 0.1881,
+            "precision_monthly10": 0.145
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2477,
+            "lift": 1.382,
+            "recall_top10": 0.1491,
+            "precision_top10": 0.2677,
+            "recall_monthly10": 0.1667,
+            "precision_monthly10": 0.2901
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1629,
+          "min_recall_monthly10": 0.134,
+          "mean_precision_monthly10": 0.2435,
+          "mean_pr_auc": 0.2479,
+          "mean_lift": 1.481
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.1  d=3",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3743,
+            "lift": 1.59,
+            "recall_top10": 0.1807,
+            "precision_top10": 0.4257,
+            "recall_monthly10": 0.1349,
+            "precision_monthly10": 0.2973
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1102,
+            "lift": 1.389,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.198,
+            "precision_monthly10": 0.1527
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2397,
+            "lift": 1.337,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1535,
+            "precision_monthly10": 0.2672
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1621,
+          "min_recall_monthly10": 0.1349,
+          "mean_precision_monthly10": 0.2391,
+          "mean_pr_auc": 0.2414,
+          "mean_lift": 1.439
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.1  d=4",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 4,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3621,
+            "lift": 1.538,
+            "recall_top10": 0.1176,
+            "precision_top10": 0.2772,
+            "recall_monthly10": 0.1261,
+            "precision_monthly10": 0.2778
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1145,
+            "lift": 1.443,
+            "recall_top10": 0.1782,
+            "precision_top10": 0.1417,
+            "recall_monthly10": 0.1634,
+            "precision_monthly10": 0.126
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2676,
+            "lift": 1.493,
+            "recall_top10": 0.1535,
+            "precision_top10": 0.2756,
+            "recall_monthly10": 0.1944,
+            "precision_monthly10": 0.3384
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1613,
+          "min_recall_monthly10": 0.1261,
+          "mean_precision_monthly10": 0.2474,
+          "mean_pr_auc": 0.2481,
+          "mean_lift": 1.491
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.03 d=3",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 3,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3722,
+            "lift": 1.581,
+            "recall_top10": 0.1765,
+            "precision_top10": 0.4158,
+            "recall_monthly10": 0.1487,
+            "precision_monthly10": 0.3277
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1138,
+            "lift": 1.434,
+            "recall_top10": 0.1287,
+            "precision_top10": 0.1024,
+            "recall_monthly10": 0.1931,
+            "precision_monthly10": 0.1489
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2294,
+            "lift": 1.28,
+            "recall_top10": 0.1184,
+            "precision_top10": 0.2126,
+            "recall_monthly10": 0.1404,
+            "precision_monthly10": 0.2443
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1607,
+          "min_recall_monthly10": 0.1404,
+          "mean_precision_monthly10": 0.2403,
+          "mean_pr_auc": 0.2385,
+          "mean_lift": 1.432
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.1  d=3",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3603,
+            "lift": 1.53,
+            "recall_top10": 0.1429,
+            "precision_top10": 0.3366,
+            "recall_monthly10": 0.1314,
+            "precision_monthly10": 0.2896
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1141,
+            "lift": 1.439,
+            "recall_top10": 0.1386,
+            "precision_top10": 0.1102,
+            "recall_monthly10": 0.1782,
+            "precision_monthly10": 0.1374
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2569,
+            "lift": 1.433,
+            "recall_top10": 0.1491,
+            "precision_top10": 0.2677,
+            "recall_monthly10": 0.1564,
+            "precision_monthly10": 0.2723
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1553,
+          "min_recall_monthly10": 0.1314,
+          "mean_precision_monthly10": 0.2331,
+          "mean_pr_auc": 0.2438,
+          "mean_lift": 1.467
+        }
+      },
+      {
+        "name": "trees full r=300 lr=0.1  d=2",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 2,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3586,
+            "lift": 1.523,
+            "recall_top10": 0.1513,
+            "precision_top10": 0.3564,
+            "recall_monthly10": 0.116,
+            "precision_monthly10": 0.2557
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1154,
+            "lift": 1.454,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.2079,
+            "precision_monthly10": 0.1603
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2437,
+            "lift": 1.36,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1404,
+            "precision_monthly10": 0.2443
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1548,
+          "min_recall_monthly10": 0.116,
+          "mean_precision_monthly10": 0.2201,
+          "mean_pr_auc": 0.2392,
+          "mean_lift": 1.446
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.1  d=2",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 2,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3622,
+            "lift": 1.538,
+            "recall_top10": 0.1513,
+            "precision_top10": 0.3564,
+            "recall_monthly10": 0.1335,
+            "precision_monthly10": 0.2942
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1117,
+            "lift": 1.408,
+            "recall_top10": 0.1386,
+            "precision_top10": 0.1102,
+            "recall_monthly10": 0.1832,
+            "precision_monthly10": 0.1412
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2432,
+            "lift": 1.357,
+            "recall_top10": 0.1345,
+            "precision_top10": 0.2415,
+            "recall_monthly10": 0.1404,
+            "precision_monthly10": 0.2443
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1524,
+          "min_recall_monthly10": 0.1335,
+          "mean_precision_monthly10": 0.2266,
+          "mean_pr_auc": 0.239,
+          "mean_lift": 1.434
+        }
+      },
+      {
+        "name": "trees full r=300 lr=0.03 d=3",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 3,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3758,
+            "lift": 1.596,
+            "recall_top10": 0.1765,
+            "precision_top10": 0.4158,
+            "recall_monthly10": 0.1289,
+            "precision_monthly10": 0.284
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1118,
+            "lift": 1.409,
+            "recall_top10": 0.1287,
+            "precision_top10": 0.1024,
+            "recall_monthly10": 0.1832,
+            "precision_monthly10": 0.1412
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2427,
+            "lift": 1.354,
+            "recall_top10": 0.1096,
+            "precision_top10": 0.1969,
+            "recall_monthly10": 0.1447,
+            "precision_monthly10": 0.2519
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1523,
+          "min_recall_monthly10": 0.1289,
+          "mean_precision_monthly10": 0.2257,
+          "mean_pr_auc": 0.2434,
+          "mean_lift": 1.453
+        }
+      },
+      {
+        "name": "trees full r=300 lr=0.1  d=4",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.1,
+          "max_depth": 4,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3764,
+            "lift": 1.599,
+            "recall_top10": 0.1422,
+            "precision_top10": 0.335,
+            "recall_monthly10": 0.1261,
+            "precision_monthly10": 0.2778
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1134,
+            "lift": 1.429,
+            "recall_top10": 0.1683,
+            "precision_top10": 0.1339,
+            "recall_monthly10": 0.1683,
+            "precision_monthly10": 0.1298
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2581,
+            "lift": 1.44,
+            "recall_top10": 0.1535,
+            "precision_top10": 0.2756,
+            "recall_monthly10": 0.1594,
+            "precision_monthly10": 0.2774
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1513,
+          "min_recall_monthly10": 0.1261,
+          "mean_precision_monthly10": 0.2283,
+          "mean_pr_auc": 0.2493,
+          "mean_lift": 1.489
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.03 d=4",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 4,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3766,
+            "lift": 1.6,
+            "recall_top10": 0.1681,
+            "precision_top10": 0.396,
+            "recall_monthly10": 0.144,
+            "precision_monthly10": 0.3174
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1106,
+            "lift": 1.394,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1683,
+            "precision_monthly10": 0.1298
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2454,
+            "lift": 1.369,
+            "recall_top10": 0.1316,
+            "precision_top10": 0.2362,
+            "recall_monthly10": 0.1404,
+            "precision_monthly10": 0.2443
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1509,
+          "min_recall_monthly10": 0.1404,
+          "mean_precision_monthly10": 0.2305,
+          "mean_pr_auc": 0.2442,
+          "mean_lift": 1.454
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.1  d=3",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 3,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.363,
+            "lift": 1.542,
+            "recall_top10": 0.1555,
+            "precision_top10": 0.3663,
+            "recall_monthly10": 0.141,
+            "precision_monthly10": 0.3107
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.105,
+            "lift": 1.323,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1617,
+            "precision_monthly10": 0.1247
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2487,
+            "lift": 1.388,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1447,
+            "precision_monthly10": 0.2519
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1491,
+          "min_recall_monthly10": 0.141,
+          "mean_precision_monthly10": 0.2291,
+          "mean_pr_auc": 0.2389,
+          "mean_lift": 1.418
+        }
+      },
+      {
+        "name": "trees full r=300 lr=0.03 d=2",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 2,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3513,
+            "lift": 1.492,
+            "recall_top10": 0.1471,
+            "precision_top10": 0.3465,
+            "recall_monthly10": 0.1218,
+            "precision_monthly10": 0.2685
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1069,
+            "lift": 1.347,
+            "recall_top10": 0.1089,
+            "precision_top10": 0.0866,
+            "recall_monthly10": 0.1782,
+            "precision_monthly10": 0.1374
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.232,
+            "lift": 1.295,
+            "recall_top10": 0.1096,
+            "precision_top10": 0.1969,
+            "recall_monthly10": 0.1447,
+            "precision_monthly10": 0.2519
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1482,
+          "min_recall_monthly10": 0.1218,
+          "mean_precision_monthly10": 0.2193,
+          "mean_pr_auc": 0.2301,
+          "mean_lift": 1.378
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.03 d=3",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 3,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3704,
+            "lift": 1.573,
+            "recall_top10": 0.1765,
+            "precision_top10": 0.4158,
+            "recall_monthly10": 0.119,
+            "precision_monthly10": 0.2623
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1072,
+            "lift": 1.351,
+            "recall_top10": 0.1386,
+            "precision_top10": 0.1102,
+            "recall_monthly10": 0.1733,
+            "precision_monthly10": 0.1336
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.242,
+            "lift": 1.35,
+            "recall_top10": 0.1228,
+            "precision_top10": 0.2205,
+            "recall_monthly10": 0.1491,
+            "precision_monthly10": 0.2595
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1471,
+          "min_recall_monthly10": 0.119,
+          "mean_precision_monthly10": 0.2185,
+          "mean_pr_auc": 0.2399,
+          "mean_lift": 1.425
+        }
+      },
+      {
+        "name": "trees full r=300 lr=0.03 d=4",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 4,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3751,
+            "lift": 1.593,
+            "recall_top10": 0.1555,
+            "precision_top10": 0.3663,
+            "recall_monthly10": 0.1436,
+            "precision_monthly10": 0.3164
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1101,
+            "lift": 1.387,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1485,
+            "precision_monthly10": 0.1145
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2453,
+            "lift": 1.368,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1491,
+            "precision_monthly10": 0.2595
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1471,
+          "min_recall_monthly10": 0.1436,
+          "mean_precision_monthly10": 0.2301,
+          "mean_pr_auc": 0.2435,
+          "mean_lift": 1.449
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.03 d=3",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 3,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3741,
+            "lift": 1.589,
+            "recall_top10": 0.1765,
+            "precision_top10": 0.4158,
+            "recall_monthly10": 0.1571,
+            "precision_monthly10": 0.3462
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1013,
+            "lift": 1.277,
+            "recall_top10": 0.0891,
+            "precision_top10": 0.0709,
+            "recall_monthly10": 0.1436,
+            "precision_monthly10": 0.1107
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2359,
+            "lift": 1.316,
+            "recall_top10": 0.1272,
+            "precision_top10": 0.2283,
+            "recall_monthly10": 0.1404,
+            "precision_monthly10": 0.2443
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.147,
+          "min_recall_monthly10": 0.1404,
+          "mean_precision_monthly10": 0.2337,
+          "mean_pr_auc": 0.2371,
+          "mean_lift": 1.394
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.03 d=4",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 4,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3832,
+            "lift": 1.628,
+            "recall_top10": 0.1765,
+            "precision_top10": 0.4158,
+            "recall_monthly10": 0.1377,
+            "precision_monthly10": 0.3035
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1074,
+            "lift": 1.354,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.1683,
+            "precision_monthly10": 0.1298
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2311,
+            "lift": 1.289,
+            "recall_top10": 0.1184,
+            "precision_top10": 0.2126,
+            "recall_monthly10": 0.133,
+            "precision_monthly10": 0.2316
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1463,
+          "min_recall_monthly10": 0.133,
+          "mean_precision_monthly10": 0.2216,
+          "mean_pr_auc": 0.2406,
+          "mean_lift": 1.424
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.1  d=2",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 2,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3505,
+            "lift": 1.489,
+            "recall_top10": 0.1401,
+            "precision_top10": 0.33,
+            "recall_monthly10": 0.1197,
+            "precision_monthly10": 0.2639
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1181,
+            "lift": 1.488,
+            "recall_top10": 0.1485,
+            "precision_top10": 0.1181,
+            "recall_monthly10": 0.1749,
+            "precision_monthly10": 0.1349
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2293,
+            "lift": 1.279,
+            "recall_top10": 0.1118,
+            "precision_top10": 0.2008,
+            "recall_monthly10": 0.1295,
+            "precision_monthly10": 0.2255
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1414,
+          "min_recall_monthly10": 0.1197,
+          "mean_precision_monthly10": 0.2081,
+          "mean_pr_auc": 0.2326,
+          "mean_lift": 1.419
+        }
+      },
+      {
+        "name": "trees core r=300 lr=0.03 d=2",
+        "params": {
+          "n_rounds": 300,
+          "learning_rate": 0.03,
+          "max_depth": 2,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3455,
+            "lift": 1.468,
+            "recall_top10": 0.1261,
+            "precision_top10": 0.297,
+            "recall_monthly10": 0.1127,
+            "precision_monthly10": 0.2485
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1042,
+            "lift": 1.314,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.165,
+            "precision_monthly10": 0.1272
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2344,
+            "lift": 1.308,
+            "recall_top10": 0.1404,
+            "precision_top10": 0.252,
+            "recall_monthly10": 0.1429,
+            "precision_monthly10": 0.2486
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1402,
+          "min_recall_monthly10": 0.1127,
+          "mean_precision_monthly10": 0.2081,
+          "mean_pr_auc": 0.228,
+          "mean_lift": 1.363
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.1  d=4",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 4,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3797,
+            "lift": 1.613,
+            "recall_top10": 0.1681,
+            "precision_top10": 0.396,
+            "recall_monthly10": 0.1482,
+            "precision_monthly10": 0.3266
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1067,
+            "lift": 1.345,
+            "recall_top10": 0.1584,
+            "precision_top10": 0.126,
+            "recall_monthly10": 0.1188,
+            "precision_monthly10": 0.0916
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2525,
+            "lift": 1.409,
+            "recall_top10": 0.1623,
+            "precision_top10": 0.2913,
+            "recall_monthly10": 0.1491,
+            "precision_monthly10": 0.2595
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1387,
+          "min_recall_monthly10": 0.1188,
+          "mean_precision_monthly10": 0.2259,
+          "mean_pr_auc": 0.2463,
+          "mean_lift": 1.456
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.03 d=4",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 4,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3825,
+            "lift": 1.625,
+            "recall_top10": 0.1681,
+            "precision_top10": 0.396,
+            "recall_monthly10": 0.1405,
+            "precision_monthly10": 0.3097
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.1025,
+            "lift": 1.292,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.1386,
+            "precision_monthly10": 0.1069
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2316,
+            "lift": 1.292,
+            "recall_top10": 0.1228,
+            "precision_top10": 0.2205,
+            "recall_monthly10": 0.136,
+            "precision_monthly10": 0.2366
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1384,
+          "min_recall_monthly10": 0.136,
+          "mean_precision_monthly10": 0.2177,
+          "mean_pr_auc": 0.2389,
+          "mean_lift": 1.403
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.1  d=2",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.1,
+          "max_depth": 2,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3592,
+            "lift": 1.526,
+            "recall_top10": 0.1576,
+            "precision_top10": 0.3713,
+            "recall_monthly10": 0.1197,
+            "precision_monthly10": 0.2639
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.102,
+            "lift": 1.286,
+            "recall_top10": 0.1188,
+            "precision_top10": 0.0945,
+            "recall_monthly10": 0.1502,
+            "precision_monthly10": 0.1158
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.235,
+            "lift": 1.311,
+            "recall_top10": 0.136,
+            "precision_top10": 0.2441,
+            "recall_monthly10": 0.1447,
+            "precision_monthly10": 0.2519
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1382,
+          "min_recall_monthly10": 0.1197,
+          "mean_precision_monthly10": 0.2105,
+          "mean_pr_auc": 0.2321,
+          "mean_lift": 1.374
+        }
+      },
+      {
+        "name": "trees full r=100 lr=0.03 d=2",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 2,
+          "feature_set": "full"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3493,
+            "lift": 1.484,
+            "recall_top10": 0.1447,
+            "precision_top10": 0.3409,
+            "recall_monthly10": 0.1354,
+            "precision_monthly10": 0.2985
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.0963,
+            "lift": 1.213,
+            "recall_top10": 0.099,
+            "precision_top10": 0.0787,
+            "recall_monthly10": 0.1337,
+            "precision_monthly10": 0.1031
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2289,
+            "lift": 1.277,
+            "recall_top10": 0.1023,
+            "precision_top10": 0.1837,
+            "recall_monthly10": 0.1259,
+            "precision_monthly10": 0.2192
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1317,
+          "min_recall_monthly10": 0.1259,
+          "mean_precision_monthly10": 0.2069,
+          "mean_pr_auc": 0.2248,
+          "mean_lift": 1.325
+        }
+      },
+      {
+        "name": "trees core r=100 lr=0.03 d=2",
+        "params": {
+          "n_rounds": 100,
+          "learning_rate": 0.03,
+          "max_depth": 2,
+          "feature_set": "core"
+        },
+        "per_fold": {
+          "2011": {
+            "n": 1011,
+            "late": 238,
+            "late_rate": 0.2354,
+            "pr_auc": 0.3508,
+            "lift": 1.49,
+            "recall_top10": 0.1513,
+            "precision_top10": 0.3564,
+            "recall_monthly10": 0.1312,
+            "precision_monthly10": 0.2891
+          },
+          "2012": {
+            "n": 1273,
+            "late": 101,
+            "late_rate": 0.0793,
+            "pr_auc": 0.0951,
+            "lift": 1.198,
+            "recall_top10": 0.1089,
+            "precision_top10": 0.0866,
+            "recall_monthly10": 0.1353,
+            "precision_monthly10": 0.1043
+          },
+          "2013": {
+            "n": 1272,
+            "late": 228,
+            "late_rate": 0.1792,
+            "pr_auc": 0.2275,
+            "lift": 1.269,
+            "recall_top10": 0.1014,
+            "precision_top10": 0.1821,
+            "recall_monthly10": 0.1248,
+            "precision_monthly10": 0.2171
+          }
+        },
+        "summary": {
+          "mean_recall_monthly10": 0.1304,
+          "min_recall_monthly10": 0.1248,
+          "mean_precision_monthly10": 0.2035,
+          "mean_pr_auc": 0.2245,
+          "mean_lift": 1.319
+        }
+      }
+    ],
+    "chosen": "trees full r=100 lr=0.03 d=3",
+    "chosen_params": {
+      "n_rounds": 100,
+      "learning_rate": 0.03,
+      "max_depth": 3,
+      "feature_set": "full"
+    },
+    "beats_benchmark": true
+  },
+  "test_2014_2015": {
+    "boosted (chosen)": {
+      "n": 2545,
+      "late": 356,
+      "late_rate": 0.1399,
+      "pr_auc": 0.3563,
+      "lift": 2.547,
+      "recall_top10": 0.2725,
+      "precision_top10": 0.3819,
+      "recall_monthly10": 0.2705,
+      "precision_monthly10": 0.3718
+    },
+    "logistic benchmark": {
+      "n": 2545,
+      "late": 356,
+      "late_rate": 0.1399,
+      "pr_auc": 0.2588,
+      "lift": 1.85,
+      "recall_top10": 0.1966,
+      "precision_top10": 0.2756,
+      "recall_monthly10": 0.2331,
+      "precision_monthly10": 0.3205
+    },
+    "route_excess_lookup": {
+      "n": 2545,
+      "late": 356,
+      "late_rate": 0.1399,
+      "pr_auc": 0.2915,
+      "lift": 2.084,
+      "recall_top10": 0.1943,
+      "precision_top10": 0.2723,
+      "recall_monthly10": 0.2616,
+      "precision_monthly10": 0.3595
+    },
+    "no_skill": {
+      "n": 2545,
+      "late": 356,
+      "late_rate": 0.1399,
+      "pr_auc": 0.1399,
+      "lift": 1.0,
+      "recall_top10": 0.0998,
+      "precision_top10": 0.1399,
+      "recall_monthly10": 0.1047,
+      "precision_monthly10": 0.1439
+    }
+  },
+  "alert_rule": "top 10% of each order month",
+  "importance_last_fold": {
+    "prior_excess_vendor": {
+      "pr_auc_drop": 0.0122,
+      "recall_monthly10_drop": 0.0076
+    },
+    "quantity": {
+      "pr_auc_drop": -0.0056,
+      "recall_monthly10_drop": 0.0075
+    },
+    "planned_lead_time_days": {
+      "pr_auc_drop": 0.0025,
+      "recall_monthly10_drop": 0.0047
+    },
+    "lead_time_missing": {
+      "pr_auc_drop": 0.0,
+      "recall_monthly10_drop": 0.0
+    },
+    "prior_known_vendor": {
+      "pr_auc_drop": 0.0002,
+      "recall_monthly10_drop": 0.0
+    },
+    "prior_known_fulfillment_route": {
+      "pr_auc_drop": 0.0,
+      "recall_monthly10_drop": 0.0
+    },
+    "prior_known_country": {
+      "pr_auc_drop": -0.0,
+      "recall_monthly10_drop": -0.0008
+    },
+    "prior_excess_fulfillment_route": {
+      "pr_auc_drop": -0.0096,
+      "recall_monthly10_drop": -0.0046
+    },
+    "prior_excess_country": {
+      "pr_auc_drop": 0.0046,
+      "recall_monthly10_drop": -0.009
+    }
+  },
+  "days_late": {
+    "median_2010_2013": 13.0,
+    "test_mae_of_that_median": 11.74,
+    "production": {
+      "median": 12.0,
+      "q25": 6.0,
+      "q75": 25.0
+    }
+  },
+  "production_model": {
+    "path": "/srv/v12e/models/v12e_model.pkl",
+    "trained_on": "2010-2015",
+    "n": 7305,
+    "tree_format": null,
+    "pmml": [
+      "/srv/v12e/models/v12e_member0.pmml",
+      "/srv/v12e/models/v12e_member1.pmml",
+      "/srv/v12e/models/v12e_member2.pmml"
+    ]
+  },
+  "runtime_seconds": 13.9
+}
