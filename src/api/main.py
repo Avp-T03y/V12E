@@ -44,11 +44,65 @@ MODEL_DIR = Path(os.environ.get("MODEL_DIR", ROOT / "models"))
 MODEL_FILE = os.environ.get("MODEL_FILE", "v12e_eval_model.pkl")
 HISTORY_CSV = os.environ.get("HISTORY_CSV", str(ROOT / "preprocessing" / "SCMS_Delivery_History_Dataset_20150929.csv"))
 STATE_DIR = os.environ.get("STATE_DIR", "")              # writable; the review log survives restarts here
+# Snap ML only: convert the loaded model's trees to the fastest inference format ("auto" picks the
+# NNPA/zDNN format when the accelerator is available). Off by default; /health reports the result.
+OPTIMIZE_TREES = os.environ.get("OPTIMIZE_TREES", "0") == "1"
 API_KEY = os.environ.get("V12E_API_KEY", "")
 USE_GRANITE = os.environ.get("USE_GRANITE", "1") == "1"
 STATE = {"art": None, "error": None, "alerts": {}, "subscribers": set(), "history": None, "policy": None,
          "lat_model": deque(maxlen=5000), "lat_total": deque(maxlen=5000), "lat_granite": deque(maxlen=5000),
          "granite_check": (0.0, None), "scored": 0, "started": time.time(), "reviews": {}}
+
+
+def _read(path):
+    try:
+        with open(path) as fh:
+            return fh.read()
+    except OSError:
+        return None
+
+
+def system_facts():
+    """Hardware and runtime facts readable inside the container (no Docker socket). Cached."""
+    if STATE.get("facts") is not None:
+        return STATE["facts"]
+    import re
+    import shutil
+    from importlib import metadata
+    cpuinfo = _read("/proc/cpuinfo")
+    machine_type, nnpa = None, None
+    if cpuinfo is not None:
+        m = re.search(r"machine\s*[=:]\s*(\w+)", cpuinfo)              # s390x: "... machine = 9175"
+        machine_type = m.group(1) if m else None
+        flags = set()
+        for line in cpuinfo.splitlines():
+            key = line.split(":", 1)[0].strip()
+            if key in ("features", "flags") and ":" in line:            # s390x "features", x86 "flags"
+                flags.update(line.split(":", 1)[1].split())
+        nnpa = "nnpa" in flags
+    meminfo = _read("/proc/meminfo") or ""
+    mm = re.search(r"MemTotal:\s*(\d+)\s*kB", meminfo)
+    cpu_max = (_read("/sys/fs/cgroup/cpu.max") or "").split()          # cgroup v2: "<quota> <period>" or "max ..."
+    mem_max = (_read("/sys/fs/cgroup/memory.max") or "").strip()
+    try:
+        snapml_version = metadata.version("snapml")
+    except Exception:
+        snapml_version = None
+    try:
+        disk_total_gb = round(shutil.disk_usage("/").total / 1024 ** 3, 1)
+    except OSError:
+        disk_total_gb = None
+    STATE["facts"] = {
+        "machine_type": machine_type,                                   # 9175 = IBM z17
+        "nnpa": nnpa,                                                   # accelerator AVAILABLE (CPU flag)
+        "cpus": os.cpu_count(),
+        "cpu_limit": round(int(cpu_max[0]) / int(cpu_max[1]), 2) if len(cpu_max) == 2 and cpu_max[0] != "max" else None,
+        "mem_total_gb": round(int(mm.group(1)) / 1024 ** 2, 1) if mm else None,
+        "mem_limit_gb": round(int(mem_max) / 1024 ** 3, 2) if mem_max.isdigit() else None,
+        "disk_total_gb": disk_total_gb,                                 # root filesystem as seen by the container
+        "snapml_version": snapml_version,
+    }
+    return STATE["facts"]
 
 
 def review_log():
@@ -99,6 +153,8 @@ async def lifespan(app):
         STATE["policy"] = vm.policy_from_artifact(STATE["art"])
         STATE["history"] = DeliveryHistory.from_scms(HISTORY_CSV)
         load_reviews()
+        if OPTIMIZE_TREES and STATE["art"]["backend"] == "snapml":
+            STATE["art"]["tree_format"] = STATE["art"]["model"].optimize_for_inference()
     except Exception as e:                  # keep serving /health with the reason
         STATE["error"] = f"{type(e).__name__}: {e}"
         STATE["art"] = None
@@ -171,7 +227,12 @@ def health():
             "scored_since_start": STATE["scored"], "uptime_s": round(time.time() - STATE["started"]),
             "latency": {"model_ms": latency_stats(STATE["lat_model"]),
                         "granite_ms": latency_stats(STATE["lat_granite"]),
-                        "score_total_ms": latency_stats(STATE["lat_total"])}}
+                        "score_total_ms": latency_stats(STATE["lat_total"])},
+            **system_facts(),
+            # inference tree format of the LOADED model, one per seed member. None = Snap ML's default
+            # format; the accelerator counts as used only when the format is zDNN (NNPA) tensors.
+            "tree_format": art.get("tree_format"),
+            "nnpa_used_by_model": any("zdnn" in str(f).lower() for f in (art.get("tree_format") or []))}
 
 
 @app.post("/score")
