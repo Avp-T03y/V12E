@@ -807,6 +807,11 @@ def cmd_evaluate(args):
         "flagged_share": round(f.mean(), 4),
     }
     ME = test_clean["month_end"]
+
+    def flag_nothing(late_rate):
+        """Reference: alert on nothing. Its "correct" share is high only because most orders are on time."""
+        return {"flag_nothing_correct": round(1 - late_rate, 4), "flag_nothing_type2_missed_late": round(late_rate, 4),
+                "note": "flagging no orders is 'correct' for every on-time order and catches no late ones"}
     headline_test = {
         "n": test_clean["n"], "late": test_clean["late"], "late_rate": test_clean["late_rate"],
         "boosted": test_clean["boosted"],
@@ -829,14 +834,14 @@ def cmd_evaluate(args):
                  "the test orders placed after the last training outcome",
         "alert_rule": "live: top 10% of orders placed in the previous 30 days; "
                       "month-end top 10% shown as the best case",
-        "live_alert_rule_test": test_clean["live"],
-        "test": headline_test,
+        "live_alert_rule_test": {**test_clean["live"], "error_breakdown_reference": flag_nothing(test_clean["late_rate"])},
+        "test": {**headline_test, "error_breakdown_reference": flag_nothing(test_clean["late_rate"])},
         "pr_curve": test_clean["pr_curve"],
         # the same figures on every order due 2014-2015, kept for comparison; never the headline
         "all_orders": {
             "cohort": "all orders due 2014-2015", "n_orders": int(len(test)),
-            "live_alert_rule_test": live,
-            "test": all_orders_test,
+            "live_alert_rule_test": {**live, "error_breakdown_reference": flag_nothing(float(yv.mean()))},
+            "test": {**all_orders_test, "error_breakdown_reference": flag_nothing(float(yv.mean()))},
             "pr_curve": pr_curve(alerts.label_late.values, alerts.risk_score.values),
         },
         "test_clean": test_clean,       # cohort details: cutoff, excluded orders, live-rule baselines
@@ -846,7 +851,9 @@ def cmd_evaluate(args):
                        "benchmark": report["validation"]["benchmark"]["summary"],
                        "top_candidates": [{"name": c["name"], **c["summary"]}
                                           for c in report["validation"]["candidates"][:5]]},
-        "days_late": report["days_late"],
+        # demo_model: the range the Live view shows (evaluation model, orders due 2010-2013);
+        # production: the range of the model refit on 2010-2015 for new orders
+        "days_late": {**report["days_late"], "demo_model": {**ev["days_late_if_late"], "orders": "due 2010-2013"}},
         "production_model": {**report["production_model"], "model_version": art.get("model_version")},
         "reload_check": {"rows": int(len(now)), "max_abs_diff": diff, "eval_model_max_abs_diff": ev_diff,
                          "passed": reload_ok},
