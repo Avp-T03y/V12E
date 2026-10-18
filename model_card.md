@@ -14,13 +14,14 @@
 |---|---|---|
 | Risk rank (e.g. P94) | Snap ML score, ranked against orders placed in the previous 30 days | Top 10% = high, next 15% = elevated. **Not a calibrated probability** |
 | Typical delay if late | Historical median and middle half of late orders due 2010–2013: 13 days (5–25) | **Not a per-order prediction.** No regressor shipped: none beat the median (its test MAE is 11.74 days) |
-| Runway ("Promised in N days") | Promised delivery date minus order date | long >120 d · medium 45–120 d · short <45 d |
-| Explanation | Template built from the score and top drivers | IBM Granite tested (about 2.9 s per sentence), **off in the demo** |
+| Runway ("Promised in N days") | Promised delivery date minus order date (PO sent date, or PQ first-sent date when there is no PO) | long >120 d · medium 45–120 d · short <45 d |
+| Explanation | Template built from the score and top drivers | IBM Granite installed and tested (about 3–8 s per sentence in our tests), **off in the demo** |
 
 ## 3. Data
 - **Source:** USAID/PEPFAR SCMS shipments: 10,324 shipments, 2006–2015, 43 countries. HIV treatment drugs (ARVs) and test kits, plus a small malaria subset (46 rows).
-- **Late rate:** 11.5% overall (train 10.7%, test 14.0%). From RDC 17.2% vs Direct Drop 5.3%; From RDC is 78% of late shipments.
+- **Late rate:** 11.5% overall (train, due 2010–2013: 4,760 orders, 758 late, 15.9%; test, due 2014–2015: 2,545 orders, 356 late, 14.0%). From RDC 17.2% vs Direct Drop 5.3%; From RDC is 78% of late shipments.
 - **Split (by promised delivery date):** trained on orders due 2010–2013, with selection on rolling folds due 2011, 2012, 2013; tested on orders due 2014–2015, scored once.
+- **Training era 2010+:** orders due 2006–2009 had a 0–4% late rate and mostly missing decision dates, so they are not used for training.
 - **Headline evaluation set:** the 1,734 test orders **placed after 25 Feb 2014**, the last outcome in the training data (164 late, 9.5%). The other 811 (192 late, 23.7%) were placed earlier, so the model had learned from outcomes that came after they were placed. All-orders figures are shown for comparison.
 - **Features (9):** `prior_excess_vendor`, `prior_excess_country`, `prior_excess_fulfillment_route`, `prior_known_vendor`, `prior_known_country`, `prior_known_fulfillment_route`, `quantity`, `planned_lead_time_days`, `lead_time_missing`. Past-performance priors use only shipments delivered before each order's cutoff (leakage-safe).
 - **Reload check:** scores are identical after save → reload (max difference 0.0 across 2,545 rows).
@@ -35,13 +36,13 @@
 | Logistic regression | 12.0% | 38.4% | 30.3% | 0.27 | 2.81× |
 | Route late-rate lookup | 17.0% | 44.5% | 24.8% | 0.28 | 2.92× |
 | Vendor late-rate lookup | 14.1% | 44.5% | 29.9% | 0.30 | 3.14× |
-| No skill (random ranking) | 10.0% | 10.0% | 9.5% | 0.09 | 1.00× |
+| No skill (random ranking, expected) | 10.0% | 10.0% | 9.5% | 0.09 | 1.00× |
 
 No skill is a random ranking flagging the same top 10%; its alerts are late at the base rate. The final model is **comparable to simple baselines** on this set; the vendor lookup has a higher PR-AUC.
 
 **All orders due 2014–2015 (2,545 orders, late rate 14.0%)**
 
-| Approach | PR-AUC | Lift (month-end) |
+| Approach | PR-AUC | Lift (PR-AUC vs no skill) |
 |---|---|---|
 | Snap ML boosted trees (final) | 0.36 | 2.55× |
 | Logistic regression | 0.26 | 1.85× |
@@ -70,7 +71,7 @@ Live rule on all orders: flagged 12.2%, caught 26.4% (94 of 356), alerts that we
 | All 2014–2015, month-end | 83.5% | 6.3% | 10.1% |
 | Flag nothing (reference) | 86.0% | 0% | 14.0% |
 
-"Correct" is lower than flagging nothing because most orders are on time, so accuracy is not our headline. We favor recall: a missed late shipment can mean a clinic stockout, while a false alarm costs a follow-up call.
+"Correct" is lower than flagging nothing because most orders are on time, so accuracy is not our headline. We aim to catch as many late shipments as possible within a fixed alert budget: a missed late shipment can mean a clinic stockout, while a false alarm costs a follow-up call.
 
 **What drives the predictions** (drop in PR-AUC when a feature is shuffled): `prior_excess_vendor` +0.012, `prior_excess_country` +0.005, `planned_lead_time_days` +0.003; `quantity` and `prior_excess_fulfillment_route` slightly negative. These effects are small, so treat importance as indicative.
 
