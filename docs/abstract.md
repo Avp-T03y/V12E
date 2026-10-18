@@ -1,10 +1,3 @@
-# Abstract
-
-**V12 Engines_IBM Z Datathon 2026 Project** · Event code: **SSF2026**
-
-## For the GitHub README (Markdown)
-
-
 ## Abstract
 
 **V12 Engines_IBM Z Datathon 2026 Project** · Event code: **SSF2026**
