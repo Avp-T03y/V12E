@@ -64,7 +64,7 @@ Show a visible time check at 1:00 and 2:00. Record a backup clip of the working 
 
 ---
 
-## D. "Why us":How V12 Engines Compares to Market Alternatives competitor framing (sourced)
+## More info on "Why us":How V12 Engines Compares to Market Alternatives competitor framing (sourced)
 
 1. Manual Tracking (Calls & Emails with Carriers / Forwarders)
 What it does: Relies on human knowledge, phone calls, and email follow-ups with carriers to sense delays.
@@ -103,7 +103,7 @@ Limitations: Designed for high-level enterprise planning rather than delivering 
 
 ---
 
-## E. Sources
+## Sources
 
 1. project44, [What is predicted ETA in supply chain](https://www.project44.com/resources/what-is-predicted-estimated-time-of-arrival-in-supply-chain/)
 2. project44, [Truckload visibility](https://www.project44.com/platform/visibility/over-the-road)
