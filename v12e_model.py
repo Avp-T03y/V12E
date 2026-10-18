@@ -10,6 +10,9 @@ One file, three commands (plus a small Python API for the scoring service):
   python v12e_model.py evaluate --model models --data data
       Reload the saved model, check its scores are identical to the ones recorded at save
       time, and write models/metrics.json (the /metrics payload for the API and dashboard).
+      The split is by promised (scheduled) delivery date, so some test orders were placed before
+      the last outcome in the training data. evaluate reports a "clean test" of only the orders
+      placed after that date; it is the headline in metrics.json.
 
   python v12e_model.py score --model models/v12e_model.pkl --input new_orders.csv --out alerts.csv
       Score new orders (same columns as the v3 feature tables) and flag the top 10% of
@@ -681,7 +684,7 @@ def cmd_evaluate(args):
     art = load_artifact(mdir)
     report = json.loads((mdir / "report.json").read_text())
     alerts = pd.read_csv(mdir / "test_alerts.csv")
-    _, test = load(args.data)
+    train, test = load(args.data)
 
     # 1. save -> reload check: identical scores on the test rows
     recorded = np.load(mdir / "reload_check.npy")
@@ -722,6 +725,69 @@ def cmd_evaluate(args):
           f"{live['error_breakdown']['correct']:.1%} · Type I {live['error_breakdown']['type1_false_alarm']:.1%} · "
           f"Type II {live['error_breakdown']['type2_missed_late']:.1%}")
 
+    # 1c. clean test. The split is by promised delivery date, so orders due 2014-2015 include orders
+    #     placed in 2012-2013, before outcomes the evaluation model was trained on had happened. The
+    #     clean test keeps only orders placed after the last training outcome: the model could have
+    #     been trained before every one of them, as in deployment.
+    era = train[train.year >= ERA_START]
+    sched = pd.to_datetime(era["scheduled_delivery_date"])
+    known = sched + pd.to_timedelta(era["days_late"].clip(lower=0).fillna(0), unit="D")   # late: delivery date
+    cutoff = known.max().normalize()                                                       # on time: <= promised
+    clean = (t_dates > cutoff).values
+    yc, sc, mc = yv[clean], ev_scores[clean], test["alert_month"].values[clean]
+    med = float(era.planned_lead_time_days.median())
+    logit_score = logistic_benchmark(matrix(era, "full", med), era.label_late)(matrix(test, "full", med))
+    month_flag = monthly_flags(sc, mc).astype(bool)
+    excl = ~clean
+
+    # the same live 30-day rule applied to each baseline score (its own rolling window), for a fair comparison
+    era_dates = pd.to_datetime(era["decision_date"]).fillna(pd.to_datetime(era["scheduled_delivery_date"]))
+    logit_era = logistic_benchmark(matrix(era, "full", med), era.label_late)(matrix(era, "full", med))
+
+    def live_rule_on(score_era, score_test):
+        last_year = (era.year == era.year.max()).values
+        pol = RollingAlertPolicy(list(era.order_id.astype(str)) + list(test.order_id.astype(str)),
+                                 list(era_dates) + list(t_dates), list(score_era) + list(score_test),
+                                 np.quantile(score_era[last_year], np.linspace(0, 1, 101)))
+        flags = np.array([pol.rank(v, d)[0] == "high" for v, d in zip(score_test, t_dates)])
+        return rule_summary(flags[clean], yc)
+
+    live_baselines = {
+        "logistic_benchmark": live_rule_on(logit_era, logit_score),
+        "route_excess_lookup": live_rule_on(era.prior_excess_fulfillment_route.values, test.prior_excess_fulfillment_route.values),
+        "vendor_excess_lookup": live_rule_on(era.prior_excess_vendor.values, test.prior_excess_vendor.values),
+    }
+    test_clean = {
+        "definition": "orders due 2014-2015 that were placed after the last outcome in the training data",
+        "cutoff_last_training_outcome": str(cutoff.date()),
+        "first_order_date": str((cutoff + pd.Timedelta(days=1)).date()),
+        "n": int(clean.sum()), "late": int(yc.sum()), "late_rate": round(float(yc.mean()), 4),
+        "excluded": {"n": int(excl.sum()), "late": int(yv[excl].sum()),
+                     "late_rate": round(float(yv[excl].mean()), 4) if excl.any() else None},
+        "boosted": metrics(yc, sc, mc),
+        "live": {"rule": live["rule"], **rule_summary(live_flag[clean], yc)},
+        "month_end": rule_summary(month_flag, yc),
+        "baselines": {
+            "logistic_benchmark": metrics(yc, logit_score[clean], mc),
+            "route_excess_lookup": metrics(yc, test.prior_excess_fulfillment_route.values[clean], mc),
+            "vendor_excess_lookup": metrics(yc, test.prior_excess_vendor.values[clean], mc),
+            "no_skill": metrics(yc, np.full(clean.sum(), era.label_late.mean()), mc),
+        },
+        "live_baselines": live_baselines,
+        "pr_curve": pr_curve(yc, sc),
+    }
+    L = test_clean["live"]
+    print(f"clean test (placed after {cutoff.date()}, the last training outcome): {test_clean['n']} orders, "
+          f"{test_clean['late']} late ({test_clean['late_rate']:.1%}); excluded {test_clean['excluded']['n']} placed earlier")
+    print(f"  live rule: flags {L['flagged_share']:.1%} · recall {L['recall']:.1%} · precision {L['precision']:.1%} · "
+          f"PR-AUC {test_clean['boosted']['pr_auc']:.3f} (lift {test_clean['boosted']['lift']:.2f})")
+    for k, v in live_baselines.items():
+        print(f"  live rule, {k:<22} flags {v['flagged_share']:.1%} · recall {v['recall']:.1%} · precision {v['precision']:.1%}")
+    b = test_clean["baselines"]
+    print("  month-end top 10%, caught: boosted {:.1%} · logistic {:.1%} · route lookup {:.1%} · vendor lookup {:.1%}".format(
+        test_clean["boosted"]["recall_monthly10"], b["logistic_benchmark"]["recall_monthly10"],
+        b["route_excess_lookup"]["recall_monthly10"], b["vendor_excess_lookup"]["recall_monthly10"]))
+
     # 2. error breakdown of the monthly top-10% alert rule (evaluation model, 2014-2015)
     f, y = alerts.flagged_monthly_top10.values, alerts.label_late.values
     tp, fp = int(((f == 1) & (y == 1)).sum()), int(((f == 1) & (y == 0)).sum())
@@ -731,9 +797,12 @@ def cmd_evaluate(args):
     metrics_payload = {
         "model_version": art.get("model_version"),
         "backend": art["backend"],
-        "split": "train 2010-2013 (selection on rolling folds 2011/2012/2013) / test 2014-2015, scored once",
+        "split": "by promised (scheduled) delivery date: train = orders due 2010-2013 (selection on rolling "
+                 "folds due 2011/2012/2013), test = orders due 2014-2015, scored once. Headline: test_clean, "
+                 "the test orders placed after the last training outcome",
         "alert_rule": "live: top 10% of orders placed in the previous 30 days; "
                       "month-end top 10% shown as the best case",
+        "test_clean": test_clean,
         "live_alert_rule_test": live,
         "test": {
             "boosted": test_m["boosted (chosen)"],
@@ -758,7 +827,12 @@ def cmd_evaluate(args):
         "reload_check": {"rows": int(len(now)), "max_abs_diff": diff, "eval_model_max_abs_diff": ev_diff,
                          "passed": reload_ok},
         "caveats": [
-            "Historical replay of 2006-2015 data, not a live feed.",
+            "The data is split by promised delivery date: the model is trained on orders due 2010-2013 and tested "
+            "on orders due 2014-2015. The demo is a replay of those orders, not a live feed.",
+            f"{test_clean['excluded']['n']} of {len(test)} test orders were placed before {cutoff.date()}, the last "
+            "outcome in the training data, so the model learned from outcomes that came after they were placed. "
+            "Headline figures use only the orders placed after that date; all-orders figures are shown for comparison.",
+            "Model selection on the validation years (orders due 2011-2013) has the same overlap and was not re-run.",
             "risk_score ranks orders; it is not a calibrated probability.",
             "Days late is the historical median and middle half, not a per-order prediction.",
             "Test years were also viewed during the baseline study; treat test numbers as indicative.",
@@ -771,6 +845,19 @@ def cmd_evaluate(args):
     print(f"written: {mdir / 'metrics.json'}")
     if not reload_ok:
         raise SystemExit("reload check FAILED: the saved model does not reproduce its scores")
+
+
+def rule_summary(flag, y):
+    """Confusion counts and error shares for a set of alert flags."""
+    flag, y = np.asarray(flag, dtype=bool), np.asarray(y) == 1
+    tp, fp = int((flag & y).sum()), int((flag & ~y).sum())
+    fn, tn = int((~flag & y).sum()), int((~flag & ~y).sum())
+    n = max(1, len(y))
+    return {"flagged_share": round(float(flag.mean()), 4) if len(flag) else 0.0,
+            "recall": round(tp / max(1, tp + fn), 4), "precision": round(tp / max(1, tp + fp), 4),
+            "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
+            "error_breakdown": {"correct": round((tp + tn) / n, 4), "type1_false_alarm": round(fp / n, 4),
+                                "type2_missed_late": round(fn / n, 4)}}
 
 
 def pr_curve(y, score, points=50):
