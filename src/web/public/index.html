@@ -80,7 +80,7 @@
     <span class="small muted" id="clock">Replay clock: waiting for the first order…</span>
   </div>
 
-  <p class="caption">Replay of historical 2014–2015 orders through the live scoring API, one at a time as if placed today; not a live 2026 feed.
+  <p class="caption">Replay of historical orders due 2014–2015, placed from 26 Feb 2014 onward, sent one at a time through the live scoring API as if placed today; not a live 2026 feed.
     Each order is ranked against the orders placed in the previous 30 days: the top 10% are <b>high</b>, the next 15% <b>elevated</b>.</p>
   <p class="banner" id="banner" hidden></p>
 
@@ -244,7 +244,7 @@
         <span class="tiny muted">pts = change in the risk score when that factor is reset to a typical value</span>
       </div>
       ${ex ? `<div class="why"><h3>Why this is flagged</h3><p style="margin:0">${esc(ex.risk_summary)}</p>
-          <span class="tiny muted">${ex.source === 'granite' ? 'Written by IBM Granite' : 'Template explanation (Granite unavailable)'} · ${esc(ex.caveat)}</span></div>
+          <span class="tiny muted">${ex.source === 'granite' ? 'Written by IBM Granite' : 'Template explanation (Granite off)'} · ${esc(ex.caveat)}</span></div>
         <div class="act"><h3>Recommended action</h3><p style="margin:0;font-weight:600">${esc(ex.recommended_action)}</p></div>` : ''}
       <div class="review">
         ${isOpen(a)

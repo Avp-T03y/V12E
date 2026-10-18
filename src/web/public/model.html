@@ -24,7 +24,7 @@
     <h1>Model results on the held-out test set</h1>
     <span class="small muted" id="subtitle">loading /api/metrics…</span>
   </div>
-  <p class="caption">Evaluated once on later shipments the model never saw (trained on 2010–2013, tested on 2014–2015 orders
+  <p class="caption">Evaluated once on later shipments the model never saw (trained on orders due 2010–2013, tested on orders due 2014–2015
     from historical USAID data); not a live 2026 feed. Alerts are the top 10% of orders placed in the previous 30 days.</p>
   <p class="banner" id="banner" hidden></p>
 
@@ -34,6 +34,7 @@
     <section class="card" style="flex:1.6 1 520px" aria-label="Precision-recall curve">
       <div class="head"><h2>Precision–recall curve</h2><span class="small muted" id="pr-sub"></span></div>
       <div id="pr"></div>
+      <p class="small muted" style="margin:0">Line: the model's ranking with hindsight (one cut-off over the whole test set). Dot: the live 30-day rule, deciding each order when it's placed.</p>
       <p class="small muted" style="margin:0" id="pr-note"></p>
     </section>
     <section class="card" style="flex:1 1 340px" aria-label="Confusion matrix">
@@ -70,7 +71,7 @@
 
   <div class="row">
     <section class="card" style="flex:1.4 1 520px" aria-label="Baselines">
-      <div class="head"><h2>Final model against simpler approaches</h2><span class="small muted">2014–2015 test set</span></div>
+      <div class="head"><h2>Final model against simpler approaches</h2><span class="small muted">Test orders due 2014–2015</span></div>
       <div style="overflow-x:auto"><table id="baselines"></table></div>
     </section>
     <section class="card" style="flex:1 1 340px" aria-label="How the model was chosen">
@@ -131,19 +132,19 @@
     const yl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="48" y="${py(v) + 4}" font-size="12" fill="#525A6E" text-anchor="end">${v.toFixed(2)}</text>`).join('');
     const xl = [0, 0.25, 0.5, 0.75, 1].map((v) => `<text x="${px(v)}" y="328" font-size="12" fill="#525A6E" text-anchor="middle">${v.toFixed(2)}</text>`).join('');
     document.getElementById('pr').innerHTML = `
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Precision against recall on the 2014-2015 test set; PR-AUC ${num(B.pr_auc)} against a no-skill rate of ${num(base)}"
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Precision against recall on test orders due 2014-2015; PR-AUC ${num(B.pr_auc)} against a no-skill rate of ${num(base)}"
         style="width:100%;height:auto;font-family:'IBM Plex Sans',system-ui,sans-serif">
         ${grid}<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#8D95A8"/>
         <line x1="${x0}" y1="${py(base)}" x2="${x1}" y2="${py(base)}" stroke="#8D95A8" stroke-dasharray="2 4"/>
-        <text x="${x1 - 4}" y="${py(base) - 6}" font-size="12" fill="#525A6E" text-anchor="end">No-skill rate ${num(base)}</text>
+        <text x="${x1 - 12}" y="${py(base) - 12}" font-size="12" fill="#525A6E" text-anchor="end">No-skill rate ${num(base)}</text>
         <polyline points="${pts}" fill="none" stroke="#0F62FE" stroke-width="3" stroke-linejoin="round"/>
         <circle cx="${px(op.r)}" cy="${py(op.p)}" r="6" fill="#fff" stroke="#161C2D" stroke-width="2"/>
-        <text x="${px(op.r) + 12}" y="${py(op.p) - 8}" font-size="13" font-weight="600" fill="#161C2D">Live alert rule</text>
+        <text x="${px(op.r) + 14}" y="${py(op.p) - 18}" font-size="13" font-weight="600" fill="#161C2D">Live alert rule</text>
         ${yl}${xl}
         <text x="${(x0 + x1) / 2}" y="352" font-size="12" fill="#525A6E" text-anchor="middle">Recall (share of late shipments caught)</text>
         <text x="${x0}" y="12" font-size="12" fill="#525A6E">Precision (share of alerts that were late)</text>
       </svg>`;
-    document.getElementById('pr-sub').textContent = `Test 2014–2015 · late rate ${pct(base)}`;
+    document.getElementById('pr-sub').textContent = `Test orders due 2014–2015 · late rate ${pct(base)}`;
     document.getElementById('pr-note').textContent =
       `Live alert rule: recall ${num(op.r)}, precision ${num(op.p)}. The curve shows every other alert budget the same model could run at.`;
   })();
@@ -209,7 +210,7 @@
       <td class="r num">${pct(r.recall_monthly10)}</td><td class="r num">${pct(r.precision_monthly10)}</td>
       <td class="r num">${num(r.pr_auc)}</td><td class="r num">${num(r.lift, 2)}×</td></tr>`).join('')}</tbody>`;
   document.getElementById('baselines').insertAdjacentHTML('afterend',
-    '<p class="small muted" style="margin:8px 0 0">Caught / alerts late: top 10% of each order month, the same budget for every approach.</p>');
+    '<p class="small muted" style="margin:8px 0 0">Caught / alerts late: top 10% of each order month, the same budget for every approach. Averaged across order months; the confusion matrix pools all months, so its percentages differ slightly.</p>');
 
   // ---- validation
   const v = m.validation || {};
