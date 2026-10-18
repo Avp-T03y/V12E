@@ -56,7 +56,15 @@ Here is the shortened, punchy version of your script, trimmed down to fit smooth
 
 *(On-Screen: Dashboard, Model, and Platform Demo)*
 
-> "In our live dashboard replay, orders are evaluated instantly at under 107 milliseconds latency. On our model tab, we achieve a PR-AUC of 0.28 against a 0.09 baseline on future test data, prioritizing high recall. And on our platform tab, everything runs securely on IBM LinuxONE containers via Docker Compose."
+> Here, we are looking at our live dashboard interface, replaying historical orders through our scoring API. Each incoming order is evaluated at order time, displaying real-time metrics like units at risk, median scoring latency of under 107 milliseconds, and open risk alerts." 
+
+ [On Screen: Clicking through 'Model' tab and looking at PR-AUC & confusion matrix]
+
+"Switching to our model tab, we evaluate performance strictly on future held-out test data. Using our Snap ML boosted-tree classifier, we achieve a strong PR-AUC compared to the no-skill baseline, optimizing for high recall to ensure we catch critical delays before they impact patients." 
+
+ [On Screen: Clicking through 'Platform' tab showing IBM LinuxONE containers]
+
+"Finally, looking under the hood at our Platform tab, everything runs natively on IBM LinuxONE using s390x architecture and Docker Compose containers. We feature tunnel-only SSH encryption, active scoring logs, and template-based explanations designed for transparent, secure healthcare logistics.
 > 
 > 
 
