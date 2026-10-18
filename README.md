@@ -3,12 +3,6 @@
 # V12 Engines
 ### Order-time delivery-delay early warning for global HIV supply chains
 
-![IBM LinuxONE](https://img.shields.io/badge/IBM-LinuxONE%20s390x-054ADA)
-![Snap ML](https://img.shields.io/badge/Snap%20ML-1.17.2-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688)
-![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED)
-![Event code](https://img.shields.io/badge/Event%20code-SSF2026-orange)
-
 **IBM Z Datathon 2026 · Event code: SSF2026**
 
 <!-- TODO: add a dashboard screenshot or GIF: <img src="docs/dashboard.png" width="800" alt="V12 Engines Live view"> -->
